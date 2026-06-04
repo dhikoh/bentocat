@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             OutletSeeder::class,
             ShippingContactSeeder::class,
             ArticleSeeder::class,
+            SettingSeeder::class,
         ]);
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ShippingContactController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ClientController;
 
 // Public client routes (Fase 3 & 4)
@@ -69,5 +70,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
         Route::get('/leads/export', [LeadController::class, 'exportCsv'])->name('leads.export');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+
+        // Website Settings (Superadmin only)
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
     });
 });

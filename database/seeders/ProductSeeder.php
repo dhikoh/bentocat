@@ -28,8 +28,8 @@ class ProductSeeder extends Seeder
         ]);
 
         // Level 2: Aromas
-        $aromas = ['Coffee Scent', 'Lavender Scent', 'Lemon Scent', 'Baby Powder Scent', 'Apple Scent'];
-        $sizes = ['5 Liter', '10 Liter'];
+        $aromas = ['Lavender', 'Lemon', 'Apple', 'Strawberry', 'Melon'];
+        $sizes = ['5.5 kg', '10 kg', '25 kg'];
 
         foreach ($aromas as $aroma) {
             $aromaVariant = ProductVariant::create([
