@@ -54,7 +54,7 @@
                         <div class="flex-1">
                             <input type="file" name="site_logo" id="site_logo" accept="image/*"
                                    class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 file:cursor-pointer">
-                            <p class="text-[10px] text-slate-500 mt-1">Format: PNG, JPG, JPEG, SVG. Maks 2MB.</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Format: PNG, JPG, JPEG, SVG. Maks 20MB.</p>
                         </div>
                     </div>
                 </div>

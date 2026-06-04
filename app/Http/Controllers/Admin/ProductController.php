@@ -33,7 +33,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
-            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
         ]);
@@ -72,7 +72,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
-            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
         ]);

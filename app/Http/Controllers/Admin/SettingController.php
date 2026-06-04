@@ -32,7 +32,7 @@ class SettingController extends Controller
             'contact_whatsapp' => 'nullable|string|max:20',
             'social_instagram' => 'nullable|url|max:255',
             'social_facebook' => 'nullable|url|max:255',
-            'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:20480',
             'site_favicon' => 'nullable|image|mimes:ico,png,jpg,jpeg|max:512',
         ]);
 

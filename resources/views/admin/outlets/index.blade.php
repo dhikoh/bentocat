@@ -18,6 +18,33 @@
             </a>
         </div>
     </div>
+ 
+    <!-- Summary Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex items-center justify-between">
+            <div>
+                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Distributor Penyuplai</span>
+                <span class="block text-2xl font-extrabold text-white mt-1">{{ $countDistributors }}</span>
+            </div>
+            <span class="text-2xl bg-blue-500/10 p-3 rounded-xl border border-blue-500/20 text-blue-400">🏢</span>
+        </div>
+        
+        <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex items-center justify-between">
+            <div>
+                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Petshop Mitra Resmi</span>
+                <span class="block text-2xl font-extrabold text-white mt-1">{{ $countMitra }}</span>
+            </div>
+            <span class="text-2xl bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-amber-400">🛡️</span>
+        </div>
+
+        <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl flex items-center justify-between">
+            <div>
+                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Petshop Non-Mitra</span>
+                <span class="block text-2xl font-extrabold text-white mt-1">{{ $countNonMitra }}</span>
+            </div>
+            <span class="text-2xl bg-slate-800 p-3 rounded-xl border border-slate-700 text-slate-400">🏪</span>
+        </div>
+    </div>
 
     <!-- CSV Bulk Import Panel -->
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">

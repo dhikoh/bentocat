@@ -35,7 +35,7 @@
                             <div class="flex flex-col items-center text-center space-y-2 pointer-events-none">
                                 <span class="text-3xl text-slate-500 group-hover:scale-110 transition-transform">📷</span>
                                 <span class="text-xs font-semibold text-slate-300">Pilih File Gambar (PNG/JPG)</span>
-                                <span class="text-[10px] text-slate-500" id="file-name-label">Maks. 2MB</span>
+                                <span class="text-[10px] text-slate-500" id="file-name-label">Maks. 20MB</span>
                             </div>
                         </div>
 
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
             previewContainer.classList.remove('hidden');
             pathLabel.textContent = this.value;
             fileInput.value = '';
-            nameLabel.textContent = 'Maks. 2MB';
+            nameLabel.textContent = 'Maks. 20MB';
         } else {
             previewContainer.classList.add('hidden');
             pathLabel.textContent = '';

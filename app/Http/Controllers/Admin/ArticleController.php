@@ -113,7 +113,7 @@ class ArticleController extends Controller
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
         ]);
 
         if ($request->hasFile('image')) {

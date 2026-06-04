@@ -36,7 +36,15 @@ class OutletController extends Controller
             ->orderBy('nama_outlet')
             ->paginate(10);
 
-        return view('admin.outlets.index', compact('outlets', 'search', 'isMitra'));
+        // Fetch counts for summary cards
+        $countDistributors = Distributor::count();
+        $countMitra = Outlet::where('is_mitra', true)->count();
+        $countNonMitra = Outlet::where('is_mitra', false)->count();
+
+        return view('admin.outlets.index', compact(
+            'outlets', 'search', 'isMitra', 
+            'countDistributors', 'countMitra', 'countNonMitra'
+        ));
     }
 
     public function create()
