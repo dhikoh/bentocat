@@ -9,5 +9,4 @@
 .git
 .github
 Dockerfile
-docker/
 .phpunit.result.cache
