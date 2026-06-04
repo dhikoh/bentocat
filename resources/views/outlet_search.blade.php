@@ -8,21 +8,21 @@
     <!-- Search overview header -->
     <div class="space-y-3">
         <div class="flex items-center gap-2">
-            <a href="{{ route('home') }}#cari-outlet" class="text-xs font-bold text-amber-500 hover:underline">← Ulangi Pencarian</a>
+            <a href="{{ route('home') }}#cari-outlet" class="text-xs font-bold text-amber-650 hover:text-amber-750 hover:underline">← Ulangi Pencarian</a>
         </div>
-        <h1 class="font-outfit font-black text-3xl sm:text-4xl text-white">Petshop Resmi di Kota {{ $city->nama }}</h1>
-        <p class="text-sm text-slate-400">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk pasir kucing BentoCat.</p>
+        <h1 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Petshop Resmi di Kota {{ $city->nama }}</h1>
+        <p class="text-sm text-slate-600">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk pasir kucing BentoCat.</p>
     </div>
 
     <!-- Map Container (Optional, rendered if coordinates exist) -->
-    <div class="bg-slate-900/30 border border-slate-900 rounded-3xl p-4 overflow-hidden">
-        <div id="results-map" class="h-64 sm:h-80 w-full rounded-2xl border border-slate-800/80 bg-slate-950"></div>
+    <div class="bg-white border border-slate-100 rounded-3xl p-4 shadow-md shadow-amber-900/5 overflow-hidden">
+        <div id="results-map" class="h-64 sm:h-80 w-full rounded-2xl border border-slate-150 bg-slate-50"></div>
     </div>
 
     <!-- Outlets Grid list -->
     <div class="space-y-6">
         @forelse($outlets as $outlet)
-            <div class="bg-slate-900/40 border {{ !$outlet->is_mitra ? 'border-slate-800/60 opacity-90' : ($outlet->featured ? 'border-amber-500/30 bg-gradient-to-b from-slate-900/40 via-slate-900/40 to-amber-950/5' : 'border-slate-900') }} p-6 sm:p-8 rounded-3xl backdrop-blur-sm space-y-6 relative">
+            <div class="bg-white border {{ !$outlet->is_mitra ? 'border-slate-200/80 opacity-90' : ($outlet->featured ? 'border-amber-500 bg-amber-50/20 shadow-md' : 'border-slate-100 shadow-md') }} p-6 sm:p-8 rounded-3xl space-y-6 relative hover:shadow-lg transition-all">
                 
                 <!-- Recommendation badge or Non-Mitra status -->
                 @if($outlet->is_mitra)
@@ -32,45 +32,45 @@
                         </span>
                     @endif
                 @else
-                    <span class="absolute top-6 right-6 bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                    <span class="absolute top-6 right-6 bg-slate-100 border border-slate-200 text-slate-550 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
                         ⚠️ Mitra Non-Aktif / Belum Menyediakan Produk
                     </span>
                 @endif
 
                 <div class="space-y-3">
-                    <h3 class="font-outfit font-black text-xl text-white flex items-center gap-2">
+                    <h3 class="font-outfit font-black text-xl text-slate-900 flex items-center gap-2">
                         <span>🏪 {{ $outlet->nama_outlet }}</span>
                         @if(isset($outlet->distance) && $outlet->distance < 99999)
-                            <span class="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg">
+                            <span class="text-xs text-amber-750 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-lg">
                                 {{ number_format($outlet->distance, 2) }} km dari Anda
                             </span>
                         @endif
                     </h3>
-                    <p class="text-xs text-slate-400 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
+                    <p class="text-xs text-slate-550 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
                 </div>
 
                 @if($outlet->is_mitra)
                     <!-- Delivery modes grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-350 bg-slate-950/60 p-4 rounded-2xl border border-slate-900">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div class="flex items-center gap-2">
                             <span>🏠</span>
                             <div>
                                 <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
-                                <span class="block text-[10px] text-slate-500">{{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                                <span class="block text-[10px] text-slate-450">{{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-900 pt-2 sm:pt-0 sm:px-3">
+                        <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-200 pt-2 sm:pt-0 sm:px-3">
                             <span>🚚</span>
                             <div>
                                 <span class="block font-semibold">Rekomendasi Kurir Lokal</span>
-                                <span class="block text-[10px] text-slate-500">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                                <span class="block text-[10px] text-slate-450">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 border-t sm:border-t-0 pt-2 sm:pt-0">
                             <span>🏪</span>
                             <div>
                                 <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
-                                <span class="block text-[10px] text-slate-500">Selalu Tersedia</span>
+                                <span class="block text-[10px] text-slate-450">Selalu Tersedia</span>
                             </div>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                         <span>Hubungi Petshop via WhatsApp</span> 💬
                     </button>
                     @if($outlet->maps_url)
-                        <a href="{{ $outlet->maps_url }}" target="_blank" class="bg-slate-900 border border-slate-800 text-slate-300 font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-all text-xs flex items-center justify-center gap-1.5 font-sans">
+                        <a href="{{ $outlet->maps_url }}" target="_blank" class="bg-white border border-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-xl hover:bg-slate-50 transition-all text-xs flex items-center justify-center gap-1.5 shadow-sm font-sans">
                             <span>Petunjuk Arah</span> 🗺️
                         </a>
                     @endif
@@ -90,19 +90,19 @@
 
                 <!-- Shipping couriers section -->
                 @if($outlet->is_mitra && ($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH') && $outlet->shippingContacts->count() > 0)
-                    <div class="border-t border-slate-900 pt-6 space-y-4">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <div class="border-t border-slate-100 pt-6 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                             <span>🚚 Kurir Lokal Terdekat Direkomendasikan Petshop:</span>
                         </h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach($outlet->shippingContacts as $courier)
-                                <div class="bg-slate-950/40 border border-slate-900 p-4 rounded-2xl flex flex-col justify-between gap-3">
+                                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between gap-3 shadow-sm">
                                     <div class="space-y-1">
-                                        <span class="block font-bold text-xs text-white">{{ $courier->nama }}</span>
+                                        <span class="block font-bold text-xs text-slate-900">{{ $courier->nama }}</span>
                                         <p class="text-[11px] text-slate-500 leading-relaxed">{{ $courier->keterangan ?: 'Melayani area jangkauan toko.' }}</p>
                                     </div>
-                                    <button onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-slate-900 border border-slate-850 hover:border-amber-500/30 hover:text-amber-400 text-slate-350 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 font-sans">
+                                    <button onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-white border border-slate-200 hover:border-amber-500/30 hover:text-amber-650 text-slate-650 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm font-sans">
                                         <span>Chat Kurir Mas Joko</span> 💬
                                     </button>
                                 </div>
@@ -114,29 +114,29 @@
             </div>
         @empty
             <!-- Fallback distributor view when no outlets are active in city -->
-            <div class="bg-slate-900/40 border border-amber-500/20 p-8 rounded-3xl text-center space-y-6">
+            <div class="bg-white border border-amber-200/60 p-8 rounded-3xl text-center shadow-md space-y-6">
                 <span class="text-4xl block">😿</span>
                 <div class="space-y-2">
-                    <h3 class="font-outfit font-black text-xl text-white">Belum Ada Petshop Terdaftar di Kota {{ $city->nama }}</h3>
-                    <p class="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
+                    <h3 class="font-outfit font-black text-xl text-slate-900">Belum Ada Petshop Terdaftar di Kota {{ $city->nama }}</h3>
+                    <p class="text-xs text-slate-600 max-w-xl mx-auto leading-relaxed">
                         Kami sedang memperluas jangkauan ke petshop di daerah Anda. Untuk saat ini, Anda dapat memesan langsung melalui distributor utama wilayah kami dengan opsi kirim kurir gudang.
                     </p>
                 </div>
 
                 @if($allocatedDistributor)
-                    <div class="bg-slate-950/80 max-w-md mx-auto p-5 rounded-2xl border border-slate-900 space-y-4 text-left">
-                        <span class="block text-[10px] font-bold text-slate-500 uppercase">Distributor Resmi Wilayah:</span>
+                    <div class="bg-slate-50 max-w-md mx-auto p-5 rounded-2xl border border-slate-100 space-y-4 text-left shadow-sm">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase">Distributor Resmi Wilayah:</span>
                         <div class="space-y-1 text-xs">
-                            <strong class="block text-white text-sm">{{ $allocatedDistributor->nama }}</strong>
-                            <span class="block text-slate-400">WhatsApp PIC: {{ $allocatedDistributor->whatsapp }} ({{ $allocatedDistributor->pic }})</span>
-                            <span class="block text-slate-400">Gudang Alamat: {{ $allocatedDistributor->alamat }}</span>
+                            <strong class="block text-slate-900 text-sm">{{ $allocatedDistributor->nama }}</strong>
+                            <span class="block text-slate-600">WhatsApp PIC: {{ $allocatedDistributor->whatsapp }} ({{ $allocatedDistributor->pic }})</span>
+                            <span class="block text-slate-600">Gudang Alamat: {{ $allocatedDistributor->alamat }}</span>
                         </div>
                         <button onclick="contactDistributor('{{ $allocatedDistributor->whatsapp }}', '{{ $allocatedDistributor->nama }}')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs">
                             <span>Hubungi Distributor Resmi</span> 💬
                         </button>
                     </div>
                 @else
-                    <p class="text-xs text-slate-600 italic">Distributor wilayah belum terdaftar.</p>
+                    <p class="text-xs text-slate-400 italic">Distributor wilayah belum terdaftar.</p>
                 @endif
             </div>
         @endforelse

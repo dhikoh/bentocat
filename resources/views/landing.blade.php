@@ -7,20 +7,20 @@
 
     <!-- 1. Hero Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 md:pt-24 flex flex-col items-center text-center space-y-6">
-        <span class="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider select-none">
+        <span class="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider select-none">
             🐾 BentoCat Premium Bentonite Cat Litter
         </span>
-        <h1 class="font-outfit font-black text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white max-w-4xl leading-[1.1]">
-            Hemat Ongkir, Beli Pasir Kucing di <span class="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">Petshop Terdekat</span> Anda!
+        <h1 class="font-outfit font-black text-4xl sm:text-6xl lg:text-7xl tracking-tight text-slate-900 max-w-4xl leading-[1.1]">
+            Hemat Ongkir, Beli Pasir Kucing di <span class="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Petshop Terdekat</span> Anda!
         </h1>
-        <p class="text-slate-400 text-sm sm:text-lg max-w-2xl leading-relaxed">
+        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl leading-relaxed">
             Hindari potongan besar marketplace yang membuat harga jadi mahal. Temukan outlet resmi penjual BentoCat di kota Anda dan nikmati harga wajar petshop lokal.
         </p>
         <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md">
             <button onclick="openSearchModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all text-sm sm:text-base">
                 Cari Toko Terdekat 📍
             </button>
-            <a href="#katalog" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold px-8 py-3.5 rounded-xl transition-all text-sm sm:text-base">
+            <a href="#katalog" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold px-8 py-3.5 rounded-xl shadow-sm transition-all text-sm sm:text-base">
                 Lihat Katalog Produk
             </a>
         </div>
@@ -29,24 +29,24 @@
     <!-- 2. Keunggulan Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-slate-900/40 border border-slate-900 p-8 rounded-3xl backdrop-blur-sm space-y-4">
+            <div class="bg-white border border-amber-100/50 p-8 rounded-3xl shadow-md shadow-amber-900/5 space-y-4">
                 <span class="text-3xl">⚡</span>
-                <h3 class="font-outfit font-bold text-lg text-white">Gumpalan Instan & Kuat</h3>
-                <p class="text-xs text-slate-400 leading-relaxed">
+                <h3 class="font-outfit font-bold text-lg text-slate-800">Gumpalan Instan & Kuat</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
                     Menyerap cairan dalam hitungan detik untuk mengunci urin seketika. Gumpalan padat tidak mudah pecah saat diserok, menjaga pasir bersih tetap higienis.
                 </p>
             </div>
-            <div class="bg-slate-900/40 border border-slate-900 p-8 rounded-3xl backdrop-blur-sm space-y-4">
+            <div class="bg-white border border-amber-100/50 p-8 rounded-3xl shadow-md shadow-amber-900/5 space-y-4">
                 <span class="text-3xl">🌸</span>
-                <h3 class="font-outfit font-bold text-lg text-white">Kontrol Bau Ekstra (Scented)</h3>
-                <p class="text-xs text-slate-400 leading-relaxed">
+                <h3 class="font-outfit font-bold text-lg text-slate-800">Kontrol Bau Ekstra (Scented)</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
                     Dilengkapi dengan aroma wangi premium (Lavender, Coffee, Apple) yang menyebarkan kesegaran alami dan menetralkan bau amonia kotoran secara maksimal.
                 </p>
             </div>
-            <div class="bg-slate-900/40 border border-slate-900 p-8 rounded-3xl backdrop-blur-sm space-y-4">
+            <div class="bg-white border border-amber-100/50 p-8 rounded-3xl shadow-md shadow-amber-900/5 space-y-4">
                 <span class="text-3xl">🍃</span>
-                <h3 class="font-outfit font-bold text-lg text-white">Minim Debu (Dust-Free)</h3>
-                <p class="text-xs text-slate-400 leading-relaxed">
+                <h3 class="font-outfit font-bold text-lg text-slate-800">Minim Debu (Dust-Free)</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
                     Diproses melalui penyaringan ganda sehingga aman bagi pernapasan kucing peliharaan maupun pemilik rumah. Mencegah noda jejak kaki kucing di lantai.
                 </p>
             </div>
@@ -56,15 +56,15 @@
     <!-- 3. Katalog Section -->
     <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24 space-y-12">
         <div class="text-center space-y-3">
-            <h2 class="font-outfit font-black text-3xl sm:text-4xl text-white">Katalog BentoCat Premium</h2>
-            <p class="text-sm text-slate-400 max-w-xl mx-auto">Varian pasir kucing bentonit premium dengan penawaran kualitas gumpalan tinggi.</p>
+            <h2 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Katalog BentoCat Premium</h2>
+            <p class="text-sm text-slate-500 max-w-xl mx-auto">Varian pasir kucing bentonit premium dengan penawaran kualitas gumpalan tinggi.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @forelse($products as $product)
-                <div class="bg-slate-900/30 border border-slate-900 rounded-3xl overflow-hidden group hover:border-amber-500/30 transition-all flex flex-col justify-between">
+                <div class="bg-white border border-amber-100/50 rounded-3xl overflow-hidden group hover:border-amber-500 hover:shadow-lg transition-all flex flex-col justify-between">
                     <div class="p-6 space-y-4">
-                        <div class="aspect-square bg-slate-950 rounded-2xl overflow-hidden border border-slate-900 flex items-center justify-center text-5xl">
+                        <div class="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-5xl">
                             @if($product->thumbnail)
                                 <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-cover">
                             @else
@@ -72,26 +72,26 @@
                             @endif
                         </div>
                         <div>
-                            <h3 class="font-outfit font-bold text-lg text-white group-hover:text-amber-400 transition-all">{{ $product->nama }}</h3>
-                            <span class="block text-[10px] text-slate-500 font-mono mt-0.5">ID: PROD-00{{ $product->id }}</span>
+                            <h3 class="font-outfit font-bold text-lg text-slate-900 group-hover:text-amber-600 transition-all">{{ $product->nama }}</h3>
+                            <span class="block text-[10px] text-slate-400 font-mono mt-0.5">ID: PROD-00{{ $product->id }}</span>
                         </div>
-                        <p class="text-xs text-slate-400 leading-relaxed">
+                        <p class="text-xs text-slate-550 leading-relaxed">
                             {{ $product->deskripsi ? strip_tags($product->deskripsi) : 'Pasir bentonit wangi gumpal kualitas premium.' }}
                         </p>
                     </div>
-                    <div class="p-6 border-t border-slate-900 bg-slate-950/40">
+                    <div class="p-6 border-t border-slate-100 bg-slate-50/50">
                         <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Varian Tersedia:</span>
                         <div class="flex flex-wrap gap-1">
                             @forelse($product->variants->whereNull('parent_id') as $v1)
-                                <span class="bg-slate-900 text-slate-300 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-800">{{ $v1->nama }}</span>
+                                <span class="bg-white text-slate-650 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-200">{{ $v1->nama }}</span>
                             @empty
-                                <span class="text-xs text-slate-600 italic">Varian standar saja.</span>
+                                <span class="text-xs text-slate-400 italic">Varian standar saja.</span>
                             @endforelse
                         </div>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full text-center py-16 text-slate-500 italic">
+                <div class="col-span-full text-center py-16 text-slate-400 italic">
                     Belum ada katalog produk terdaftar.
                 </div>
             @endforelse
@@ -113,26 +113,26 @@
 
         <!-- Modal Centerer -->
         <div class="flex min-h-screen items-center justify-center p-4 sm:p-6 md:p-8">
-            <div class="relative w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-10 text-left shadow-2xl transition-all space-y-6">
+            <div class="relative w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white border border-slate-100 p-6 sm:p-10 text-left shadow-2xl transition-all space-y-6">
                 
                 <!-- Close Button -->
-                <button type="button" onclick="closeSearchModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white transition-all text-xl">
+                <button type="button" onclick="closeSearchModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition-all text-xl">
                     ✕
                 </button>
 
                 <!-- Modal Header -->
                 <div class="space-y-2 pr-8">
-                    <h3 class="font-outfit font-black text-2xl sm:text-3xl text-white flex items-center gap-2">
+                    <h3 class="font-outfit font-black text-2xl sm:text-3xl text-slate-900 flex items-center gap-2">
                         <span>Cari Toko BentoCat Terdekat</span> 🐾
                     </h3>
-                    <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
                         Masukkan kota dan produk pilihan Anda untuk menemukan petshop mitra resmi terdekat dengan harga terbaik.
                     </p>
                 </div>
 
                 <!-- Global error notifications inside Modal -->
                 @if($errors->any())
-                    <div class="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-xs text-rose-400 space-y-1">
+                    <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-600 space-y-1">
                         @foreach($errors->all() as $error)
                             <p>⚠️ {{ $error }}</p>
                         @endforeach
@@ -154,30 +154,30 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Client Name -->
                         <div>
-                            <label for="nama" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lengkap Anda</label>
-                            <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required placeholder="Siapa nama panggilan Anda?" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none transition-all">
+                            <label for="nama" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Lengkap Anda</label>
+                            <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required placeholder="Siapa nama panggilan Anda?" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
                         </div>
 
                         <!-- Client WhatsApp -->
                         <div>
-                            <label for="whatsapp" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp Aktif</label>
-                            <input type="text" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}" required placeholder="Contoh: 08123456789" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none transition-all">
+                            <label for="whatsapp" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nomor WhatsApp Aktif</label>
+                            <input type="text" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}" required placeholder="Contoh: 08123456789" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
                         </div>
                     </div>
 
                     <!-- Client Address -->
                     <div>
-                        <label for="alamat" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat Pengiriman / Rumah Anda</label>
-                        <textarea name="alamat" id="alamat" rows="2" required placeholder="Tuliskan alamat lengkap pengiriman untuk perhitungan ongkir kurir lokal..." class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none transition-all">{{ old('alamat') }}</textarea>
+                        <label for="alamat" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat Pengiriman / Rumah Anda</label>
+                        <textarea name="alamat" id="alamat" rows="2" required placeholder="Tuliskan alamat lengkap pengiriman untuk perhitungan ongkir kurir lokal..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">{{ old('alamat') }}</textarea>
                     </div>
 
                     <!-- Geolocation trigger (GPS Browser) -->
-                    <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-850 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="space-y-1 text-center sm:text-left">
-                            <span class="block text-xs font-bold text-white">Izinkan Geolocation (GPS Browser)</span>
-                            <span class="block text-[10px] text-slate-550">Membantu sistem menyortir petshop dari jarak terdekat secara akurat.</span>
+                            <span class="block text-xs font-bold text-slate-800">Izinkan Geolocation (GPS Browser)</span>
+                            <span class="block text-[10px] text-slate-500">Membantu sistem menyortir petshop dari jarak terdekat secara akurat.</span>
                         </div>
-                        <button type="button" id="gps-btn" onclick="requestGPS()" class="bg-slate-900 border border-slate-850 hover:border-amber-500/50 hover:text-amber-400 text-slate-350 font-bold px-4 py-2 rounded-xl text-[10px] flex items-center gap-1.5 transition-all shrink-0">
+                        <button type="button" id="gps-btn" onclick="requestGPS()" class="bg-white border border-slate-200 hover:border-amber-500/50 hover:text-amber-600 text-slate-650 font-bold px-4 py-2 rounded-xl text-[10px] flex items-center gap-1.5 transition-all shadow-sm shrink-0">
                             <span>Bagikan Koordinat</span> 📍
                         </button>
                     </div>
@@ -186,8 +186,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Province Select -->
                         <div>
-                            <label for="provinsi_id" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Provinsi Tujuan</label>
-                            <select name="provinsi_id" id="provinsi_id" required onchange="loadCities(this.value)" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-300 focus:outline-none transition-all">
+                            <label for="provinsi_id" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Provinsi Tujuan</label>
+                            <select name="provinsi_id" id="provinsi_id" required onchange="loadCities(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
                                 <option value="">Pilih Provinsi...</option>
                                 @foreach($provinces as $prov)
                                     <option value="{{ $prov->id }}">{{ $prov->nama }}</option>
@@ -197,22 +197,22 @@
 
                         <!-- City Select -->
                         <div>
-                            <label for="kota_id" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota / Kabupaten</label>
-                            <select name="kota_id" id="kota_id" required disabled class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-300 focus:outline-none transition-all disabled:opacity-40">
+                            <label for="kota_id" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kota / Kabupaten</label>
+                            <select name="kota_id" id="kota_id" required disabled class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none transition-all disabled:opacity-45">
                                 <option value="">Pilih Kota...</option>
                             </select>
                         </div>
                     </div>
 
                     <!-- Product Selection & Variant cascades -->
-                    <div class="bg-slate-950/20 p-4 rounded-2xl border border-slate-900 space-y-3">
-                        <h4 class="text-[10px] font-bold text-slate-450 uppercase tracking-wider border-b border-slate-850 pb-1.5">Produk Yang Dicari</h4>
+                    <div class="bg-amber-50/20 p-4 rounded-2xl border border-amber-100/50 space-y-3">
+                        <h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider border-b border-amber-100/50 pb-1.5">Produk Yang Dicari</h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <!-- Product Selection -->
                             <div class="md:col-span-2">
-                                <label for="produk_id" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Model Pasir</label>
-                                <select name="produk_id" id="produk_id" required onchange="onProductChange(this.value)" class="w-full bg-slate-950 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none">
+                                <label for="produk_id" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Model Pasir</label>
+                                <select name="produk_id" id="produk_id" required onchange="onProductChange(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none">
                                     <option value="">Pilih Produk...</option>
                                     @foreach($products as $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->nama }}</option>
@@ -222,16 +222,16 @@
 
                             <!-- Variant Lvl 1: Kategori -->
                             <div>
-                                <label for="varian_level_1" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Kategori / Seri</label>
-                                <select name="varian_level_1" id="varian_level_1" disabled onchange="onLevel1Change(this.value)" class="w-full bg-slate-950 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none disabled:opacity-40">
+                                <label for="varian_level_1" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Kategori / Seri</label>
+                                <select name="varian_level_1" id="varian_level_1" disabled onchange="onLevel1Change(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none disabled:opacity-40">
                                     <option value="">Pilih Kategori...</option>
                                 </select>
                             </div>
 
                             <!-- Variant Lvl 2: Aroma -->
                             <div>
-                                <label for="varian_level_2" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Aroma / Scent</label>
-                                <select name="varian_level_2" id="varian_level_2" disabled onchange="onLevel2Change(this.value)" class="w-full bg-slate-950 border border-slate-855 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none disabled:opacity-40">
+                                <label for="varian_level_2" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Aroma / Scent</label>
+                                <select name="varian_level_2" id="varian_level_2" disabled onchange="onLevel2Change(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none disabled:opacity-40">
                                     <option value="">Pilih Aroma...</option>
                                 </select>
                             </div>
@@ -261,36 +261,36 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div class="space-y-3">
-                <h2 class="font-outfit font-black text-3xl text-white">Tips & Edukasi Perawatan Kucing</h2>
-                <p class="text-sm text-slate-400 max-w-md">Ketahui tips merawat kotak pasir kucing, menjaga kesegaran rumah, dan memilih jenis pasir terbaik.</p>
+                <h2 class="font-outfit font-black text-3xl text-slate-900">Tips & Edukasi Perawatan Kucing</h2>
+                <p class="text-sm text-slate-500 max-w-md">Ketahui tips merawat kotak pasir kucing, menjaga kesegaran rumah, dan memilih jenis pasir terbaik.</p>
             </div>
-            <a href="{{ route('blog.index') }}" class="text-xs font-bold text-amber-500 hover:underline shrink-0">Lihat Semua Artikel →</a>
+            <a href="{{ route('blog.index') }}" class="text-xs font-bold text-amber-650 hover:text-amber-700 hover:underline shrink-0">Lihat Semua Artikel →</a>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @forelse($articles as $article)
-                <article class="bg-slate-900/20 border border-slate-900 rounded-3xl overflow-hidden group hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <article class="bg-white border border-slate-100 rounded-3xl overflow-hidden group hover:border-amber-500/20 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
                     <div class="p-5 space-y-4">
-                        <div class="aspect-[16/10] bg-slate-950 rounded-2xl overflow-hidden border border-slate-900 flex items-center justify-center text-3xl font-serif text-slate-700">
+                        <div class="aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-3xl font-serif text-slate-400">
                             📚
                         </div>
                         <div class="space-y-2">
-                            <span class="block text-[10px] text-slate-500">{{ $article->published_at ? $article->published_at->format('d M Y') : 'Draft' }}</span>
-                            <h3 class="font-outfit font-bold text-base text-white group-hover:text-amber-400 transition-all">
+                            <span class="block text-[10px] text-slate-400">{{ $article->published_at ? $article->published_at->format('d M Y') : 'Draft' }}</span>
+                            <h3 class="font-outfit font-bold text-base text-slate-900 group-hover:text-amber-650 transition-all">
                                 <a href="{{ route('blog.show', $article->slug) }}">{{ $article->title }}</a>
                             </h3>
-                            <p class="text-xs text-slate-400 leading-relaxed line-clamp-3">
+                            <p class="text-xs text-slate-500 leading-relaxed line-clamp-3">
                                 {{ $article->summary ?: 'Baca info selengkapnya tentang artikel perawatan kucing ini...' }}
                             </p>
                         </div>
                     </div>
-                    <div class="p-5 border-t border-slate-900 bg-slate-950/20 flex justify-between items-center text-xs">
+                    <div class="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-between items-center text-xs">
                         <span class="text-slate-500">Penulis: {{ $article->author->name }}</span>
-                        <a href="{{ route('blog.show', $article->slug) }}" class="font-bold text-amber-500 group-hover:underline">Baca Lengkap</a>
+                        <a href="{{ route('blog.show', $article->slug) }}" class="font-bold text-amber-650 hover:underline">Baca Lengkap</a>
                     </div>
                 </article>
             @empty
-                <div class="col-span-full text-center py-12 text-slate-500 italic">Belum ada tulisan artikel yang dipublikasikan.</div>
+                <div class="col-span-full text-center py-12 text-slate-400 italic">Belum ada tulisan artikel yang dipublikasikan.</div>
             @endforelse
         </div>
     </section>
@@ -348,7 +348,7 @@
                 document.getElementById('latitude_input').value = pos.coords.latitude;
                 document.getElementById('longitude_input').value = pos.coords.longitude;
                 btn.innerHTML = "Koordinat Berhasil Disinkronkan ✓";
-                btn.className = "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all shrink-0";
+                btn.className = "bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all shrink-0";
             },
             (err) => {
                 btn.innerText = "Koordinat Gagal Ditemukan ❌";
