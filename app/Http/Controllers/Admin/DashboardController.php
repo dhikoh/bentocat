@@ -52,9 +52,42 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->get();
 
+        // 1. WhatsApp Clicks & Conversion Rate
+        $totalWaClicks = DB::table('lead_actions')
+            ->whereIn('action_type', ['CLICK_WA_OUTLET', 'CLICK_WA_SHIPPING_CONTACT'])
+            ->count();
+        $conversionRate = $totalLeads > 0 ? round(($totalWaClicks / $totalLeads) * 100, 1) : 0;
+
+        // 2. Aroma (Varian Level 2) Stats
+        $aromaStats = LeadRequest::select('varian_level_2', DB::raw('count(id) as total'))
+            ->whereNotNull('varian_level_2')
+            ->where('varian_level_2', '!=', '')
+            ->groupBy('varian_level_2')
+            ->orderByDesc('total')
+            ->get();
+
+        // 3. Size (Varian Level 3) Stats
+        $sizeStats = LeadRequest::select('varian_level_3', DB::raw('count(id) as total'))
+            ->whereNotNull('varian_level_3')
+            ->where('varian_level_3', '!=', '')
+            ->groupBy('varian_level_3')
+            ->orderByDesc('total')
+            ->get();
+
+        // 4. Non-Mitra Clicks (Prospecting Index)
+        $nonMitraProspects = LeadRequest::select('outlets.nama_outlet', 'cities.nama as city_name', DB::raw('count(lead_requests.id) as total_clicks'))
+            ->join('outlets', 'lead_requests.outlet_id', '=', 'outlets.id')
+            ->join('cities', 'lead_requests.kota_id', '=', 'cities.id')
+            ->where('outlets.is_mitra', false)
+            ->groupBy('outlets.id', 'outlets.nama_outlet', 'cities.nama')
+            ->orderByDesc('total_clicks')
+            ->limit(5)
+            ->get();
+
         return view('admin.dashboard', compact(
             'totalLeads', 'totalOutlets', 'totalDistributors', 'totalProducts',
-            'citiesDemand', 'heatmapPoints', 'productStats'
+            'citiesDemand', 'heatmapPoints', 'productStats', 'totalWaClicks',
+            'conversionRate', 'aromaStats', 'sizeStats', 'nonMitraProspects'
         ));
     }
 }

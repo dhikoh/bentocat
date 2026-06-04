@@ -22,12 +22,18 @@
     <!-- Outlets Grid list -->
     <div class="space-y-6">
         @forelse($outlets as $outlet)
-            <div class="bg-slate-900/40 border {{ $outlet->featured ? 'border-amber-500/30 bg-gradient-to-b from-slate-900/40 via-slate-900/40 to-amber-950/5' : 'border-slate-900' }} p-6 sm:p-8 rounded-3xl backdrop-blur-sm space-y-6 relative">
+            <div class="bg-slate-900/40 border {{ !$outlet->is_mitra ? 'border-slate-800/60 opacity-90' : ($outlet->featured ? 'border-amber-500/30 bg-gradient-to-b from-slate-900/40 via-slate-900/40 to-amber-950/5' : 'border-slate-900') }} p-6 sm:p-8 rounded-3xl backdrop-blur-sm space-y-6 relative">
                 
-                <!-- Recommendation badge -->
-                @if($outlet->featured)
-                    <span class="absolute top-6 right-6 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                        ★ Rekomendasi Utama
+                <!-- Recommendation badge or Non-Mitra status -->
+                @if($outlet->is_mitra)
+                    @if($outlet->featured)
+                        <span class="absolute top-6 right-6 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                            ★ Rekomendasi Utama
+                        </span>
+                    @endif
+                @else
+                    <span class="absolute top-6 right-6 bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                        ⚠️ Mitra Non-Aktif / Belum Menyediakan Produk
                     </span>
                 @endif
 
@@ -43,45 +49,47 @@
                     <p class="text-xs text-slate-400 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
                 </div>
 
-                <!-- Delivery modes grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-350 bg-slate-950/60 p-4 rounded-2xl border border-slate-900">
-                    <div class="flex items-center gap-2">
-                        <span>🏠</span>
-                        <div>
-                            <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
-                            <span class="block text-[10px] text-slate-500">{{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                @if($outlet->is_mitra)
+                    <!-- Delivery modes grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-350 bg-slate-950/60 p-4 rounded-2xl border border-slate-900">
+                        <div class="flex items-center gap-2">
+                            <span>🏠</span>
+                            <div>
+                                <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
+                                <span class="block text-[10px] text-slate-500">{{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-900 pt-2 sm:pt-0 sm:px-3">
+                            <span>🚚</span>
+                            <div>
+                                <span class="block font-semibold">Rekomendasi Kurir Lokal</span>
+                                <span class="block text-[10px] text-slate-500">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 border-t sm:border-t-0 pt-2 sm:pt-0">
+                            <span>🏪</span>
+                            <div>
+                                <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
+                                <span class="block text-[10px] text-slate-500">Selalu Tersedia</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-900 pt-2 sm:pt-0 sm:px-3">
-                        <span>🚚</span>
-                        <div>
-                            <span class="block font-semibold">Rekomendasi Kurir Lokal</span>
-                            <span class="block text-[10px] text-slate-500">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 border-t sm:border-t-0 pt-2 sm:pt-0">
-                        <span>🏪</span>
-                        <div>
-                            <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
-                            <span class="block text-[10px] text-slate-500">Selalu Tersedia</span>
-                        </div>
-                    </div>
-                </div>
+                @endif
 
                 <div class="flex flex-col sm:flex-row gap-4 pt-2">
                     <!-- Action WA Redirect Button -->
-                    <button onclick="contactOutlet({{ $outlet->id }}, '{{ $outlet->whatsapp }}', '{{ $outlet->nama_outlet }}')" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                    <button onclick="contactOutlet({{ $outlet->id }}, '{{ $outlet->whatsapp }}', '{{ $outlet->nama_outlet }}', {{ $outlet->is_mitra ? 'true' : 'false' }})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <span>Hubungi Petshop via WhatsApp</span> 💬
                     </button>
                     @if($outlet->maps_url)
-                        <a href="{{ $outlet->maps_url }}" target="_blank" class="bg-slate-900 border border-slate-800 text-slate-300 font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-all text-xs flex items-center justify-center gap-1.5">
+                        <a href="{{ $outlet->maps_url }}" target="_blank" class="bg-slate-900 border border-slate-800 text-slate-300 font-semibold px-6 py-3 rounded-xl hover:bg-slate-800 transition-all text-xs flex items-center justify-center gap-1.5 font-sans">
                             <span>Petunjuk Arah</span> 🗺️
                         </a>
                     @endif
                 </div>
 
                 <!-- Shipping couriers section -->
-                @if(($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH') && $outlet->shippingContacts->count() > 0)
+                @if($outlet->is_mitra && ($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH') && $outlet->shippingContacts->count() > 0)
                     <div class="border-t border-slate-900 pt-6 space-y-4">
                         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                             <span>🚚 Kurir Lokal Terdekat Direkomendasikan Petshop:</span>
@@ -94,7 +102,7 @@
                                         <span class="block font-bold text-xs text-white">{{ $courier->nama }}</span>
                                         <p class="text-[11px] text-slate-500 leading-relaxed">{{ $courier->keterangan ?: 'Melayani area jangkauan toko.' }}</p>
                                     </div>
-                                    <button onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-slate-900 border border-slate-850 hover:border-amber-500/30 hover:text-amber-400 text-slate-300 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                                    <button onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-slate-900 border border-slate-850 hover:border-amber-500/30 hover:text-amber-400 text-slate-350 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 font-sans">
                                         <span>Chat Kurir Mas Joko</span> 💬
                                     </button>
                                 </div>
@@ -146,6 +154,8 @@
     const leadId = {{ $lead->id }};
     const customerName = "{{ $customer->nama }}";
     const productName = "{{ $lead->product->nama }}";
+    const aroma = "{{ $lead->varian_level_2 ?? '-' }}";
+    const size = "{{ $lead->varian_level_3 ?? '-' }}";
     const varianText = "{{ $lead->varian_level_1 }} {{ $lead->varian_level_2 ? ' • ' . $lead->varian_level_2 : '' }}";
 
     // Setup Leaflet map
@@ -190,7 +200,7 @@
     }
 
     // AJAX Action loggers
-    function contactOutlet(outletId, whatsapp, outletName) {
+    function contactOutlet(outletId, whatsapp, outletName, isMitra) {
         fetch('{{ route("leads.log-action") }}', {
             method: 'POST',
             body: JSON.stringify({
@@ -203,7 +213,12 @@
             }
         })
         .finally(() => {
-            const message = `Halo ${outletName}, saya ${customerName} melihat info dari website BentoCat. Saya mencari produk ${productName} varian ${varianText}. Apakah barang ini tersedia?`;
+            let message = '';
+            if (isMitra) {
+                message = `Halo ${outletName}, saya ingin membeli produk BentoCat ${productName} - ${aroma} - ${size} dari web bentocat.id. Apakah stok tersedia?`;
+            } else {
+                message = `Halo ${outletName}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan pasir kucing BentoCat? Saya sangat tertarik untuk membelinya.`;
+            }
             const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
         });

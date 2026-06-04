@@ -26,18 +26,24 @@
         </h2>
 
         @forelse($outlets as $outlet)
-            <div class="bg-slate-900/30 border {{ $outlet->featured ? 'border-amber-500/30' : 'border-slate-900' }} p-6 rounded-3xl backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div class="bg-slate-900/30 border {{ !$outlet->is_mitra ? 'border-slate-800/60 opacity-90' : ($outlet->featured ? 'border-amber-500/30' : 'border-slate-900') }} p-6 rounded-3xl backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div class="space-y-2">
                     <h3 class="font-outfit font-bold text-lg text-white flex items-center gap-2">
                         <span>🏪 {{ $outlet->nama_outlet }}</span>
-                        @if($outlet->featured)
-                            <span class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Rekomendasi</span>
+                        @if($outlet->is_mitra)
+                            @if($outlet->featured)
+                                <span class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Rekomendasi</span>
+                            @endif
+                        @else
+                            <span class="bg-slate-800 border border-slate-700 text-slate-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Mitra Non-Aktif</span>
                         @endif
                     </h3>
                     <p class="text-xs text-slate-400 max-w-xl">{{ $outlet->alamat_lengkap }}</p>
                     <div class="flex gap-4 text-[10px] text-slate-500">
                         <span>Mode Kirim: 
-                            @if($outlet->delivery_mode === 'SELF_DELIVERY')
+                            @if(!$outlet->is_mitra)
+                                Belum Menyediakan BentoCat
+                            @elseif($outlet->delivery_mode === 'SELF_DELIVERY')
                                 Pengantaran Toko
                             @elseif($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT')
                                 Kurir Eksternal
@@ -52,7 +58,11 @@
 
                 <!-- WA Direct (logs via simulated lead trigger if not filled, or simple wa.me link directly for guest routing) -->
                 @php
-                    $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda terdaftar di website BentoCat {$city->nama}. Apakah stok pasir BentoCat sedang ready?";
+                    if ($outlet->is_mitra) {
+                        $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda terdaftar di website BentoCat {$city->nama}. Apakah stok pasir BentoCat sedang ready?";
+                    } else {
+                        $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan pasir kucing BentoCat? Saya sangat tertarik untuk membelinya.";
+                    }
                     $waUrl = "https://wa.me/" . preg_replace('/[^0-9]/', '', $outlet->whatsapp) . "?text=" . urlencode($message);
                 @endphp
                 <a href="{{ $waUrl }}" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-6 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0">

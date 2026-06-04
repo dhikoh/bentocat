@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\ClientController;
 
 // Public client routes (Fase 3 & 4)
@@ -53,7 +54,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Core Catalog, Partners & Shipping CRUD Resources
         Route::resource('/distributors', DistributorController::class);
+        
+        // Outlet CSV Import/Export (defined before resource)
+        Route::get('/outlets/export', [OutletController::class, 'exportCsv'])->name('outlets.export');
+        Route::post('/outlets/import', [OutletController::class, 'importCsv'])->name('outlets.import');
         Route::resource('/outlets', OutletController::class);
+        
         Route::resource('/shipping-contacts', ShippingContactController::class);
         Route::resource('/products', ProductController::class);
 
@@ -70,6 +76,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
         Route::get('/leads/export', [LeadController::class, 'exportCsv'])->name('leads.export');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+
+        // Customer CRM
+        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+        Route::get('/customers/export', [CustomerController::class, 'exportCsv'])->name('customers.export');
 
         // Website Settings (Superadmin only)
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

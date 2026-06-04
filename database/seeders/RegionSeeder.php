@@ -22,13 +22,13 @@ class RegionSeeder extends Seeder
                 'Tangerang', 'Tangerang Selatan', 'Serang', 'Cilegon'
             ],
             'Jawa Tengah' => [
-                'Semarang', 'Surakarta', 'Magelang', 'Pekalongan', 'Salatiga', 'Tegal'
+                'Semarang', 'Surakarta', 'Magelang', 'Pekalongan', 'Salatiga', 'Tegal', 'Pati', 'Sukoharjo', 'Karanganyar', 'Cilacap'
             ],
             'DI Yogyakarta' => [
                 'Yogyakarta', 'Sleman', 'Bantul'
             ],
             'Jawa Timur' => [
-                'Surabaya', 'Malang', 'Blitar', 'Kediri', 'Madiun', 'Mojokerto', 'Pasuruan', 'Probolinggo', 'Batu', 'Sidoarjo'
+                'Surabaya', 'Malang', 'Blitar', 'Kediri', 'Madiun', 'Mojokerto', 'Pasuruan', 'Probolinggo', 'Batu', 'Sidoarjo', 'Bojonegoro', 'Gresik', 'Tuban', 'Lamongan'
             ],
             'Bali' => [
                 'Denpasar', 'Badung', 'Gianyar'
@@ -39,6 +39,9 @@ class RegionSeeder extends Seeder
             'Sumatera Selatan' => [
                 'Palembang', 'Prabumulih', 'Lubuklinggau'
             ],
+            'Sumatera Barat' => [
+                'Padang'
+            ],
             'Sulawesi Selatan' => [
                 'Macassar', 'Parepare', 'Palopo'
             ],
@@ -48,12 +51,13 @@ class RegionSeeder extends Seeder
         ];
 
         foreach ($regions as $provinceName => $cities) {
-            $province = Province::create(['nama' => $provinceName]);
+            $province = Province::firstOrCreate(['nama' => $provinceName]);
 
             foreach ($cities as $cityName) {
-                City::create([
+                City::firstOrCreate([
+                    'nama' => $cityName
+                ], [
                     'provinsi_id' => $province->id,
-                    'nama' => $cityName,
                     'slug' => Str::slug($cityName)
                 ]);
             }

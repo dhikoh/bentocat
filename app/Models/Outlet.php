@@ -15,14 +15,25 @@ class Outlet extends Model
     protected $fillable = [
         'distributor_id', 'kota_id', 'nama_outlet', 'nama_pic', 'whatsapp',
         'alamat_lengkap', 'latitude', 'longitude', 'google_maps_url',
-        'featured', 'status', 'delivery_mode'
+        'featured', 'is_mitra', 'status', 'delivery_mode'
     ];
 
     protected $casts = [
         'featured' => 'boolean',
+        'is_mitra' => 'boolean',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];
+
+    public function scopeMitra($query)
+    {
+        return $query->where('is_mitra', true);
+    }
+
+    public function scopeNonMitra($query)
+    {
+        return $query->where('is_mitra', false);
+    }
 
     public function distributor(): BelongsTo
     {
