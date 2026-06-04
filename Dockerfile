@@ -23,7 +23,7 @@ RUN apk add --no-cache \
 
 # Install PHP extensions helper
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions gd pdo_mysql bcmath zip opcache intl
+RUN install-php-extensions gd pdo_mysql pdo_pgsql pgsql bcmath zip opcache intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
