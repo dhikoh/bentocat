@@ -1,0 +1,13 @@
+/node_modules
+/vendor
+/storage/*.sqlite
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*.log
+.env
+.git
+.github
+Dockerfile
+docker/
+.phpunit.result.cache
