@@ -202,6 +202,8 @@ class OutletController extends Controller
 
     public function importCsv(Request $request)
     {
+        @set_time_limit(300);
+
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt|max:4096'
         ]);
