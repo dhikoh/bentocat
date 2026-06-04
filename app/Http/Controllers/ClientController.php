@@ -251,7 +251,9 @@ class ClientController extends Controller
         // Safely parse blocks JSON
         $blocks = [];
         if ($article->content_json) {
-            $blocks = json_decode($article->content_json, true) ?: [];
+            $blocks = is_array($article->content_json) 
+                ? $article->content_json 
+                : (json_decode($article->content_json, true) ?: []);
         }
 
         return view('blog.show', compact('article', 'blocks'));
