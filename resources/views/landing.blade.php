@@ -338,14 +338,30 @@
     }
 
     // Auto-open modal on validation errors or hash trigger
-    window.addEventListener('DOMContentLoaded', () => {
+    function checkHashAndOpen() {
         if (window.location.hash === '#cari-outlet' || window.location.hash === '#search') {
             openSearchModal();
         }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        checkHashAndOpen();
         @if($errors->any() || old('nama'))
             openSearchModal();
         @endif
+
+        // Intercept clicks on links pointing to #cari-outlet to open modal instantly
+        document.querySelectorAll('a[href*="#cari-outlet"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const isHomepage = window.location.pathname === '/' || window.location.pathname.endsWith('/index.php');
+                if (isHomepage) {
+                    openSearchModal();
+                }
+            });
+        });
     });
+
+    window.addEventListener('hashchange', checkHashAndOpen);
 
     function requestGPS() {
         const btn = document.getElementById('gps-btn');
