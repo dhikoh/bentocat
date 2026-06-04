@@ -246,4 +246,14 @@ class ClientDiscoveryTest extends TestCase
         $responseDetail->assertSee('Pasir kucing bentonite menyerap amonia dengan cepat.');
         $responseDetail->assertSee('Vet Indonesia');
     }
+
+    public function test_api_get_outlets_by_city(): void
+    {
+        $response = $this->get('/api/outlets-by-city/' . $this->city->id);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'nama_outlet' => 'Petshop Jaya Featured'
+        ]);
+    }
 }

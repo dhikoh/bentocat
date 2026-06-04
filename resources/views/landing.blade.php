@@ -198,9 +198,23 @@
                         <!-- City Select -->
                         <div>
                             <label for="kota_id" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kota / Kabupaten</label>
-                            <select name="kota_id" id="kota_id" required disabled class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none transition-all disabled:opacity-45">
+                            <select name="kota_id" id="kota_id" required disabled onchange="onCityChange(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none transition-all disabled:opacity-45">
                                 <option value="">Pilih Kota...</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Petshop List Preview (Shown after choosing city) -->
+                    <div id="petshop-preview-wrapper" class="hidden bg-slate-50 p-4 rounded-2xl border border-slate-150 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                            <span class="block text-[10px] font-bold text-slate-650 uppercase tracking-wider">🏪 Petshop Resmi Tersedia:</span>
+                            <span id="petshop-preview-count" class="text-[10px] font-black text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">0 Mitra</span>
+                        </div>
+                        <div id="petshop-preview-list" class="space-y-2 max-h-36 overflow-y-auto pr-1 text-xs text-slate-700">
+                            <!-- Populated via AJAX -->
+                        </div>
+                        <div id="petshop-direct-link-container" class="pt-2 border-t border-slate-200 text-[10px] text-slate-500 leading-relaxed">
+                            <!-- Link to city landing page direct browse -->
                         </div>
                     </div>
 
@@ -360,8 +374,12 @@
         );
     }
 
+    let citiesCache = [];
+
     function loadCities(provinceId) {
         const citySelect = document.getElementById('kota_id');
+        const previewWrapper = document.getElementById('petshop-preview-wrapper');
+        previewWrapper.classList.add('hidden'); // Reset preview when province changes
         citySelect.innerHTML = '<option value="">Memuat...</option>';
         citySelect.disabled = true;
 
@@ -373,6 +391,7 @@
         fetch(`/api/cities-by-province/${provinceId}`)
             .then(res => res.json())
             .then(data => {
+                citiesCache = data; // Store in cache for slugs/names
                 citySelect.innerHTML = '<option value="">Pilih Kota...</option>';
                 data.forEach(city => {
                     const opt = document.createElement('option');
@@ -385,6 +404,85 @@
             .catch(err => {
                 console.error("Error loading cities:", err);
                 citySelect.innerHTML = '<option value="">Gagal Memuat Kota</option>';
+            });
+    }
+
+    function onCityChange(cityId) {
+        const previewWrapper = document.getElementById('petshop-preview-wrapper');
+        const previewList = document.getElementById('petshop-preview-list');
+        const previewCount = document.getElementById('petshop-preview-count');
+        const linkContainer = document.getElementById('petshop-direct-link-container');
+
+        if (!cityId) {
+            previewWrapper.classList.add('hidden');
+            return;
+        }
+
+        // Find city details in cache
+        const city = citiesCache.find(c => c.id == cityId);
+        const citySlug = city ? city.slug : '';
+        const cityName = city ? city.nama : 'Kota Ini';
+
+        previewList.innerHTML = '<div class="text-[11px] text-slate-400 italic">Memuat daftar petshop...</div>';
+        previewWrapper.classList.remove('hidden');
+
+        fetch(`/api/outlets-by-city/${cityId}`)
+            .then(res => res.json())
+            .then(outlets => {
+                previewList.innerHTML = '';
+                previewCount.innerText = `${outlets.length} Mitra`;
+
+                if (outlets.length === 0) {
+                    previewList.innerHTML = `
+                        <div class="p-3 bg-rose-50/50 border border-rose-100 rounded-xl text-rose-700 text-[11px] leading-relaxed">
+                            ⚠️ Belum ada petshop resmi di kota ini. 
+                            Anda akan secara otomatis diarahkan ke <strong>Distributor Utama Regional</strong> untuk pengiriman langsung dari gudang.
+                        </div>
+                    `;
+                    linkContainer.innerHTML = '';
+                } else {
+                    outlets.forEach(outlet => {
+                        const item = document.createElement('div');
+                        item.className = "p-2 bg-white rounded-xl border border-slate-200/60 shadow-sm flex items-start gap-2 text-[11px]";
+                        
+                        const badge = outlet.featured 
+                            ? `<span class="bg-amber-100 text-amber-700 px-1 py-0.5 rounded text-[8px] font-bold">Featured ⭐</span>` 
+                            : ``;
+                        const typeBadge = outlet.is_mitra 
+                            ? `<span class="bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded text-[8px] font-bold">Mitra Resmi 🐾</span>` 
+                            : `<span class="bg-slate-100 text-slate-600 px-1 py-0.5 rounded text-[8px] font-bold">Retailer</span>`;
+
+                        item.innerHTML = `
+                            <span class="text-base shrink-0">🏪</span>
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <strong class="text-slate-800">${outlet.nama_outlet}</strong>
+                                    ${badge}
+                                    ${typeBadge}
+                                </div>
+                                <p class="text-slate-500 text-[10px] leading-tight">${outlet.alamat_lengkap}</p>
+                            </div>
+                        `;
+                        previewList.appendChild(item);
+                    });
+
+                    // Add Direct Browse Link
+                    if (citySlug) {
+                        linkContainer.innerHTML = `
+                            💡 Ingin beli eceran langsung ke petshop? Anda juga bisa 
+                            <a href="/kota/${citySlug}" target="_blank" class="text-amber-650 hover:text-amber-750 hover:underline font-bold inline-flex items-center gap-0.5">
+                                Kunjungi Halaman Wilayah ${cityName} ↗
+                            </a>
+                            tanpa mengisi formulir di atas.
+                        `;
+                    } else {
+                        linkContainer.innerHTML = '';
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("Error loading preview outlets:", err);
+                previewList.innerHTML = '<div class="text-[11px] text-rose-650">Gagal memuat daftar petshop.</div>';
             });
     }
 

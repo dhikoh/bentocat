@@ -17,6 +17,7 @@ use App\Http\Controllers\ClientController;
 // Public client routes (Fase 3 & 4)
 Route::get('/', [ClientController::class, 'index'])->name('home');
 Route::get('/api/cities-by-province/{province_id}', [ClientController::class, 'getCities']);
+Route::get('/api/outlets-by-city/{city_id}', [ClientController::class, 'getOutletsByCity']);
 Route::post('/search-outlet', [ClientController::class, 'searchOutlets'])->name('search-outlet');
 Route::post('/api/leads/action', [ClientController::class, 'logAction'])->name('leads.log-action');
 

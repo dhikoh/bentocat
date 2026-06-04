@@ -38,6 +38,17 @@ class ClientController extends Controller
         return response()->json($cities);
     }
 
+    // Get outlets under a city for AJAX preview
+    public function getOutletsByCity($city_id)
+    {
+        $outlets = Outlet::where('kota_id', $city_id)
+            ->where('status', 'AKTIF')
+            ->orderBy('featured', 'desc')
+            ->get(['id', 'nama_outlet', 'alamat_lengkap', 'featured', 'is_mitra']);
+            
+        return response()->json($outlets);
+    }
+
     // Process lead and search for closest petshops/distributor
     public function searchOutlets(Request $request)
     {
