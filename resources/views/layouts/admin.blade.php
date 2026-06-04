@@ -121,6 +121,9 @@
             <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.settings.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
                 <span class="text-lg">⚙️</span> Pengaturan Web
             </a>
+            <a href="{{ route('admin.audit.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.audit.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                <span class="text-lg">🔍</span> Audit & Kesehatan Bisnis
+            </a>
             @endif
         </nav>
 

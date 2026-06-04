@@ -84,5 +84,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Website Settings (Superadmin only)
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Audit & Business Health Panel (Superadmin / Editor)
+        Route::get('/audit', [\App\Http\Controllers\Admin\AuditController::class, 'index'])->name('audit.index');
+        Route::post('/audit/merge', [\App\Http\Controllers\Admin\AuditController::class, 'merge'])->name('audit.merge');
     });
 });
