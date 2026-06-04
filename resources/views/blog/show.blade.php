@@ -24,46 +24,98 @@
     </div>
 
     <!-- Render Content Blocks -->
-    <div class="space-y-8">
-        @forelse($blocks as $block)
+    <div class="space-        @forelse($blocks as $block)
             @php
                 $type = $block['type'] ?? 'paragraph';
             @endphp
 
             @if($type === 'paragraph')
                 <!-- Paragraph Block -->
-                <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
-                    {!! nl2br(e($block['content'] ?? '')) !!}
-                </p>
+                <div class="space-y-2">
+                    @if(!empty($block['heading']))
+                        <h3 class="font-outfit font-black text-xl sm:text-2xl text-slate-900 mt-6">{{ $block['heading'] }}</h3>
+                    @endif
+                    @if(!empty($block['text']) || !empty($block['content']))
+                        <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+                            {!! nl2br(e($block['text'] ?? ($block['content'] ?? ''))) !!}
+                        </p>
+                    @endif
+                    @if(!empty($block['referenceUrl']))
+                        <div class="pt-1">
+                            <a href="{{ $block['referenceUrl'] }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-650 hover:underline">
+                                <span>🔗 Rujukan Artikel</span> ↗
+                            </a>
+                        </div>
+                    @endif
+                </div>
 
-            @elseif($type === 'qna')
-                <!-- QnA Block -->
-                <div class="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm space-y-3">
-                    <div class="flex gap-2">
-                        <span class="text-amber-650 font-extrabold font-outfit text-sm">TANYA:</span>
-                        <strong class="text-sm text-slate-850 font-outfit">{{ $block['question'] ?? '' }}</strong>
+            @elseif($type === 'quick_answer' || $type === 'qna')
+                <!-- QnA / Quick Answer Block -->
+                <div class="bg-amber-50/20 border border-amber-100 p-6 rounded-2xl shadow-sm space-y-3">
+                    <div class="flex gap-2 items-start">
+                        <span class="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Tanya Jawab</span>
+                        @if(!empty($block['question']))
+                            <strong class="text-sm text-slate-900 font-outfit">{{ $block['question'] }}</strong>
+                        @endif
                     </div>
-                    <div class="flex gap-2 border-t border-slate-100 pt-3">
-                        <span class="text-emerald-600 font-extrabold font-outfit text-sm">JAWAB:</span>
-                        <p class="text-xs sm:text-sm text-slate-650 leading-relaxed">{{ $block['answer'] ?? '' }}</p>
+                    <div class="border-t border-amber-100/50 pt-3">
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                            {!! nl2br(e($block['text'] ?? ($block['answer'] ?? ''))) !!}
+                        </p>
+                        @if(!empty($block['referenceUrl']))
+                            <div class="pt-2">
+                                <a href="{{ $block['referenceUrl'] }}" target="_blank" class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 hover:underline">
+                                    <span>Rujukan Referensi</span> ↗
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-            @elseif($type === 'dialogue')
-                <!-- Dialogue Block -->
-                <div class="flex gap-4 items-start bg-white p-4 rounded-2xl border border-slate-100 shadow-sm shadow-amber-950/2 max-w-xl">
-                    <div class="w-10 h-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-lg shrink-0">
-                        👤
-                    </div>
-                    <div class="space-y-1">
-                        <span class="block text-xs font-bold text-amber-650 uppercase tracking-wider">{{ $block['character'] ?? 'Karakter' }}</span>
-                        <p class="text-xs sm:text-sm text-slate-600 italic">"{{ $block['dialogue'] ?? '' }}"</p>
-                    </div>
+            @elseif($type === 'dialog' || $type === 'dialogue')
+                <!-- Dialogue / Conversation Block -->
+                <div class="space-y-4 max-w-xl bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">🗣️ Ilustrasi Percakapan:</span>
+                    @if(!empty($block['lines']) && is_array($block['lines']))
+                        @foreach($block['lines'] as $line)
+                            @php
+                                $role = strtolower($line['role'] ?? 'anak');
+                                $avatar = $role === 'ibu' ? '👩' : ($role === 'ayah' ? '👨' : '👦');
+                                $bg = $role === 'ibu' ? 'bg-rose-50 border-rose-100' : ($role === 'ayah' ? 'bg-indigo-50 border-indigo-100' : 'bg-amber-50 border-amber-100');
+                                $textCol = $role === 'ibu' ? 'text-rose-700' : ($role === 'ayah' ? 'text-indigo-700' : 'text-amber-700');
+                            @endphp
+                            <div class="flex gap-3 items-start">
+                                <div class="w-8 h-8 rounded-full {{ $bg }} border flex items-center justify-center text-sm shrink-0 shadow-sm">
+                                    {{ $avatar }}
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span class="block text-[10px] font-bold {{ $textCol }} uppercase tracking-wider">{{ $line['role'] ?? 'Anak' }}</span>
+                                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed italic">"{{ $line['text'] ?? '' }}"</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @elseif(!empty($block['character']))
+                        @php
+                            $role = strtolower($block['character']);
+                            $avatar = $role === 'ibu' ? '👩' : ($role === 'ayah' ? '👨' : '👦');
+                            $bg = $role === 'ibu' ? 'bg-rose-50 border-rose-100' : ($role === 'ayah' ? 'bg-indigo-50 border-indigo-100' : 'bg-amber-50 border-amber-100');
+                            $textCol = $role === 'ibu' ? 'text-rose-700' : ($role === 'ayah' ? 'text-indigo-700' : 'text-amber-700');
+                        @endphp
+                        <div class="flex gap-4 items-start bg-white p-4 rounded-2xl border border-slate-100 shadow-sm max-w-xl">
+                            <div class="w-10 h-10 rounded-full {{ $bg }} border flex items-center justify-center text-lg shrink-0">
+                                {{ $avatar }}
+                            </div>
+                            <div class="space-y-1">
+                                <span class="block text-xs font-bold {{ $textCol }} uppercase tracking-wider">{{ $block['character'] }}</span>
+                                <p class="text-xs sm:text-sm text-slate-655 italic">"{{ $block['dialogue'] ?? '' }}"</p>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             @elseif($type === 'quote')
                 <!-- Quote Block -->
-                <blockquote class="border-l-4 border-amber-500 bg-amber-50/30 p-5 rounded-r-2xl italic text-slate-655 text-xs sm:text-sm leading-relaxed space-y-1">
+                <blockquote class="border-l-4 border-amber-500 bg-amber-50/30 p-5 rounded-r-2xl italic text-slate-700 text-xs sm:text-sm leading-relaxed space-y-1">
                     <p>"{{ $block['quote'] ?? '' }}"</p>
                     @if(!empty($block['source']))
                         <cite class="block text-[10px] text-slate-450 not-italic font-bold">— {{ $block['source'] }}</cite>
@@ -72,48 +124,78 @@
 
             @elseif($type === 'analogy')
                 <!-- Analogy Block -->
-                <div class="bg-indigo-50/30 border border-indigo-100/50 p-6 rounded-2xl space-y-2">
-                    <span class="text-xs font-bold text-indigo-650 uppercase tracking-wider flex items-center gap-1">
-                        <span>💡 Analogi / Perumpamaan:</span>
+                <div class="bg-indigo-50/20 border border-indigo-100/50 p-6 rounded-2xl space-y-2">
+                    <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider flex items-center gap-1">
+                        <span>💡 Analogi: {{ $block['title'] ?? 'Perumpamaan' }}</span>
                     </span>
-                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                        {{ $block['analogy'] ?? '' }}
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                        {!! nl2br(e($block['text'] ?? ($block['analogy'] ?? ''))) !!}
                     </p>
                 </div>
 
             @elseif($type === 'dalil')
                 <!-- Dalil / References Block -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-                    <span class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
-                        Dalil / Rujukan
-                    </span>
-                    <p class="text-sm font-serif text-slate-700 italic leading-relaxed">
-                        "{{ $block['hadits'] ?? '' }}"
-                    </p>
+                <div class="bg-emerald-50/20 border border-emerald-100 p-6 rounded-2xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                            📚 {{ $block['title'] ?? 'Dalil / Rujukan' }}
+                        </span>
+                    </div>
+                    @if(!empty($block['arabic']))
+                        <p class="text-right text-lg sm:text-xl font-serif text-slate-900 leading-loose" dir="rtl">{{ $block['arabic'] }}</p>
+                    @elseif(!empty($block['hadits']))
+                        <p class="text-sm font-serif text-slate-700 italic leading-relaxed">"{{ $block['hadits'] }}"</p>
+                    @endif
+                    @if(!empty($block['translation']))
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans italic">"{{ $block['translation'] }}"</p>
+                    @endif
                     @if(!empty($block['source']))
-                        <span class="block text-[10px] text-slate-450 font-mono text-right">— {{ $block['source'] }}</span>
+                        <div class="flex justify-between items-center text-[10px] text-slate-450 pt-2 border-t border-emerald-100/50">
+                            <span>Rujukan: <strong>{{ $block['source'] }}</strong></span>
+                            @if(!empty($block['sourceUrl']))
+                                <a href="{{ $block['sourceUrl'] }}" target="_blank" class="text-emerald-700 hover:underline">Rujukan Asli ↗</a>
+                            @endif
+                        </div>
                     @endif
                 </div>
 
             @elseif($type === 'doa')
                 <!-- Doa Block -->
-                <div class="bg-amber-50/20 border border-amber-100/50 p-6 rounded-2xl space-y-4">
-                    <span class="block text-[10px] font-bold text-amber-650 uppercase tracking-wider">Doa / Harapan:</span>
-                    @if(!empty($block['doa']))
-                        <p class="text-right text-lg font-serif text-slate-900 leading-loose">{{ $block['doa'] }}</p>
+                <div class="bg-amber-50/25 border border-amber-100 p-6 rounded-2xl space-y-4">
+                    <span class="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-150 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        🤲 Doa: {{ $block['title'] ?? 'Permohonan' }}
+                    </span>
+                    @if(!empty($block['arabic']))
+                        <p class="text-right text-lg sm:text-xl font-serif text-slate-900 leading-loose" dir="rtl">{{ $block['arabic'] }}</p>
+                    @elseif(!empty($block['doa']))
+                        <p class="text-right text-lg font-serif text-slate-900 leading-loose" dir="rtl">{{ $block['doa'] }}</p>
+                    @endif
+                    @if(!empty($block['translation']))
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans italic">
+                            <strong class="text-slate-500 not-italic">Artinya:</strong> "{{ $block['translation'] }}"
+                        </p>
+                    @elseif(!empty($block['meaning']))
+                        <p class="text-xs text-slate-700 border-t border-amber-100/50 pt-2">
+                            <strong class="text-slate-500">Artinya:</strong> "{{ $block['meaning'] }}"
+                        </p>
                     @endif
                     @if(!empty($block['latin']))
-                        <p class="text-xs italic text-slate-600 font-sans">{{ $block['latin'] }}</p>
+                        <p class="text-xs italic text-slate-500 font-sans">Lafadz: {{ $block['latin'] }}</p>
                     @endif
-                    @if(!empty($block['meaning']))
-                        <p class="text-xs text-slate-600 border-t border-amber-100/50 pt-2"><strong class="text-slate-500">Artinya:</strong> "{{ $block['meaning'] }}"</p>
+                    @if(!empty($block['source']))
+                        <div class="flex justify-between items-center text-[10px] text-slate-450 pt-2 border-t border-amber-100/50">
+                            <span>Sumber: <strong>{{ $block['source'] }}</strong></span>
+                            @if(!empty($block['sourceUrl']))
+                                <a href="{{ $block['sourceUrl'] }}" target="_blank" class="text-amber-700 hover:underline">Link Asli ↗</a>
+                            @endif
+                        </div>
                     @endif
                 </div>
 
             @elseif($type === 'image')
                 <!-- Image Block -->
                 <div class="space-y-2">
-                    <div class="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
+                    <div class="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 shadow-sm">
                         <img src="{{ $block['url'] ?? '#' }}" alt="{{ $block['caption'] ?? 'Gambar Artikel' }}" class="w-full max-h-96 object-cover">
                     </div>
                     @if(!empty($block['caption']))
@@ -124,10 +206,10 @@
             @elseif($type === 'video')
                 <!-- Video Block -->
                 <div class="space-y-2">
-                    <div class="aspect-video w-full rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
+                    <div class="aspect-video w-full rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 shadow-sm">
                         @php
                             $youtubeId = '';
-                            $url = $block['youtube_url'] ?? '';
+                            $url = $block['url'] ?? ($block['youtube_url'] ?? '');
                             if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $url, $match)) {
                                 $youtubeId = $match[1];
                             }
@@ -142,7 +224,6 @@
                         <span class="block text-center text-[10px] text-slate-400 italic">{{ $block['caption'] }}</span>
                     @endif
                 </div>
-
             @endif
         @empty
             <p class="text-slate-400 italic">Artikel ini tidak memiliki blok konten.</p>

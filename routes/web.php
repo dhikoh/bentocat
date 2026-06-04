@@ -71,6 +71,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Editorial CMS (Article blocks)
         Route::resource('/articles', ArticleController::class);
         Route::post('/articles/upload-image', [ArticleController::class, 'uploadImage'])->name('articles.upload-image');
+        Route::post('/articles/ai-assist', [ArticleController::class, 'aiAssist'])->name('articles.ai-assist');
 
         // Leads View & CSV Export
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');

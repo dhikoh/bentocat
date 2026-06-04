@@ -111,6 +111,72 @@
                 </div>
             </div>
 
+            <!-- AI Writing Assistant Card -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">🤖</span>
+                    <h2 class="text-sm font-bold text-white uppercase tracking-wider">AI Writing Assistant</h2>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Dapatkan saran outline, pertanyaan FAQs, optimasi judul/deskripsi meta SEO, dan rekomendasi link internal otomatis berdasarkan judul dan deskripsi artikel.
+                </p>
+                
+                <button type="button" id="btn-ai-assist" class="w-full bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-amber-500 text-xs font-bold py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span>✨ Hasilkan Rekomendasi AI</span>
+                </button>
+
+                <!-- Loading Indicator -->
+                <div id="ai-loading" class="hidden flex items-center justify-center gap-2 py-4">
+                    <svg class="animate-spin h-5 w-5 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-xs text-slate-400">Sedang memproses AI...</span>
+                </div>
+
+                <!-- Error Box -->
+                <div id="ai-error" class="hidden bg-rose-950/40 border border-rose-800/60 p-3 rounded-xl text-rose-400 text-xs leading-relaxed"></div>
+
+                <!-- AI Results Container -->
+                <div id="ai-results" class="hidden space-y-4 border-t border-slate-800/80 pt-4 max-h-[350px] overflow-y-auto pr-1">
+                    <!-- Outline Suggestions -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-slate-300">📌 Struktur Outline:</h3>
+                        <ul id="ai-outline" class="text-xs text-slate-400 list-disc list-inside space-y-1 pl-1"></ul>
+                    </div>
+
+                    <!-- FAQ Suggestions -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-slate-300">❓ Pertanyaan FAQs:</h3>
+                        <div id="ai-faqs" class="space-y-2 text-xs text-slate-400 bg-slate-950/60 p-2.5 rounded-xl border border-slate-850"></div>
+                    </div>
+
+                    <!-- Meta Tags Suggestion -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-slate-300">🔍 Optimasi SEO:</h3>
+                        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-850 space-y-2">
+                            <div>
+                                <span class="text-[10px] text-slate-500 font-bold block">JUDUL SEO:</span>
+                                <span id="ai-seo-title" class="text-xs text-slate-300 block font-medium mt-0.5"></span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-500 font-bold block">META DESKRIPSI:</span>
+                                <span id="ai-seo-desc" class="text-xs text-slate-400 block mt-0.5 leading-relaxed"></span>
+                            </div>
+                            <button type="button" id="btn-apply-seo" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-1.5 px-2 rounded-lg text-[10px] transition-all cursor-pointer">
+                                Terapkan Ke Kolom SEO
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Internal Links Suggestion -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-slate-300">🔗 Link Internal Otomatis:</h3>
+                        <ul id="ai-links" class="text-[11px] text-slate-400 space-y-1.5 pl-1"></ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- SEO Metadata card -->
             <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-4">
                 <h2 class="text-sm font-bold text-white uppercase tracking-wider">Optimasi SEO (Google Search)</h2>
@@ -452,5 +518,99 @@
 
     // Render initially
     renderBlocks();
+
+    // AI Writing Assistant Event Listener
+    document.getElementById('btn-ai-assist').addEventListener('click', async function () {
+        const title = document.getElementById('title').value;
+        const summary = document.getElementById('summary').value;
+
+        if (!title.trim()) {
+            alert('Silakan isi Judul Artikel terlebih dahulu untuk memulai analisis AI.');
+            return;
+        }
+
+        const btn = document.getElementById('btn-ai-assist');
+        const loading = document.getElementById('ai-loading');
+        const errorBox = document.getElementById('ai-error');
+        const results = document.getElementById('ai-results');
+
+        btn.disabled = true;
+        btn.classList.add('opacity-50');
+        loading.classList.remove('hidden');
+        errorBox.classList.add('hidden');
+        results.classList.add('hidden');
+
+        try {
+            const response = await fetch('{{ route("admin.articles.ai-assist") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ title, summary })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Gagal mengambil rekomendasi AI.');
+            }
+
+            // Populate Outline
+            const outlineUl = document.getElementById('ai-outline');
+            outlineUl.innerHTML = '';
+            data.outline.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                outlineUl.appendChild(li);
+            });
+
+            // Populate FAQs
+            const faqsDiv = document.getElementById('ai-faqs');
+            faqsDiv.innerHTML = '';
+            data.faqs.forEach(faq => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'space-y-0.5 border-b border-slate-850 pb-2 last:border-b-0 last:pb-0';
+                itemDiv.innerHTML = `
+                    <p class="font-bold text-slate-300">Q: ${faq.q}</p>
+                    <p class="text-slate-400">${faq.a}</p>
+                `;
+                faqsDiv.appendChild(itemDiv);
+            });
+
+            // Populate SEO Recommendations
+            document.getElementById('ai-seo-title').textContent = data.seo_title;
+            document.getElementById('ai-seo-desc').textContent = data.seo_description;
+
+            // Handle Apply SEO Button Click
+            document.getElementById('btn-apply-seo').onclick = function () {
+                document.getElementById('seo_title').value = data.seo_title;
+                document.getElementById('seo_description').value = data.seo_description;
+                alert('Rekomendasi judul dan deskripsi SEO berhasil diterapkan!');
+            };
+
+            // Populate Internal Links
+            const linksUl = document.getElementById('ai-links');
+            linksUl.innerHTML = '';
+            data.internal_links.forEach(link => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start gap-1.5';
+                li.innerHTML = `
+                    <span class="text-slate-500 mt-0.5">▪</span> 
+                    <a href="${link.url}" target="_blank" class="text-amber-400 hover:underline hover:text-amber-500 transition-all">${link.title}</a>
+                `;
+                linksUl.appendChild(li);
+            });
+
+            results.classList.remove('hidden');
+        } catch (e) {
+            errorBox.textContent = e.message || 'Terjadi kesalahan sistem saat menghubungi server AI.';
+            errorBox.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-50');
+            loading.classList.add('hidden');
+        }
+    });
 </script>
 @endsection
