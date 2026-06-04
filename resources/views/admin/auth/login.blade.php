@@ -33,8 +33,7 @@
         <div class="absolute -bottom-10 -left-10 w-28 h-28 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
         <div class="text-center mb-8 relative z-10">
-            <span class="text-5xl block mb-2 select-none animate-bounce">🐱</span>
-            <h1 class="text-3xl font-extrabold text-white tracking-tight">BentoCat</h1>
+            <img src="{{ asset('images/logo.png') }}" alt="BentoCat Logo" class="h-12 w-auto mx-auto mb-3">
             <p class="text-sm text-slate-400 mt-1 uppercase tracking-widest font-semibold text-[10px]">Lead Intelligence Platform</p>
         </div>
 
@@ -53,7 +52,7 @@
             <div>
                 <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Alamat Email</label>
                 <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus
-                       placeholder="admin@bentocat.com" 
+                       placeholder="admin@bentocat.id" 
                        class="w-full bg-slate-950/80 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
             </div>
 

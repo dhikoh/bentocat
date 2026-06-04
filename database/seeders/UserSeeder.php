@@ -12,21 +12,21 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name' => 'Superadmin BentoCat',
-            'email' => 'admin@bentocat.com',
+            'email' => 'admin@bentocat.id',
             'password' => Hash::make('Bismillah@bentocat'),
             'role' => 'superadmin'
         ]);
 
         User::create([
             'name' => 'Editor BentoCat',
-            'email' => 'editor@bentocat.com',
+            'email' => 'editor@bentocat.id',
             'password' => Hash::make('Bismillah@bentocat'),
             'role' => 'editor'
         ]);
 
         User::create([
             'name' => 'Contributor BentoCat',
-            'email' => 'contributor@bentocat.com',
+            'email' => 'contributor@bentocat.id',
             'password' => Hash::make('Bismillah@bentocat'),
             'role' => 'contributor'
         ]);

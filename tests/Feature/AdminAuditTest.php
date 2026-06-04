@@ -32,7 +32,7 @@ class AdminAuditTest extends TestCase
         // 1. Create Superadmin User
         $this->admin = User::create([
             'name' => 'Super Admin',
-            'email' => 'superadmin@bentocat.com',
+            'email' => 'superadmin@bentocat.id',
             'password' => bcrypt('password123'),
             'role' => 'superadmin'
         ]);

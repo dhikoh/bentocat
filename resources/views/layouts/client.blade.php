@@ -6,6 +6,7 @@
     <title>@yield('title', 'BentoCat - Premium Cat Litter Discovery')</title>
     <meta name="description" content="@yield('meta_description', 'Temukan outlet resmi terdekat yang menjual BentoCat Premium Bentonite Cat Litter dengan harga lokal terjangkau.')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,10 +64,7 @@
     <header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm shadow-amber-900/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <a href="{{ route('home') }}" class="flex items-center gap-2 group">
-                <span class="text-2xl">🐱</span>
-                <span class="font-outfit font-black text-2xl tracking-tight bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent group-hover:from-amber-400 group-hover:to-amber-500 transition-all">
-                    BentoCat
-                </span>
+                <img src="{{ asset('images/logo.png') }}" alt="BentoCat Logo" class="h-10 w-auto">
             </a>
 
             <!-- Desktop Menu -->

@@ -44,8 +44,7 @@
     <!-- Mobile Header -->
     <header class="md:hidden bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 py-3 shrink-0">
         <div class="flex items-center gap-2">
-            <span class="text-2xl">🐱</span>
-            <span class="font-bold text-amber-500 tracking-wider text-lg">BENTOCAT</span>
+            <img src="{{ asset('images/logo.png') }}" alt="BentoCat Logo" class="h-8 w-auto">
         </div>
         <button id="mobile-menu-btn" class="text-slate-400 hover:text-amber-500 focus:outline-none">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,11 +57,10 @@
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900/95 border-r border-slate-800 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:static md:inset-auto md:shrink-0 backdrop-blur-md">
         <!-- Brand logo -->
         <div class="px-6 py-5 border-b border-slate-800/80 flex items-center justify-between shrink-0">
-            <div class="flex items-center gap-2">
-                <span class="text-3xl animate-bounce">🐱</span>
+            <div class="flex items-center gap-2.5">
+                <img src="{{ asset('images/logo.png') }}" alt="BentoCat Logo" class="h-9 w-auto">
                 <div>
-                    <span class="block font-black text-amber-400 tracking-wider text-xl">BENTOCAT</span>
-                    <span class="block text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Lead Intelligence</span>
+                    <span class="block text-[9px] text-slate-500 uppercase tracking-widest font-semibold">Lead Intelligence</span>
                 </div>
             </div>
             <button id="close-sidebar-btn" class="md:hidden text-slate-500 hover:text-rose-500">

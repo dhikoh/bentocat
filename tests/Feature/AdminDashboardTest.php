@@ -20,7 +20,7 @@ class AdminDashboardTest extends TestCase
     {
         $admin = User::create([
             'name' => 'Admin User',
-            'email' => 'admin@bentocat.com',
+            'email' => 'admin@bentocat.id',
             'password' => bcrypt('password123'),
             'role' => 'superadmin'
         ]);
