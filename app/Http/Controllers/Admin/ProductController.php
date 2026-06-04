@@ -33,6 +33,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
+            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
         ]);
@@ -42,6 +43,19 @@ class ProductController extends Controller
         if ($count > 0) {
             $validated['slug'] = $validated['slug'] . '-' . ($count + 1);
         }
+
+        if ($request->hasFile('thumbnail_file')) {
+            $file = $request->file('thumbnail_file');
+            $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('uploads/products');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            $file->move($uploadPath, $filename);
+            $validated['thumbnail'] = '/uploads/products/' . $filename;
+        }
+
+        unset($validated['thumbnail_file']);
 
         Product::create($validated);
 
@@ -58,6 +72,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
+            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
         ]);
@@ -67,6 +82,27 @@ class ProductController extends Controller
         if ($count > 0) {
             $validated['slug'] = $validated['slug'] . '-' . ($count + 1);
         }
+
+        if ($request->hasFile('thumbnail_file')) {
+            // Clean up old file if it exists and is a local upload
+            if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
+                $oldPath = public_path($product->thumbnail);
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+            }
+
+            $file = $request->file('thumbnail_file');
+            $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $uploadPath = public_path('uploads/products');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            $file->move($uploadPath, $filename);
+            $validated['thumbnail'] = '/uploads/products/' . $filename;
+        }
+
+        unset($validated['thumbnail_file']);
 
         $product->update($validated);
 

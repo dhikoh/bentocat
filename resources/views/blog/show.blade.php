@@ -134,24 +134,30 @@
                 </div>
 
             @elseif($type === 'dalil')
-                <!-- Dalil / References Block -->
+                <!-- Riset / Studi Block -->
                 <div class="bg-emerald-50/20 border border-emerald-100 p-6 rounded-2xl space-y-4">
                     <div class="flex justify-between items-center">
                         <span class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
-                            📚 {{ $block['title'] ?? 'Dalil / Rujukan' }}
+                            📚 Studi & Riset: {{ $block['title'] ?? 'Referensi' }}
                         </span>
                     </div>
                     @if(!empty($block['arabic']))
-                        <p class="text-right text-lg sm:text-xl font-serif text-slate-900 leading-loose" dir="rtl">{{ $block['arabic'] }}</p>
+                        <blockquote class="border-l-4 border-emerald-500 pl-4 py-1 italic text-slate-800 text-sm md:text-base leading-relaxed font-sans font-medium">
+                            "{!! nl2br(e($block['arabic'])) !!}"
+                        </blockquote>
                     @elseif(!empty($block['hadits']))
-                        <p class="text-sm font-serif text-slate-700 italic leading-relaxed">"{{ $block['hadits'] }}"</p>
+                        <blockquote class="border-l-4 border-emerald-500 pl-4 py-1 italic text-slate-800 text-sm md:text-base leading-relaxed font-sans font-medium">
+                            "{!! nl2br(e($block['hadits'])) !!}"
+                        </blockquote>
                     @endif
                     @if(!empty($block['translation']))
-                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans italic">"{{ $block['translation'] }}"</p>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                            <span class="font-semibold text-slate-500">Penjelasan:</span> {{ $block['translation'] }}
+                        </p>
                     @endif
                     @if(!empty($block['source']))
                         <div class="flex justify-between items-center text-[10px] text-slate-450 pt-2 border-t border-emerald-100/50">
-                            <span>Rujukan: <strong>{{ $block['source'] }}</strong></span>
+                            <span>Sumber Riset: <strong>{{ $block['source'] }}</strong></span>
                             @if(!empty($block['sourceUrl']))
                                 <a href="{{ $block['sourceUrl'] }}" target="_blank" class="text-emerald-700 hover:underline">Rujukan Asli ↗</a>
                             @endif
@@ -160,27 +166,27 @@
                 </div>
 
             @elseif($type === 'doa')
-                <!-- Doa Block -->
+                <!-- Tips Khusus Block -->
                 <div class="bg-amber-50/25 border border-amber-100 p-6 rounded-2xl space-y-4">
                     <span class="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-150 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
-                        🤲 Doa: {{ $block['title'] ?? 'Permohonan' }}
+                        💡 Tips: {{ $block['title'] ?? 'Rekomendasi' }}
                     </span>
                     @if(!empty($block['arabic']))
-                        <p class="text-right text-lg sm:text-xl font-serif text-slate-900 leading-loose" dir="rtl">{{ $block['arabic'] }}</p>
+                        <p class="text-slate-800 text-sm md:text-base font-semibold leading-relaxed font-sans border-l-4 border-amber-400 pl-4 py-1">{{ $block['arabic'] }}</p>
                     @elseif(!empty($block['doa']))
-                        <p class="text-right text-lg font-serif text-slate-900 leading-loose" dir="rtl">{{ $block['doa'] }}</p>
+                        <p class="text-slate-800 text-sm md:text-base font-semibold leading-relaxed font-sans border-l-4 border-amber-400 pl-4 py-1">{{ $block['doa'] }}</p>
                     @endif
                     @if(!empty($block['translation']))
-                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans italic">
-                            <strong class="text-slate-500 not-italic">Artinya:</strong> "{{ $block['translation'] }}"
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                            <strong class="text-slate-500 font-semibold">Detail:</strong> {{ $block['translation'] }}
                         </p>
                     @elseif(!empty($block['meaning']))
-                        <p class="text-xs text-slate-700 border-t border-amber-100/50 pt-2">
-                            <strong class="text-slate-500">Artinya:</strong> "{{ $block['meaning'] }}"
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                            <strong class="text-slate-500 font-semibold">Detail:</strong> {{ $block['meaning'] }}
                         </p>
                     @endif
                     @if(!empty($block['latin']))
-                        <p class="text-xs italic text-slate-500 font-sans">Lafadz: {{ $block['latin'] }}</p>
+                        <p class="text-xs italic text-slate-500 font-sans">Sorotan: {{ $block['latin'] }}</p>
                     @endif
                     @if(!empty($block['source']))
                         <div class="flex justify-between items-center text-[10px] text-slate-450 pt-2 border-t border-amber-100/50">

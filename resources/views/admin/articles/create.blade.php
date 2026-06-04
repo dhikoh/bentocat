@@ -66,10 +66,10 @@
                             ⚖️ Analogi
                         </button>
                         <button type="button" onclick="addBlock('dalil')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
-                            📚 Dalil / Hadits
+                            📚 Riset / Studi
                         </button>
                         <button type="button" onclick="addBlock('doa')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
-                            🤲 Doa
+                            💡 Tips Khusus
                         </button>
                         <button type="button" onclick="addBlock('image')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
                             🖼️ Gambar
@@ -308,17 +308,17 @@
                 fieldsHtml = `
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Teks Arab (Dalil / Hadits)</label>
-                            <textarea rows="2" dir="rtl" oninput="updateBlockField(${index}, 'arabic', this.value)" placeholder="Teks arab..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none text-right font-serif">${block.arabic || ''}</textarea>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kutipan / Temuan Utama</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'arabic', this.value)" placeholder="Masukkan kutipan penting atau data riset..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.arabic || ''}</textarea>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Terjemahan Indonesia</label>
-                            <textarea rows="2" oninput="updateBlockField(${index}, 'translation', this.value)" placeholder="Terjemah..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.translation || ''}</textarea>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Penjelasan Riset / Studi</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'translation', this.value)" placeholder="Penjelasan riset..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.translation || ''}</textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sumber (Perawi / Kitab)</label>
-                                <input type="text" value="${block.source || ''}" oninput="updateBlockField(${index}, 'source', this.value)" placeholder="Contoh: HR. Bukhari" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sumber Riset / Publikasi</label>
+                                <input type="text" value="${block.source || ''}" oninput="updateBlockField(${index}, 'source', this.value)" placeholder="Contoh: Journal of Feline Medicine, 2024" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Sumber URL</label>
@@ -331,21 +331,21 @@
                 fieldsHtml = `
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama Doa / Judul</label>
-                            <input type="text" value="${block.title || ''}" oninput="updateBlockField(${index}, 'title', this.value)" placeholder="Contoh: Doa Memohon Rahmat" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Judul Tips / Rekomendasi</label>
+                            <input type="text" value="${block.title || ''}" oninput="updateBlockField(${index}, 'title', this.value)" placeholder="Contoh: Cara Menyimpan Pasir Agar Awet" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Teks Arab Doa</label>
-                            <textarea rows="2" dir="rtl" oninput="updateBlockField(${index}, 'arabic', this.value)" placeholder="Doa arab..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none text-right font-serif">${block.arabic || ''}</textarea>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Poin Sorotan Utama (Highlight)</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'arabic', this.value)" placeholder="Masukkan poin sorotan penting dari tips..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.arabic || ''}</textarea>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Arti Doa</label>
-                            <textarea rows="2" oninput="updateBlockField(${index}, 'translation', this.value)" placeholder="Arti doa..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.translation || ''}</textarea>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Detail Penerapan Tips</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'translation', this.value)" placeholder="Penjelasan rinci mengenai tips..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.translation || ''}</textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sumber Doa</label>
-                                <input type="text" value="${block.source || ''}" oninput="updateBlockField(${index}, 'source', this.value)" placeholder="Contoh: QS. Al-Baqarah: 201" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sumber Tips / Ahli (Opsional)</label>
+                                <input type="text" value="${block.source || ''}" oninput="updateBlockField(${index}, 'source', this.value)" placeholder="Contoh: Dr. Sarah (Cat Expert)" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Sumber URL</label>
@@ -402,8 +402,8 @@
             quick_answer: "Jawaban Cepat",
             dialog: "Dialog Percakapan",
             analogy: "Analogi",
-            dalil: "Dalil / Hadits",
-            doa: "Doa",
+            dalil: "Riset / Studi",
+            doa: "Tips Khusus",
             image: "Gambar / Foto",
             video: "Video Link"
         };

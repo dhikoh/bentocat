@@ -48,6 +48,7 @@ class AdminArticlesAiTest extends TestCase
 
         // Create another article to test internal links
         Article::create([
+            'author_id' => $admin->id,
             'title' => 'Cara Merawat Bulu Kucing Agar Tebal',
             'slug' => 'cara-merawat-bulu-kucing-agar-tebal',
             'summary' => 'Panduan singkat merawat bulu kucing.',
