@@ -1,0 +1,456 @@
+@extends('layouts.admin')
+
+@section('title', 'Edit Artikel - ' . $article->title)
+
+@section('content')
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="flex items-center gap-2">
+        <a href="{{ route('admin.articles.index') }}" class="text-sm font-bold text-amber-500 hover:underline">← Kembali ke Daftar</a>
+    </div>
+
+    <div>
+        <h1 class="text-2xl font-bold text-white">Edit Artikel: {{ $article->title }}</h1>
+        <p class="text-sm text-slate-400">Gunakan editor berbasis blok untuk memperbarui konten interaktif.</p>
+    </div>
+
+    <form id="article-form" action="{{ route('admin.articles.update', $article->id) }}" method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="content_json" id="content_json" value="">
+
+        <!-- Left: Block Editor Container -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Core Metadata -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-4">
+                <div>
+                    <label for="title" class="block text-xs font-bold text-slate-400 uppercase mb-2">Judul Artikel</label>
+                    <input type="text" name="title" id="title" value="{{ old('title', $article->title) }}" required placeholder="Tulis judul artikel yang menarik..." 
+                           class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="summary" class="block text-xs font-bold text-slate-400 uppercase mb-2">Ringkasan / Ringkasan (Summary)</label>
+                    <textarea name="summary" id="summary" rows="2" placeholder="Ringkasan singkat artikel untuk preview halaman depan..." 
+                              class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none transition-all">{{ old('summary', $article->summary) }}</textarea>
+                </div>
+            </div>
+
+            <!-- Dynamic Block Editor Panel -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Susunan Blok Konten</h2>
+                        <p class="text-xs text-slate-500 mt-1">Tambahkan berbagai jenis blok di bawah untuk membentuk tubuh artikel.</p>
+                    </div>
+                </div>
+
+                <!-- Visual Blocks Container -->
+                <div id="blocks-container" class="space-y-4">
+                    <!-- Blocks will render here dynamically via JavaScript -->
+                </div>
+
+                <!-- Block Adder Controls -->
+                <div class="border-t border-slate-800/80 pt-6">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-3">Tambah Blok Baru</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button" onclick="addBlock('paragraph')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            📝 Paragraf
+                        </button>
+                        <button type="button" onclick="addBlock('quick_answer')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            💡 Jawaban Cepat
+                        </button>
+                        <button type="button" onclick="addBlock('dialog')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            🗣️ Dialog
+                        </button>
+                        <button type="button" onclick="addBlock('analogy')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            ⚖️ Analogi
+                        </button>
+                        <button type="button" onclick="addBlock('dalil')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            📚 Dalil / Hadits
+                        </button>
+                        <button type="button" onclick="addBlock('doa')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            🤲 Doa
+                        </button>
+                        <button type="button" onclick="addBlock('image')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            🖼️ Gambar
+                        </button>
+                        <button type="button" onclick="addBlock('video')" class="bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-slate-900 text-xs font-bold py-2 px-3 rounded-xl text-slate-300 transition-all flex items-center justify-center gap-1.5">
+                            🎥 Video Link
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right: SEO Config & Publish Actions -->
+        <div class="space-y-6">
+            
+            <!-- Publish card -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-4">
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Publikasi</h2>
+                
+                <div>
+                    <label for="status" class="block text-xs font-bold text-slate-500 uppercase mb-2">Status</label>
+                    <select name="status" id="status" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none transition-all">
+                        <option value="DRAFT" {{ $article->status === 'DRAFT' ? 'selected' : '' }}>Draft</option>
+                        <option value="UNDER_REVIEW" {{ $article->status === 'UNDER_REVIEW' ? 'selected' : '' }}>Menunggu Review</option>
+                        <option value="PUBLISHED" {{ $article->status === 'PUBLISHED' ? 'selected' : '' }}>Published (Publikasikan)</option>
+                    </select>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <a href="{{ route('admin.articles.index') }}" class="flex-1 bg-slate-850 hover:bg-slate-800 text-slate-400 text-center py-2.5 rounded-xl text-xs font-semibold transition-all">
+                        Batal
+                    </a>
+                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/10 transition-all">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </div>
+
+            <!-- SEO Metadata card -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-4">
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Optimasi SEO (Google Search)</h2>
+                
+                <div>
+                    <label for="seo_title" class="block text-xs font-bold text-slate-500 uppercase mb-2">Judul SEO (SEO Title)</label>
+                    <input type="text" name="seo_title" id="seo_title" value="{{ old('seo_title', $article->seo_title) }}" placeholder="Kosongkan untuk menyamakan dengan judul..." 
+                           class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="seo_description" class="block text-xs font-bold text-slate-500 uppercase mb-2">Deskripsi Meta SEO</label>
+                    <textarea name="seo_description" id="seo_description" rows="3" placeholder="Tulis meta description unik untuk search engine snippet..." 
+                              class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none transition-all">{{ old('seo_description', $article->seo_description) }}</textarea>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    // Prefill with existing database blocks
+    let blocks = {!! $blocksJson !!} || [];
+
+    function renderBlocks() {
+        const container = document.getElementById('blocks-container');
+        container.innerHTML = '';
+
+        if (blocks.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-10 border border-dashed border-slate-800 rounded-2xl text-slate-600 italic text-xs select-none">
+                    Belum ada blok konten ditambahkan. Pilih jenis blok di bawah untuk mulai menulis.
+                </div>
+            `;
+            return;
+        }
+
+        blocks.forEach((block, index) => {
+            const blockDiv = document.createElement('div');
+            blockDiv.className = "bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 relative group";
+
+            // Reorder and delete controls header
+            let headerHtml = `
+                <div class="flex items-center justify-between border-b border-slate-850 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-slate-400">#${index + 1}</span>
+                        <span class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${getBlockTypeName(block.type)}</span>
+                    </div>
+                    <div class="flex gap-1">
+                        <button type="button" onclick="moveBlock(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="p-1 hover:bg-slate-800 rounded text-slate-500 disabled:opacity-30">⬆️</button>
+                        <button type="button" onclick="moveBlock(${index}, 1)" ${index === blocks.length - 1 ? 'disabled' : ''} class="p-1 hover:bg-slate-800 rounded text-slate-500 disabled:opacity-30">⬇️</button>
+                        <button type="button" onclick="deleteBlock(${index})" class="p-1 hover:bg-rose-500/10 text-rose-500 rounded">❌</button>
+                    </div>
+                </div>
+            `;
+
+            let fieldsHtml = '';
+
+            if (block.type === 'paragraph') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sub-Judul (Opsional)</label>
+                            <input type="text" value="${block.heading || ''}" oninput="updateBlockField(${index}, 'heading', this.value)" placeholder="Contoh: Manfaat Pasir Bentonit" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Isi Paragraf Teks</label>
+                            <textarea rows="4" oninput="updateBlockField(${index}, 'text', this.value)" placeholder="Tuliskan isi paragraf di sini..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.text || ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Referensi (Opsional)</label>
+                            <input type="url" value="${block.referenceUrl || ''}" oninput="updateBlockField(${index}, 'referenceUrl', this.value)" placeholder="https://..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                    </div>
+                `;
+            } else if (block.type === 'quick_answer') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pertanyaan / Poin Jawaban Cepat</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'text', this.value)" placeholder="Tulis poin jawaban ringkas di sini..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.text || ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Referensi (Opsional)</label>
+                            <input type="url" value="${block.referenceUrl || ''}" oninput="updateBlockField(${index}, 'referenceUrl', this.value)" placeholder="https://..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                    </div>
+                `;
+            } else if (block.type === 'dialog') {
+                let linesHtml = (block.lines || []).map((line, lineIndex) => `
+                    <div class="flex gap-2 items-center">
+                        <select onchange="updateDialogLine(${index}, ${lineIndex}, 'role', this.value)" class="bg-slate-900 border border-slate-850 text-xs text-slate-300 rounded-lg p-2 focus:outline-none">
+                            <option value="anak" ${line.role === 'anak' ? 'selected' : ''}>Anak</option>
+                            <option value="ibu" ${line.role === 'ibu' ? 'selected' : ''}>Ibu</option>
+                            <option value="ayah" ${line.role === 'ayah' ? 'selected' : ''}>Ayah</option>
+                        </select>
+                        <input type="text" value="${line.text || ''}" oninput="updateDialogLine(${index}, ${lineIndex}, 'text', this.value)" placeholder="Ucapan dialog..." class="flex-1 bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        <button type="button" onclick="deleteDialogLine(${index}, ${lineIndex})" class="text-rose-500 text-xs px-2 py-1">Hapus</button>
+                    </div>
+                `).join('');
+
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dialog Percakapan</label>
+                        <div class="space-y-2" id="dialog-lines-${index}">
+                            ${linesHtml}
+                        </div>
+                        <button type="button" onclick="addDialogLine(${index})" class="bg-slate-900 hover:bg-slate-800 text-xs text-amber-500 border border-slate-800 px-3 py-1.5 rounded-lg">
+                            + Tambah Baris Percakapan
+                        </button>
+                    </div>
+                `;
+            } else if (block.type === 'analogy') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Judul Analogi</label>
+                            <input type="text" value="${block.title || ''}" oninput="updateBlockField(${index}, 'title', this.value)" placeholder="Contoh: Menyaring Air Kotor" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Penjelasan Analogi</label>
+                            <textarea rows="3" oninput="updateBlockField(${index}, 'text', this.value)" placeholder="Jelaskan analoginya di sini..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.text || ''}</textarea>
+                        </div>
+                    </div>
+                `;
+            } else if (block.type === 'dalil') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Teks Arab (Dalil / Hadits)</label>
+                            <textarea rows="2" dir="rtl" oninput="updateBlockField(${index}, 'arabic', this.value)" placeholder="Teks arab..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none text-right font-serif">${block.arabic || ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Terjemahan Indonesia</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'translation', this.value)" placeholder="Terjemah..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.translation || ''}</textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sumber (Perawi / Kitab)</label>
+                                <input type="text" value="${block.source || ''}" oninput="updateBlockField(${index}, 'source', this.value)" placeholder="Contoh: HR. Bukhari" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Sumber URL</label>
+                                <input type="url" value="${block.sourceUrl || ''}" oninput="updateBlockField(${index}, 'sourceUrl', this.value)" placeholder="https://..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (block.type === 'doa') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama Doa / Judul</label>
+                            <input type="text" value="${block.title || ''}" oninput="updateBlockField(${index}, 'title', this.value)" placeholder="Contoh: Doa Memohon Rahmat" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Teks Arab Doa</label>
+                            <textarea rows="2" dir="rtl" oninput="updateBlockField(${index}, 'arabic', this.value)" placeholder="Doa arab..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none text-right font-serif">${block.arabic || ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Arti Doa</label>
+                            <textarea rows="2" oninput="updateBlockField(${index}, 'translation', this.value)" placeholder="Arti doa..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">${block.translation || ''}</textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sumber Doa</label>
+                                <input type="text" value="${block.source || ''}" oninput="updateBlockField(${index}, 'source', this.value)" placeholder="Contoh: QS. Al-Baqarah: 201" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Sumber URL</label>
+                                <input type="url" value="${block.sourceUrl || ''}" oninput="updateBlockField(${index}, 'sourceUrl', this.value)" placeholder="https://..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (block.type === 'image') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-4">
+                            <div class="w-20 h-20 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center overflow-hidden text-2xl select-none shrink-0">
+                                ${block.url ? `<img src="${block.url}" class="w-full h-full object-cover">` : '🖼️'}
+                            </div>
+                            <div class="flex-1 space-y-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Upload File Gambar</label>
+                                <input type="file" accept="image/*" onchange="uploadBlockImage(this, ${index})" class="text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500/10 file:text-amber-400 hover:file:bg-amber-500/20 cursor-pointer">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">URL Gambar Langsung (Bisa diedit manual)</label>
+                            <input type="text" id="img-url-field-${index}" value="${block.url || ''}" oninput="updateBlockField(${index}, 'url', this.value)" placeholder="https://..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Caption Gambar (Keterangan di bawah foto)</label>
+                            <input type="text" value="${block.caption || ''}" oninput="updateBlockField(${index}, 'caption', this.value)" placeholder="Contoh: Kemasan BentoCat Premium 10 Liter" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                    </div>
+                `;
+            } else if (block.type === 'video') {
+                fieldsHtml = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">YouTube Video Link / URL Embed</label>
+                            <input type="url" value="${block.url || ''}" oninput="updateBlockField(${index}, 'url', this.value)" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Caption Video</label>
+                            <input type="text" value="${block.caption || ''}" oninput="updateBlockField(${index}, 'caption', this.value)" placeholder="Contoh: Video cara penggumpalan BentoCat" class="w-full bg-slate-900 border border-slate-850 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                        </div>
+                    </div>
+                `;
+            }
+
+            blockDiv.innerHTML = headerHtml + fieldsHtml;
+            container.appendChild(blockDiv);
+        });
+    }
+
+    function getBlockTypeName(type) {
+        const names = {
+            paragraph: "Paragraf / Teks",
+            quick_answer: "Jawaban Cepat",
+            dialog: "Dialog Percakapan",
+            analogy: "Analogi",
+            dalil: "Dalil / Hadits",
+            doa: "Doa",
+            image: "Gambar / Foto",
+            video: "Video Link"
+        };
+        return names[type] || type;
+    }
+
+    function addBlock(type) {
+        let blockSchema = { type: type };
+        if (type === 'paragraph' || type === 'quick_answer') {
+            blockSchema.heading = '';
+            blockSchema.text = '';
+            blockSchema.referenceUrl = '';
+        } else if (type === 'dialog') {
+            blockSchema.lines = [{ role: 'anak', text: '' }];
+        } else if (type === 'analogy') {
+            blockSchema.title = '';
+            blockSchema.text = '';
+        } else if (type === 'dalil' || type === 'doa') {
+            blockSchema.title = '';
+            blockSchema.arabic = '';
+            blockSchema.translation = '';
+            blockSchema.source = '';
+            blockSchema.sourceUrl = '';
+        } else if (type === 'image') {
+            blockSchema.url = '';
+            blockSchema.caption = '';
+        } else if (type === 'video') {
+            blockSchema.url = '';
+            blockSchema.caption = '';
+        }
+
+        blocks.push(blockSchema);
+        renderBlocks();
+    }
+
+    function updateBlockField(index, field, value) {
+        blocks[index][field] = value;
+    }
+
+    // Dialog block helpers
+    function addDialogLine(blockIndex) {
+        blocks[blockIndex].lines.push({ role: 'anak', text: '' });
+        renderBlocks();
+    }
+
+    function updateDialogLine(blockIndex, lineIndex, field, value) {
+        blocks[blockIndex].lines[lineIndex][field] = value;
+    }
+
+    function deleteDialogLine(blockIndex, lineIndex) {
+        blocks[blockIndex].lines.splice(lineIndex, 1);
+        renderBlocks();
+    }
+
+    function deleteBlock(index) {
+        if (confirm("Apakah Anda yakin ingin menghapus blok konten ini?")) {
+            blocks.splice(index, 1);
+            renderBlocks();
+        }
+    }
+
+    function moveBlock(index, offset) {
+        const target = index + offset;
+        if (target < 0 || target >= blocks.length) return;
+        
+        const temp = blocks[index];
+        blocks[index] = blocks[target];
+        blocks[target] = temp;
+        
+        renderBlocks();
+    }
+
+    // AJAX image uploading
+    function uploadBlockImage(input, index) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        input.disabled = true;
+
+        fetch('{{ route("admin.articles.upload-image") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            input.disabled = false;
+            if (data.success) {
+                blocks[index].url = data.url;
+                renderBlocks();
+            } else {
+                alert("Upload gagal: " + (data.message || "Kesalahan tidak diketahui"));
+            }
+        })
+        .catch(error => {
+            input.disabled = false;
+            console.error("Error uploading image:", error);
+            alert("Terjadi kesalahan koneksi saat mengunggah gambar.");
+        });
+    }
+
+    // Sync state on form submit
+    document.getElementById('article-form').addEventListener('submit', function (e) {
+        document.getElementById('content_json').value = JSON.stringify(blocks);
+    });
+
+    // Render initially
+    renderBlocks();
+</script>
+@endsection

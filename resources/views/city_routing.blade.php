@@ -1,0 +1,105 @@
+@extends('layouts.client')
+
+@section('title', 'Jual Pasir Kucing BentoCat Terdekat di ' . $city->nama . ' - Gumpal Premium')
+@section('meta_description', 'Temukan distributor resmi dan outlet petshop terdekat yang menjual pasir kucing BentoCat Premium di ' . $city->nama . '. Harga murah, hemat ongkir!')
+
+@section('content')
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+
+    <!-- SEO Title & Headings -->
+    <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <span class="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+            📍 Pasir Kucing Premium {{ $city->nama }}
+        </span>
+        <h1 class="font-outfit font-black text-4xl sm:text-5xl text-white tracking-tight leading-tight">
+            Agen & Petshop Resmi Jual Pasir Kucing BentoCat di <span class="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">{{ $city->nama }}</span>
+        </h1>
+        <p class="text-sm sm:text-base text-slate-400 leading-relaxed">
+            Dapatkan pasir kucing bentonit wangi gumpal berkualitas ekspor merk BentoCat di kota Anda. Beli langsung dari petshop mitra kami untuk menghindari ongkos kirim marketplace yang mahal.
+        </p>
+    </div>
+
+    <!-- Active outlets in this city -->
+    <div class="space-y-6">
+        <h2 class="font-outfit font-bold text-lg text-white border-b border-slate-900 pb-3">
+            Daftar Toko & Petshop Penjual Resmi ({{ $outlets->count() }})
+        </h2>
+
+        @forelse($outlets as $outlet)
+            <div class="bg-slate-900/30 border {{ $outlet->featured ? 'border-amber-500/30' : 'border-slate-900' }} p-6 rounded-3xl backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div class="space-y-2">
+                    <h3 class="font-outfit font-bold text-lg text-white flex items-center gap-2">
+                        <span>🏪 {{ $outlet->nama_outlet }}</span>
+                        @if($outlet->featured)
+                            <span class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Rekomendasi</span>
+                        @endif
+                    </h3>
+                    <p class="text-xs text-slate-400 max-w-xl">{{ $outlet->alamat_lengkap }}</p>
+                    <div class="flex gap-4 text-[10px] text-slate-500">
+                        <span>Mode Kirim: 
+                            @if($outlet->delivery_mode === 'SELF_DELIVERY')
+                                Pengantaran Toko
+                            @elseif($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT')
+                                Kurir Eksternal
+                            @elseif($outlet->delivery_mode === 'PICKUP_ONLY')
+                                Ambil Sendiri
+                            @else
+                                Semua Mode
+                            @endif
+                        </span>
+                    </div>
+                </div>
+
+                <!-- WA Direct (logs via simulated lead trigger if not filled, or simple wa.me link directly for guest routing) -->
+                @php
+                    $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda terdaftar di website BentoCat {$city->nama}. Apakah stok pasir BentoCat sedang ready?";
+                    $waUrl = "https://wa.me/" . preg_replace('/[^0-9]/', '', $outlet->whatsapp) . "?text=" . urlencode($message);
+                @endphp
+                <a href="{{ $waUrl }}" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-6 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0">
+                    <span>Chat WhatsApp Toko</span> 💬
+                </a>
+            @empty
+                <!-- Fallback distributor info -->
+                <div class="bg-slate-900/20 border border-slate-900 p-8 rounded-3xl text-center space-y-6">
+                    <span class="text-3xl">🐈</span>
+                    <div class="space-y-1.5">
+                        <h4 class="font-bold text-white text-base">Belum Ada Petshop Mitra Terdaftar</h4>
+                        <p class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                            Kami belum memiliki mitra petshop offline terdaftar di area ini. Silakan hubungi distributor utama untuk pembelian eceran/grosir langsung dari gudang.
+                        </p>
+                    </div>
+
+                    @if($distributor)
+                        <div class="bg-slate-950/80 max-w-sm mx-auto p-5 rounded-2xl border border-slate-900 text-left space-y-3">
+                            <span class="block text-[9px] font-bold text-slate-500 uppercase">Distributor Regional:</span>
+                            <div class="text-xs space-y-1">
+                                <strong class="block text-white">{{ $distributor->nama }}</strong>
+                                <span class="block text-slate-400">WhatsApp: {{ $distributor->whatsapp }}</span>
+                                <span class="block text-slate-400">Alamat: {{ $distributor->alamat }}</span>
+                            </div>
+                            @php
+                                $messageDist = "Halo {$distributor->nama}, saya ingin bertanya tentang ketersediaan pasir kucing BentoCat di wilayah {$city->nama}.";
+                                $waDistUrl = "https://wa.me/" . preg_replace('/[^0-9]/', '', $distributor->whatsapp) . "?text=" . urlencode($messageDist);
+                            @endphp
+                            <a href="{{ $waDistUrl }}" target="_blank" class="w-full bg-slate-900 border border-slate-800 hover:border-amber-500/30 hover:text-amber-400 text-slate-350 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                                <span>Hubungi Distributor</span> 💬
+                            </a>
+                        </div>
+                    @else
+                        <p class="text-xs text-slate-600 italic">Distributor wilayah belum terdaftar.</p>
+                    @endif
+                </div>
+            @endforelse
+    </div>
+
+    <!-- Quick action to lead search form -->
+    <div class="border-t border-slate-900 pt-12 text-center space-y-4">
+        <h3 class="font-outfit font-bold text-lg text-white">Ingin koordinat Anda disinkronkan secara presisi?</h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">Gunakan formulir pencarian interaktif di halaman utama untuk menghitung rute kurir dan melacak jarak km terdekat.</p>
+        <a href="{{ route('home') }}#cari-outlet" class="inline-block bg-slate-900 hover:bg-slate-800 border border-slate-850 text-amber-450 font-bold text-xs px-6 py-3 rounded-xl transition-all">
+            Gunakan Geolocation Pencarian Utama 📍
+        </a>
+    </div>
+
+</div>
+@endsection
