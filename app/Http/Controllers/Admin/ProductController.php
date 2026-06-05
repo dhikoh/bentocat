@@ -48,14 +48,20 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('thumbnail_file')) {
-            $file = $request->file('thumbnail_file');
-            $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('uploads/products');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
+            try {
+                $file = $request->file('thumbnail_file');
+                $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
+                $uploadPath = public_path('uploads/products');
+                if (!file_exists($uploadPath)) {
+                    if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+                        throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server. Harap periksa izin akses penulisan (write permissions) folder 'public' di server.");
+                    }
+                }
+                $file->move($uploadPath, $filename);
+                $validated['thumbnail'] = '/uploads/products/' . $filename;
+            } catch (\Exception $e) {
+                return back()->withInput()->with('error', 'Gagal mengunggah berkas: ' . $e->getMessage());
             }
-            $file->move($uploadPath, $filename);
-            $validated['thumbnail'] = '/uploads/products/' . $filename;
         }
 
         unset($validated['thumbnail_file']);
@@ -90,22 +96,28 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('thumbnail_file')) {
-            // Clean up old file if it exists and is a local upload
-            if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
-                $oldPath = public_path($product->thumbnail);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
+            try {
+                // Clean up old file if it exists and is a local upload
+                if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
+                    $oldPath = public_path($product->thumbnail);
+                    if (file_exists($oldPath)) {
+                        @unlink($oldPath);
+                    }
                 }
-            }
 
-            $file = $request->file('thumbnail_file');
-            $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $uploadPath = public_path('uploads/products');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
+                $file = $request->file('thumbnail_file');
+                $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
+                $uploadPath = public_path('uploads/products');
+                if (!file_exists($uploadPath)) {
+                    if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+                        throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server. Harap periksa izin akses penulisan (write permissions) folder 'public' di server.");
+                    }
+                }
+                $file->move($uploadPath, $filename);
+                $validated['thumbnail'] = '/uploads/products/' . $filename;
+            } catch (\Exception $e) {
+                return back()->withInput()->with('error', 'Gagal mengunggah berkas: ' . $e->getMessage());
             }
-            $file->move($uploadPath, $filename);
-            $validated['thumbnail'] = '/uploads/products/' . $filename;
         }
 
         unset($validated['thumbnail_file']);
