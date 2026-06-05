@@ -280,13 +280,74 @@ class OutletController extends Controller
             // Determine is_mitra
             $isMitra = in_array($mitraRaw, ['ya', 'yes', 'mitra', '1', 'true']);
 
-            // Find city
+            // Find or create city dynamically
             $city = null;
             if (!empty($kotaName)) {
                 $city = City::where('nama', 'like', "%{$kotaName}%")->first();
+                if (!$city) {
+                    $city = City::where('nama', $kotaName)->first();
+                }
+                
+                if (!$city) {
+                    // Predefined mapping of common cities to provinces to populate them correctly
+                    $cityProvinceMap = [
+                        'Banjarmasin' => 'Kalimantan Selatan',
+                        'Lampung' => 'Lampung',
+                        'Jambi' => 'Jambi',
+                        'Klaten' => 'Jawa Tengah',
+                        'Jember' => 'Jawa Timur',
+                        'Tulungagung' => 'Jawa Timur',
+                        'Sragen' => 'Jawa Tengah',
+                        'Kendal' => 'Jawa Tengah',
+                        'Mataram' => 'Nusa Tenggara Barat',
+                        'Batam' => 'Kepulauan Riau',
+                        'Boyolali' => 'Jawa Tengah',
+                        'Banyuwangi' => 'Jawa Timur',
+                        'Kendari' => 'Sulawesi Tenggara',
+                        'Ponorogo' => 'Jawa Timur',
+                        'Cianjur' => 'Jawa Barat',
+                        'Bengkulu' => 'Bengkulu',
+                        'Karawang' => 'Jawa Barat',
+                        'Manado' => 'Sulawesi Utara',
+                        'Pontianak' => 'Kalimantan Barat',
+                        'Palu' => 'Sulawesi Tengah',
+                        'Trenggalek' => 'Jawa Timur',
+                        'Magetan' => 'Jawa Timur',
+                        'Kebumen' => 'Jawa Tengah',
+                        'Purbalingga' => 'Jawa Tengah',
+                        'Subang' => 'Jawa Barat',
+                        'Kudus' => 'Jawa Tengah',
+                        'Nganjuk' => 'Jawa Timur',
+                        'Purwakarta' => 'Jawa Barat',
+                        'Jombang' => 'Jawa Timur',
+                        'Palangkaraya' => 'Kalimantan Tengah',
+                        'Purwodadi' => 'Jawa Tengah',
+                        'Wonosobo' => 'Jawa Tengah',
+                        'Pekanbaru' => 'Riau',
+                        'Banda Aceh' => 'Aceh',
+                        'Denpasar' => 'Bali',
+                        'Badung' => 'Bali',
+                        'Gianyar' => 'Bali',
+                    ];
+                    
+                    $provinceName = 'Lainnya';
+                    foreach ($cityProvinceMap as $cName => $pName) {
+                        if (stripos($kotaName, $cName) !== false) {
+                            $provinceName = $pName;
+                            break;
+                        }
+                    }
+                    
+                    $province = Province::firstOrCreate(['nama' => $provinceName]);
+                    $city = City::create([
+                        'provinsi_id' => $province->id,
+                        'nama' => $kotaName,
+                        'slug' => \Illuminate\Support\Str::slug($kotaName)
+                    ]);
+                }
             }
             if (!$city) {
-                $failed[] = "Baris {$rowNum}: Kota '{$kotaName}' tidak terdaftar di sistem.";
+                $failed[] = "Baris {$rowNum}: Kota '{$kotaName}' wajib diisi.";
                 continue;
             }
 
