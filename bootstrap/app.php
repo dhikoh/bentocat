@@ -15,6 +15,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectTo('/admin/login', '/admin/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Ukuran file terlalu besar! Batas unggahan terlampaui.',
+                ], 413);
+            }
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Ukuran file terlalu besar! Batas unggahan terlampaui. Silakan kompres file atau gunakan file dengan ukuran lebih kecil (maks. 20MB).');
+        });
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

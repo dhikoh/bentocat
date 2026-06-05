@@ -74,14 +74,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/articles/upload-image', [ArticleController::class, 'uploadImage'])->name('articles.upload-image');
         Route::post('/articles/ai-assist', [ArticleController::class, 'aiAssist'])->name('articles.ai-assist');
 
-        // Leads View & CSV Export
+        // Leads View & CSV Export & Delete
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
         Route::get('/leads/export', [LeadController::class, 'exportCsv'])->name('leads.export');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+        Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
 
-        // Customer CRM
-        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+        // Customer CRM (Full Resource)
         Route::get('/customers/export', [CustomerController::class, 'exportCsv'])->name('customers.export');
+        Route::resource('/customers', CustomerController::class);
 
         // Website Settings (Superadmin only)
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

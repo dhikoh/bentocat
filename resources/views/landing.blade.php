@@ -222,11 +222,11 @@
                     <div class="bg-amber-50/20 p-4 rounded-2xl border border-amber-100/50 space-y-3">
                         <h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider border-b border-amber-100/50 pb-1.5">Produk Yang Dicari</h4>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                             <!-- Product Selection -->
-                            <div class="md:col-span-2">
-                                <label for="produk_id" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Model Pasir</label>
-                                <select name="produk_id" id="produk_id" required onchange="onProductChange(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none">
+                            <div class="col-span-12 md:col-span-6" id="wrapper_produk_id">
+                                <label for="produk_id" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Pilih Produk</label>
+                                <select name="produk_id" id="produk_id" required onchange="onProductChange(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none">
                                     <option value="">Pilih Produk...</option>
                                     @foreach($products as $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->nama }}</option>
@@ -234,19 +234,27 @@
                                 </select>
                             </div>
 
-                            <!-- Variant Lvl 1: Kategori -->
-                            <div>
-                                <label for="varian_level_1" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Kategori / Seri</label>
+                            <!-- Variant Lvl 1 -->
+                            <div class="col-span-12 md:col-span-6 hidden" id="wrapper_varian_level_1">
+                                <label for="varian_level_1" id="label_varian_level_1" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Kategori / Seri</label>
                                 <select name="varian_level_1" id="varian_level_1" disabled onchange="onLevel1Change(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none disabled:opacity-40">
-                                    <option value="">Pilih Kategori...</option>
+                                    <option value="" id="placeholder_varian_level_1">Pilih Kategori...</option>
                                 </select>
                             </div>
 
-                            <!-- Variant Lvl 2: Aroma -->
-                            <div>
-                                <label for="varian_level_2" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Aroma / Scent</label>
+                            <!-- Variant Lvl 2 -->
+                            <div class="col-span-12 md:col-span-6 hidden" id="wrapper_varian_level_2">
+                                <label for="varian_level_2" id="label_varian_level_2" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Aroma / Scent</label>
                                 <select name="varian_level_2" id="varian_level_2" disabled onchange="onLevel2Change(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none disabled:opacity-40">
-                                    <option value="">Pilih Aroma...</option>
+                                    <option value="" id="placeholder_varian_level_2">Pilih Aroma...</option>
+                                </select>
+                            </div>
+
+                            <!-- Variant Lvl 3 -->
+                            <div class="col-span-12 md:col-span-6 hidden" id="wrapper_varian_level_3">
+                                <label for="varian_level_3" id="label_varian_level_3" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Ukuran / Kemasan</label>
+                                <select name="varian_level_3" id="varian_level_3" disabled class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none disabled:opacity-40">
+                                    <option value="" id="placeholder_varian_level_3">Pilih Ukuran...</option>
                                 </select>
                             </div>
                         </div>
@@ -506,11 +514,24 @@
     function onProductChange(productId) {
         const lvl1Select = document.getElementById('varian_level_1');
         const lvl2Select = document.getElementById('varian_level_2');
+        const lvl3Select = document.getElementById('varian_level_3');
+        const wrap1 = document.getElementById('wrapper_varian_level_1');
+        const wrap2 = document.getElementById('wrapper_varian_level_2');
+        const wrap3 = document.getElementById('wrapper_varian_level_3');
 
-        lvl1Select.innerHTML = '<option value="">Pilih Kategori...</option>';
+        // Reset all select elements & hide wrappers
+        wrap1.classList.add('hidden');
+        wrap2.classList.add('hidden');
+        wrap3.classList.add('hidden');
+
+        lvl1Select.innerHTML = '<option value="" id="placeholder_varian_level_1">Pilih Kategori...</option>';
         lvl1Select.disabled = true;
-        lvl2Select.innerHTML = '<option value="">Pilih Aroma...</option>';
+        lvl2Select.innerHTML = '<option value="" id="placeholder_varian_level_2">Pilih Aroma...</option>';
         lvl2Select.disabled = true;
+        lvl3Select.innerHTML = '<option value="" id="placeholder_varian_level_3">Pilih Ukuran...</option>';
+        lvl3Select.disabled = true;
+
+        updateGridWidths(false);
 
         if (!productId) return;
 
@@ -521,6 +542,11 @@
         const lvl1Variants = product.variants.filter(v => v.parent_id === null);
 
         if (lvl1Variants.length > 0) {
+            // Update label & placeholder
+            const label1 = product.label_level_1 || 'Kategori';
+            document.getElementById('label_varian_level_1').innerText = label1;
+            document.getElementById('placeholder_varian_level_1').innerText = `Pilih ${label1}...`;
+
             lvl1Variants.forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = v.nama;
@@ -529,15 +555,28 @@
                 lvl1Select.appendChild(opt);
             });
             lvl1Select.disabled = false;
+            wrap1.classList.remove('hidden');
+            updateGridWidths(true);
         }
     }
 
     function onLevel1Change(value) {
         const lvl1Select = document.getElementById('varian_level_1');
         const lvl2Select = document.getElementById('varian_level_2');
+        const lvl3Select = document.getElementById('varian_level_3');
+        const wrap2 = document.getElementById('wrapper_varian_level_2');
+        const wrap3 = document.getElementById('wrapper_varian_level_3');
 
-        lvl2Select.innerHTML = '<option value="">Pilih Aroma...</option>';
+        // Reset level 2 & 3
+        wrap2.classList.add('hidden');
+        wrap3.classList.add('hidden');
+
+        lvl2Select.innerHTML = '<option value="" id="placeholder_varian_level_2">Pilih Aroma...</option>';
         lvl2Select.disabled = true;
+        lvl3Select.innerHTML = '<option value="" id="placeholder_varian_level_3">Pilih Ukuran...</option>';
+        lvl3Select.disabled = true;
+
+        if (!value) return;
 
         const selectedOpt = lvl1Select.options[lvl1Select.selectedIndex];
         const parentId = selectedOpt.dataset.id;
@@ -547,10 +586,14 @@
         const product = productsData.find(p => p.id == productId);
         if (!product) return;
 
-        // Level 2: Scent variants (parent_id matches level 1 variant id)
+        // Level 2: Child variants (parent_id matches level 1 variant id)
         const lvl2Variants = product.variants.filter(v => v.parent_id == parentId);
 
         if (lvl2Variants.length > 0) {
+            const label2 = product.label_level_2 || 'Aroma';
+            document.getElementById('label_varian_level_2').innerText = label2;
+            document.getElementById('placeholder_varian_level_2').innerText = `Pilih ${label2}...`;
+
             lvl2Variants.forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = v.nama;
@@ -559,11 +602,59 @@
                 lvl2Select.appendChild(opt);
             });
             lvl2Select.disabled = false;
+            wrap2.classList.remove('hidden');
         }
     }
 
     function onLevel2Change(value) {
-        // Safe to add level 3 if size lists are needed later.
+        const lvl2Select = document.getElementById('varian_level_2');
+        const lvl3Select = document.getElementById('varian_level_3');
+        const wrap3 = document.getElementById('wrapper_varian_level_3');
+
+        // Reset level 3
+        wrap3.classList.add('hidden');
+        lvl3Select.innerHTML = '<option value="" id="placeholder_varian_level_3">Pilih Ukuran...</option>';
+        lvl3Select.disabled = true;
+
+        if (!value) return;
+
+        const selectedOpt = lvl2Select.options[lvl2Select.selectedIndex];
+        const parentId = selectedOpt.dataset.id;
+        if (!parentId) return;
+
+        const productId = document.getElementById('produk_id').value;
+        const product = productsData.find(p => p.id == productId);
+        if (!product) return;
+
+        // Level 3: Child variants (parent_id matches level 2 variant id)
+        const lvl3Variants = product.variants.filter(v => v.parent_id == parentId);
+
+        if (lvl3Variants.length > 0) {
+            const label3 = product.label_level_3 || 'Ukuran';
+            document.getElementById('label_varian_level_3').innerText = label3;
+            document.getElementById('placeholder_varian_level_3').innerText = `Pilih ${label3}...`;
+
+            lvl3Variants.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.nama;
+                opt.dataset.id = v.id;
+                opt.innerText = v.nama;
+                lvl3Select.appendChild(opt);
+            });
+            lvl3Select.disabled = false;
+            wrap3.classList.remove('hidden');
+        }
+    }
+
+    function updateGridWidths(hasVariants) {
+        const prodWrapper = document.getElementById('wrapper_produk_id');
+        if (hasVariants) {
+            prodWrapper.classList.remove('col-span-12');
+            prodWrapper.classList.add('col-span-12', 'md:col-span-6');
+        } else {
+            prodWrapper.classList.remove('md:col-span-6');
+            prodWrapper.classList.add('col-span-12');
+        }
     }
 </script>
 @endsection

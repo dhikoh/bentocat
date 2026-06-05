@@ -30,10 +30,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                         <!-- Upload File Input -->
                         <div class="border-2 border-dashed border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 flex flex-col items-center justify-center bg-slate-950/40 transition-all group relative cursor-pointer min-h-[140px]">
-                            <input type="file" name="thumbnail_file" id="thumbnail_file" accept="image/png, image/jpeg, image/jpg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(this)">
+                            <input type="file" name="thumbnail_file" id="thumbnail_file" accept="image/png, image/jpeg, image/jpg, video/mp4, video/quicktime, video/x-msvideo, video/webm" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(this)">
                             <div class="flex flex-col items-center text-center space-y-2 pointer-events-none">
-                                <span class="text-3xl text-slate-500 group-hover:scale-110 transition-transform">📷</span>
-                                <span class="text-xs font-semibold text-slate-300">Pilih File Gambar (PNG/JPG)</span>
+                                <span class="text-3xl text-slate-500 group-hover:scale-110 transition-transform">🎥</span>
+                                <span class="text-xs font-semibold text-slate-300">Pilih Gambar / Video Produk</span>
                                 <span class="text-[10px] text-slate-500" id="file-name-label">Maks. 20MB</span>
                             </div>
                         </div>
@@ -68,6 +68,31 @@
                           class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">{{ old('deskripsi') }}</textarea>
             </div>
 
+            <div class="border-t border-slate-800/80 pt-6 space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Label Varian Produk (Kustom)</h3>
+                <p class="text-xs text-slate-500">Sesuaikan penamaan label tingkatan varian untuk produk ini agar sesuai pada modal pencarian dan halaman kelola varian. Kosongkan untuk menggunakan label default.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="label_level_1" class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Label Tingkat 1 (Default: Kategori)</label>
+                        <input type="text" name="label_level_1" id="label_level_1" value="{{ old('label_level_1') }}" 
+                               placeholder="Misal: Jenis Pasir, Rasa" 
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label for="label_level_2" class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Label Tingkat 2 (Default: Varian)</label>
+                        <input type="text" name="label_level_2" id="label_level_2" value="{{ old('label_level_2') }}" 
+                               placeholder="Misal: Aroma, Ukuran" 
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label for="label_level_3" class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Label Tingkat 3 (Default: Ukuran)</label>
+                        <input type="text" name="label_level_3" id="label_level_3" value="{{ old('label_level_3') }}" 
+                               placeholder="Misal: Kemasan, Berat" 
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+
             <div class="border-t border-slate-800/80 pt-6 flex items-center justify-between">
                 <label class="flex items-center gap-2 text-sm text-slate-300 select-none cursor-pointer">
                     <span class="text-xs font-bold text-slate-400 uppercase mr-1">Status Publikasi:</span>
@@ -95,18 +120,28 @@
 function previewImage(input) {
     const file = input.files[0];
     const previewContainer = document.getElementById('thumbnail-preview-container');
-    const preview = document.getElementById('thumbnail-preview');
     const nameLabel = document.getElementById('file-name-label');
-    const pathLabel = document.getElementById('preview-path');
     const urlInput = document.getElementById('thumbnail');
 
     if (file) {
         nameLabel.textContent = file.name;
         const reader = new FileReader();
         reader.onload = function(e) {
-            preview.src = e.target.result;
+            previewContainer.innerHTML = '';
+            let mediaHtml = '';
+            if (file.type.startsWith('video/')) {
+                mediaHtml = `<video id="thumbnail-preview" src="${e.target.result}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
+            } else {
+                mediaHtml = `<img id="thumbnail-preview" src="${e.target.result}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+            }
+            mediaHtml += `
+                <div class="overflow-hidden">
+                    <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
+                    <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${file.name} (Siap diunggah)</span>
+                </div>
+            `;
+            previewContainer.innerHTML = mediaHtml;
             previewContainer.classList.remove('hidden');
-            pathLabel.textContent = file.name + ' (Siap diunggah)';
             urlInput.value = '';
         }
         reader.readAsDataURL(file);
@@ -118,25 +153,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('thumbnail_file');
     const nameLabel = document.getElementById('file-name-label');
     const previewContainer = document.getElementById('thumbnail-preview-container');
-    const preview = document.getElementById('thumbnail-preview');
-    const pathLabel = document.getElementById('preview-path');
 
-    if (urlInput.value.trim() !== '') {
-        preview.src = urlInput.value;
+    const initialUrl = urlInput.value.trim();
+    if (initialUrl !== '') {
+        previewContainer.innerHTML = '';
+        let mediaHtml = '';
+        const isVideo = /\.(mp4|mov|avi|webm)$/i.test(initialUrl);
+        const resolvedUrl = initialUrl.startsWith('http') ? initialUrl : '{{ asset('') }}' + initialUrl.replace(/^\//, '');
+        if (isVideo) {
+            mediaHtml = `<video id="thumbnail-preview" src="${resolvedUrl}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
+        } else {
+            mediaHtml = `<img id="thumbnail-preview" src="${resolvedUrl}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+        }
+        mediaHtml += `
+            <div class="overflow-hidden">
+                <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
+                <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${initialUrl}</span>
+            </div>
+        `;
+        previewContainer.innerHTML = mediaHtml;
         previewContainer.classList.remove('hidden');
-        pathLabel.textContent = urlInput.value;
     }
 
     urlInput.addEventListener('input', function() {
-        if (this.value.trim() !== '') {
-            preview.src = this.value;
+        const val = this.value.trim();
+        if (val !== '') {
+            previewContainer.innerHTML = '';
+            let mediaHtml = '';
+            const isVideo = /\.(mp4|mov|avi|webm)$/i.test(val);
+            if (isVideo) {
+                mediaHtml = `<video id="thumbnail-preview" src="${val}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
+            } else {
+                mediaHtml = `<img id="thumbnail-preview" src="${val}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+            }
+            mediaHtml += `
+                <div class="overflow-hidden">
+                    <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
+                    <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${val}</span>
+                </div>
+            `;
+            previewContainer.innerHTML = mediaHtml;
             previewContainer.classList.remove('hidden');
-            pathLabel.textContent = this.value;
             fileInput.value = '';
             nameLabel.textContent = 'Maks. 20MB';
         } else {
             previewContainer.classList.add('hidden');
-            pathLabel.textContent = '';
+            previewContainer.innerHTML = '';
         }
     });
 });

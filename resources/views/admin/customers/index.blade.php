@@ -9,9 +9,14 @@
             <h1 class="text-2xl font-bold text-white">Database Pelanggan BentoCat (CRM)</h1>
             <p class="text-sm text-slate-400">Daftar pelanggan (cat owners) yang melakukan pencarian outlet melalui website.</p>
         </div>
-        <a href="{{ route('admin.customers.export', ['search' => $search]) }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2 text-sm self-start md:self-auto">
-            <span>Ekspor Kontak CSV</span> 📥
-        </a>
+        <div class="flex items-center gap-3 self-start md:self-auto">
+            <a href="{{ route('admin.customers.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2 text-sm">
+                <span>Tambah Pelanggan</span> ➕
+            </a>
+            <a href="{{ route('admin.customers.export', ['search' => $search]) }}" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm">
+                <span>Ekspor CSV</span> 📥
+            </a>
+        </div>
     </div>
 
     <!-- Search & Filter -->
@@ -39,8 +44,9 @@
                         <th class="px-6 py-4">Nomor WhatsApp</th>
                         <th class="px-6 py-4">Alamat Lengkap</th>
                         <th class="px-6 py-4">Lokasi (GPS)</th>
-                        <th class="px-6 py-4 text-center">Total Leads (Interaksi)</th>
-                        <th class="px-6 py-4 text-right">Tanggal Bergabung</th>
+                        <th class="px-6 py-4">Total Leads (Interaksi)</th>
+                        <th class="px-6 py-4">Tanggal Bergabung</th>
+                        <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-850">
@@ -64,13 +70,27 @@
                             <td class="px-6 py-4 text-center font-bold text-amber-500">
                                 {{ $customer->lead_requests_count }}
                             </td>
-                            <td class="px-6 py-4 text-right text-xs text-slate-500">
+                            <td class="px-6 py-4 text-xs text-slate-500">
                                 {{ $customer->created_at->format('d M Y, H:i') }}
+                            </td>
+                            <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                <a href="{{ route('admin.customers.edit', $customer->id) }}" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                    Edit
+                                </a>
+                                @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                    <form action="{{ route('admin.customers.destroy', $customer->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Menghapus data pelanggan ini juga akan menghapus semua data leads dan log aktivitas terkait secara permanen. Lanjutkan?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white border border-rose-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan data pelanggan.</td>
+                            <td colspan="7" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan data pelanggan.</td>
                         </tr>
                     @endforelse
                 </tbody>

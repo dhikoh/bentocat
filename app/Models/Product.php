@@ -10,7 +10,25 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'slug', 'thumbnail', 'deskripsi', 'status'];
+    protected $fillable = [
+        'nama', 'slug', 'thumbnail', 'deskripsi', 'status',
+        'label_level_1', 'label_level_2', 'label_level_3'
+    ];
+
+    public function getLabelLevel1Attribute($value)
+    {
+        return $value ?: 'Kategori';
+    }
+
+    public function getLabelLevel2Attribute($value)
+    {
+        return $value ?: 'Varian / Aroma';
+    }
+
+    public function getLabelLevel3Attribute($value)
+    {
+        return $value ?: 'Ukuran / Kemasan';
+    }
 
     public function variants(): HasMany
     {

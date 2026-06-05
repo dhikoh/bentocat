@@ -10,7 +10,7 @@
 
     <div>
         <h1 class="text-2xl font-bold text-white">Hierarki Varian: {{ $product->nama }}</h1>
-        <p class="text-sm text-slate-400">Kelola variasi produk BentoCat hingga 3 tingkat kedalaman: Kategori (Level 1) → Aroma (Level 2) → Ukuran (Level 3).</p>
+        <p class="text-sm text-slate-400">Kelola variasi produk hingga 3 tingkat kedalaman: {{ $product->label_level_1 }} (Level 1) → {{ $product->label_level_2 }} (Level 2) → {{ $product->label_level_3 }} (Level 3).</p>
     </div>
 
     <!-- Main Grid -->
@@ -18,20 +18,20 @@
         
         <!-- Left: Form to Add Root (Level 1) Variant -->
         <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl h-fit space-y-4">
-            <h2 class="text-lg font-bold text-white">Tambah Varian Tingkat 1</h2>
-            <p class="text-xs text-slate-500">Mulai dengan menambahkan kategori atau seri varian utama (misal: "Premium Series", "Eco Series").</p>
+            <h2 class="text-lg font-bold text-white">Tambah {{ $product->label_level_1 }}</h2>
+            <p class="text-xs text-slate-500">Mulai dengan menambahkan {{ strtolower($product->label_level_1) }} utama (misal: "Premium Series", "Eco Series").</p>
             
             <form action="{{ route('admin.products.variants.store', $product->id) }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="parent_id" value="">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nama Kategori Varian</label>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nama {{ $product->label_level_1 }}</label>
                     <input type="text" name="nama" required 
                            placeholder="Contoh: Premium Series" 
                            class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
                 </div>
                 <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition-all">
-                    Tambah Kategori Varian 🐾
+                    Tambah {{ $product->label_level_1 }} 🐾
                 </button>
             </form>
         </div>
@@ -42,16 +42,16 @@
 
             <div class="space-y-4">
                 @forelse($variantsTree as $level1)
-                    <!-- Level 1 (Kategori) -->
+                    <!-- Level 1 ({{ $product->label_level_1 }}) -->
                     <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center gap-2">
-                                <span class="bg-amber-500/20 text-amber-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 1: Kategori</span>
+                                <span class="bg-amber-500/20 text-amber-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 1: {{ $product->label_level_1 }}</span>
                                 <span class="font-bold text-white text-base">{{ $level1->nama }}</span>
                             </div>
                             <div class="flex gap-2">
                                 <button onclick="openAddModal({{ $level1->id }}, '{{ $level1->nama }}', 2)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-                                    + Aroma (Lvl 2)
+                                    + {{ $product->label_level_2 }} (Lvl 2)
                                 </button>
                                 <form action="{{ route('admin.variants.destroy', $level1->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
                                     @csrf
@@ -63,18 +63,18 @@
                             </div>
                         </div>
 
-                        <!-- Level 2 (Aroma) -->
+                        <!-- Level 2 ({{ $product->label_level_2 }}) -->
                         <div class="pl-6 border-l border-slate-800 space-y-3">
                             @forelse($level1->children as $level2)
                                 <div class="bg-slate-950/60 border border-slate-850 rounded-xl p-3.5 space-y-3">
                                     <div class="flex items-center justify-between gap-4">
                                         <div class="flex items-center gap-2">
-                                            <span class="bg-blue-500/20 text-blue-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 2: Aroma</span>
+                                            <span class="bg-blue-500/20 text-blue-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 2: {{ $product->label_level_2 }}</span>
                                             <span class="font-semibold text-slate-200 text-sm">{{ $level2->nama }}</span>
                                         </div>
                                         <div class="flex gap-2">
                                             <button onclick="openAddModal({{ $level2->id }}, '{{ $level2->nama }}', 3)" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-                                                + Ukuran (Lvl 3)
+                                                + {{ $product->label_level_3 }} (Lvl 3)
                                             </button>
                                             <form action="{{ route('admin.variants.destroy', $level2->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
                                                 @csrf
@@ -86,15 +86,15 @@
                                         </div>
                                     </div>
 
-                                    <!-- Level 3 (Ukuran) -->
+                                    <!-- Level 3 ({{ $product->label_level_3 }}) -->
                                     <div class="pl-6 border-l border-slate-850 space-y-2">
                                         @forelse($level2->children as $level3)
                                             <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-2 flex items-center justify-between gap-4">
                                                 <div class="flex items-center gap-2">
-                                                    <span class="bg-violet-500/20 text-violet-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 3: Ukuran</span>
+                                                    <span class="bg-violet-500/20 text-violet-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 3: {{ $product->label_level_3 }}</span>
                                                     <span class="text-xs font-medium text-slate-300">{{ $level3->nama }}</span>
                                                 </div>
-                                                <form action="{{ route('admin.variants.destroy', $level3->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus varian ukuran ini?')">
+                                                <form action="{{ route('admin.variants.destroy', $level3->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus varian ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-rose-500 hover:text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded transition-all">
@@ -103,15 +103,14 @@
                                                 </form>
                                             </div>
                                         @empty
-                                            <p class="text-[11px] text-slate-600 italic">Belum ada ukuran (Level 3) ditambahkan untuk aroma ini.</p>
+                                            <p class="text-[11px] text-slate-600 italic">Belum ada {{ strtolower($product->label_level_3) }} (Level 3) ditambahkan untuk {{ strtolower($product->label_level_2) }} ini.</p>
                                         @endforelse
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-xs text-slate-500 italic pl-2">Belum ada aroma (Level 2) ditambahkan untuk kategori ini.</p>
+                                <p class="text-xs text-slate-500 italic pl-2">Belum ada {{ strtolower($product->label_level_2) }} (Level 2) ditambahkan untuk {{ strtolower($product->label_level_1) }} ini.</p>
                             @endforelse
                         </div>
-
                     </div>
                 @empty
                     <div class="text-center py-12 text-slate-500 italic border border-dashed border-slate-800 rounded-2xl">
@@ -153,6 +152,10 @@
 
 @section('scripts')
 <script>
+    const labelLevel1 = "{{ $product->label_level_1 }}";
+    const labelLevel2 = "{{ $product->label_level_2 }}";
+    const labelLevel3 = "{{ $product->label_level_3 }}";
+
     function openAddModal(parentId, parentName, targetLevel) {
         document.getElementById('modal-parent-id').value = parentId;
         
@@ -162,15 +165,15 @@
         const inputEl = document.getElementById('modal-input-nama');
 
         if (targetLevel === 2) {
-            titleEl.innerText = "Tambah Aroma (Level 2)";
-            descEl.innerText = `Menambahkan aroma baru di bawah kategori "${parentName}".`;
-            labelEl.innerText = "Nama Aroma / Wangi";
-            inputEl.placeholder = "Contoh: Lavender / Coffee / Lemon";
+            titleEl.innerText = `Tambah ${labelLevel2} (Level 2)`;
+            descEl.innerText = `Menambahkan ${labelLevel2.toLowerCase()} baru di bawah ${labelLevel1.toLowerCase()} "${parentName}".`;
+            labelEl.innerText = `Nama ${labelLevel2}`;
+            inputEl.placeholder = `Contoh pilihan ${labelLevel2.toLowerCase()}`;
         } else if (targetLevel === 3) {
-            titleEl.innerText = "Tambah Ukuran (Level 3)";
-            descEl.innerText = `Menambahkan ukuran kemasan baru di bawah wangi "${parentName}".`;
-            labelEl.innerText = "Ukuran Kemasan";
-            inputEl.placeholder = "Contoh: 5 Liter / 10 Liter / 20 kg";
+            titleEl.innerText = `Tambah ${labelLevel3} (Level 3)`;
+            descEl.innerText = `Menambahkan ${labelLevel3.toLowerCase()} baru di bawah ${labelLevel2.toLowerCase()} "${parentName}".`;
+            labelEl.innerText = `Nama ${labelLevel3}`;
+            inputEl.placeholder = `Contoh pilihan ${labelLevel3.toLowerCase()}`;
         }
 
         const modal = document.getElementById('add-variant-modal');

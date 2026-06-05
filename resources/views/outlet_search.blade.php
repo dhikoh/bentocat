@@ -11,7 +11,7 @@
             <a href="{{ route('home') }}#cari-outlet" class="text-xs font-bold text-amber-650 hover:text-amber-750 hover:underline">← Ulangi Pencarian</a>
         </div>
         <h1 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Petshop Resmi di Kota {{ $city->nama }}</h1>
-        <p class="text-sm text-slate-600">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk pasir kucing BentoCat.</p>
+        <p class="text-sm text-slate-600">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk {{ $lead->product->nama }}.</p>
     </div>
 
     <!-- Map Container (Optional, rendered if coordinates exist) -->
@@ -149,28 +149,40 @@
 <!-- Leaflet Map JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+@php
+    $variantDetails = [];
+    if (!empty($lead->varian_level_1) && $lead->varian_level_1 !== 'Default') {
+        $variantDetails[] = ($lead->product->label_level_1 ?: 'Kategori') . ': ' . $lead->varian_level_1;
+    }
+    if (!empty($lead->varian_level_2)) {
+        $variantDetails[] = ($lead->product->label_level_2 ?: 'Aroma') . ': ' . $lead->varian_level_2;
+    }
+    if (!empty($lead->varian_level_3)) {
+        $variantDetails[] = ($lead->product->label_level_3 ?: 'Ukuran') . ': ' . $lead->varian_level_3;
+    }
+    $variantDetailsStr = implode(', ', $variantDetails);
+@endphp
+
 <script>
     // Lead ID passed from controller
     const leadId = {{ $lead->id }};
     const customerName = "{{ $customer->nama }}";
     const productName = "{{ $lead->product->nama }}";
-    const aroma = "{{ $lead->varian_level_2 ?? '-' }}";
-    const size = "{{ $lead->varian_level_3 ?? '-' }}";
-    const varianText = "{{ $lead->varian_level_1 }} {{ $lead->varian_level_2 ? ' • ' . $lead->varian_level_2 : '' }}";
-
+    const variantDetailsStr = "{{ $variantDetailsStr }}";
+ 
     // Setup Leaflet map
     const map = L.map('results-map').setView([-7.2575, 112.7521], 11); // Fallback Surabaya coordinates
-
+ 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-
+ 
     const markers = [];
-
+ 
     // Add user marker if coordinates are shared
     const userLat = {{ $customer->latitude ?: 'null' }};
     const userLon = {{ $customer->longitude ?: 'null' }};
-
+ 
     if (userLat && userLon) {
         const userIcon = L.divIcon({
             html: '📍',
@@ -180,7 +192,7 @@
         L.marker([userLat, userLon], { icon: userIcon }).addTo(map).bindPopup('Lokasi Anda').openPopup();
         map.setView([userLat, userLon], 13);
     }
-
+ 
     // Add outlets markers
     @foreach($outlets as $outlet)
         @if($outlet->latitude && $outlet->longitude)
@@ -192,13 +204,13 @@
             })();
         @endif
     @endforeach
-
+ 
     // Fit map bounds to show all markers if any exist
     if (markers.length > 0) {
         const group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
     }
-
+ 
     // AJAX Action loggers
     function contactOutlet(outletId, whatsapp, outletName, isMitra) {
         fetch('{{ route("leads.log-action") }}', {
@@ -214,16 +226,17 @@
         })
         .finally(() => {
             let message = '';
+            let variantSuffix = variantDetailsStr ? ` (${variantDetailsStr})` : '';
             if (isMitra) {
-                message = `Halo ${outletName}, saya ingin membeli produk BentoCat ${productName} - ${aroma} - ${size} dari web bentocat.id. Apakah stok tersedia?`;
+                message = `Halo ${outletName}, saya ingin membeli produk ${productName}${variantSuffix} dari web bentocat.id. Apakah stok tersedia?`;
             } else {
-                message = `Halo ${outletName}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan pasir kucing BentoCat? Saya sangat tertarik untuk membelinya.`;
+                message = `Halo ${outletName}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan produk ${productName}? Saya sangat tertarik untuk membelinya.`;
             }
             const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
         });
     }
-
+ 
     function contactCourier(outletId, whatsapp, courierName) {
         fetch('{{ route("leads.log-action") }}', {
             method: 'POST',
@@ -237,14 +250,15 @@
             }
         })
         .finally(() => {
-            const message = `Halo ${courierName}, saya ${customerName} merujuk dari website BentoCat. Ingin memesan pengantaran pasir kucing dari petshop ke alamat rumah saya.`;
+            const message = `Halo ${courierName}, saya ${customerName} merujuk dari website BentoCat. Ingin memesan pengantaran produk ${productName} dari petshop ke alamat rumah saya.`;
             const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
         });
     }
-
+ 
     function contactDistributor(whatsapp, distName) {
-        const message = `Halo ${distName}, saya ${customerName} melihat dari website BentoCat. Di kota saya belum ada petshop resmi terdaftar, apakah saya bisa membeli BentoCat ${productName} varian ${varianText} langsung dikirim dari distributor?`;
+        let variantSuffix = variantDetailsStr ? ` dengan pilihan ${variantDetailsStr}` : '';
+        const message = `Halo ${distName}, saya ${customerName} melihat dari website BentoCat. Di kota saya belum ada petshop resmi terdaftar, apakah saya bisa membeli ${productName}${variantSuffix} langsung dikirim dari distributor?`;
         const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
         window.open(waUrl, '_blank');
     }

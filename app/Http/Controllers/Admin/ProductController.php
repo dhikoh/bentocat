@@ -33,9 +33,12 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
-            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
+            'thumbnail_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi,webm|max:20480',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
+            'label_level_1' => 'nullable|string|max:100',
+            'label_level_2' => 'nullable|string|max:100',
+            'label_level_3' => 'nullable|string|max:100',
         ]);
 
         $validated['slug'] = Str::slug($validated['nama']);
@@ -72,9 +75,12 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
-            'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
+            'thumbnail_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi,webm|max:20480',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
+            'label_level_1' => 'nullable|string|max:100',
+            'label_level_2' => 'nullable|string|max:100',
+            'label_level_3' => 'nullable|string|max:100',
         ]);
 
         $validated['slug'] = Str::slug($validated['nama']);

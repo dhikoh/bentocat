@@ -48,7 +48,11 @@
                             <td class="px-6 py-4 flex items-center gap-3">
                                 <div class="w-12 h-12 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center text-xl shrink-0 select-none">
                                     @if($product->thumbnail)
-                                        <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-cover">
+                                        @if(preg_match('/\.(mp4|mov|avi|webm)$/i', $product->thumbnail))
+                                            <video src="{{ $product->thumbnail }}" class="w-full h-full object-cover" muted autoplay loop></video>
+                                        @else
+                                            <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-cover">
+                                        @endif
                                     @else
                                         🐱
                                     @endif

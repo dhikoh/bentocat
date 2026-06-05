@@ -78,4 +78,61 @@ class CustomerController extends Controller
 
         return $response;
     }
+
+    public function create()
+    {
+        return view('admin.customers.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'whatsapp' => 'required|string|max:25|unique:customer_profiles,whatsapp',
+            'alamat' => 'required|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'provinsi' => 'nullable|string|max:255',
+            'kota' => 'nullable|string|max:255',
+        ]);
+
+        $validated['uuid'] = (string) \Illuminate\Support\Str::uuid();
+
+        CustomerProfile::create($validated);
+
+        return redirect()->route('admin.customers.index')->with('success', 'Pelanggan berhasil ditambahkan.');
+    }
+
+    public function edit(CustomerProfile $customer)
+    {
+        return view('admin.customers.edit', compact('customer'));
+    }
+
+    public function update(Request $request, CustomerProfile $customer)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'whatsapp' => 'required|string|max:25|unique:customer_profiles,whatsapp,' . $customer->id,
+            'alamat' => 'required|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'provinsi' => 'nullable|string|max:255',
+            'kota' => 'nullable|string|max:255',
+        ]);
+
+        $customer->update($validated);
+
+        return redirect()->route('admin.customers.index')->with('success', 'Pelanggan berhasil diperbarui.');
+    }
+
+    public function destroy(CustomerProfile $customer)
+    {
+        if (auth()->user()->role !== 'superadmin') {
+            return redirect()->back()->with('error', 'Hanya Superadmin yang memiliki izin untuk menghapus data pelanggan.');
+        }
+
+        $customer->delete();
+
+        return redirect()->route('admin.customers.index')->with('success', 'Pelanggan beserta seluruh log lead & aktivitas terkait berhasil dihapus.');
+    }
 }

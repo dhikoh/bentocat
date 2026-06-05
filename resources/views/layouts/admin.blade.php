@@ -17,24 +17,92 @@
     <style>
         body {
             font-family: 'Instrument Sans', sans-serif;
+            background-color: #FCFBF9 !important;
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Outfit', sans-serif;
         }
+        
+        /* Redefine Tailwind v4 variables for bright theme inside admin */
+        :root {
+            --color-slate-950: #FCFBF9 !important; /* Page BG */
+            --color-slate-900: #ffffff !important; /* Sidebar & Card BG */
+            --color-slate-850: #f1f5f9 !important;
+            --color-slate-800: #e2e8f0 !important; /* Light border */
+            --color-slate-700: #475569 !important;
+            --color-slate-600: #64748b !important;
+            --color-slate-500: #94a3b8 !important; /* Muted text */
+            --color-slate-450: #94a3b8 !important;
+            --color-slate-400: #334155 !important;
+            --color-slate-350: #1e293b !important;
+            --color-slate-300: #1e293b !important; /* Primary text */
+            --color-slate-200: #0f172a !important; /* Dark text */
+            --color-slate-100: #0f172a !important;
+        }
+
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0f172a;
+            background: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #334155;
+            background: #cbd5e1;
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #f59e0b;
+        }
+
+        /* Force text-white to be dark slate inside light admin */
+        .text-white {
+            color: #0f172a !important;
+        }
+
+        /* Active / Status text overrides */
+        .text-amber-400 {
+            color: #d97706 !important;
+        }
+        .text-emerald-400 {
+            color: #059669 !important;
+        }
+        .text-rose-400 {
+            color: #dc2626 !important;
+        }
+        .text-purple-400 {
+            color: #7c3aed !important;
+        }
+        .text-blue-400 {
+            color: #2563eb !important;
+        }
+
+        /* Form overrides for consistent light inputs */
+        input, select, textarea {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            border-color: #cbd5e1 !important;
+        }
+        input::placeholder, textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+        
+        /* Exception: keep white text on badge or dark buttons */
+        .bg-gradient-to-r.from-amber-500.to-orange-600 span,
+        .bg-emerald-500 span,
+        .bg-amber-500 span,
+        .bg-rose-500 span,
+        .bg-slate-800,
+        .bg-slate-800 span {
+            color: #ffffff !important;
+        }
+        
+        .bg-slate-800 {
+            background-color: #1e293b !important;
+        }
+        .bg-slate-800:hover {
+            background-color: #334155 !important;
         }
     </style>
     @yield('styles')

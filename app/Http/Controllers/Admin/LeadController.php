@@ -117,4 +117,15 @@ class LeadController extends Controller
 
         return $response;
     }
+
+    public function destroy(LeadRequest $lead)
+    {
+        if (auth()->user()->role !== 'superadmin') {
+            return redirect()->back()->with('error', 'Hanya Superadmin yang memiliki izin untuk menghapus data lead.');
+        }
+
+        $lead->delete();
+
+        return redirect()->route('admin.leads.index')->with('success', 'Data Lead berhasil dihapus.');
+    }
 }

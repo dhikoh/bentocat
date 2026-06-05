@@ -96,10 +96,19 @@
                             <td class="px-6 py-4 text-xs text-slate-400">
                                 {{ $lead->created_at->format('d M Y H:i') }}
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right flex justify-end gap-2 items-center">
                                 <a href="{{ route('admin.leads.show', $lead->id) }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                     Detail
                                 </a>
+                                @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                    <form action="{{ route('admin.leads.destroy', $lead->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data lead ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white border border-rose-500/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty

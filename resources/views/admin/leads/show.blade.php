@@ -13,8 +13,19 @@
             <h1 class="text-2xl font-bold text-white">Detail Lead ID: #{{ $lead->id }}</h1>
             <p class="text-sm text-slate-400">Masuk pada {{ $lead->created_at->format('d M Y H:i:s') }}</p>
         </div>
-        <div class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-xs font-bold text-slate-300">
-            Status: <span class="text-emerald-400 font-extrabold uppercase">Routed</span>
+        <div class="flex items-center gap-2">
+            <div class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-xs font-bold text-slate-300">
+                Status: <span class="text-emerald-400 font-extrabold uppercase">Routed</span>
+            </div>
+            @if(Auth::user() && Auth::user()->role === 'superadmin')
+                <form action="{{ route('admin.leads.destroy', $lead->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data lead ini?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-lg shadow-rose-500/10 transition-all">
+                        Hapus Lead 🗑️
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 
