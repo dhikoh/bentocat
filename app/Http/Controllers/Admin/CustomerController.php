@@ -160,4 +160,131 @@ class CustomerController extends Controller
         CustomerProfile::query()->delete();
         return redirect()->route('admin.customers.index')->with('success', "Berhasil mengosongkan {$count} data pelanggan.");
     }
+
+    public function importCsv(Request $request)
+    {
+        @set_time_limit(300);
+
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:4096'
+        ]);
+
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+
+        $handle = fopen($path, 'r');
+        if (!$handle) {
+            return back()->with('error', 'Gagal membuka file CSV.');
+        }
+
+        $headers = fgetcsv($handle, 1000, ',');
+        if (!$headers) {
+            fclose($handle);
+            return back()->with('error', 'File CSV kosong atau tidak valid.');
+        }
+
+        // BOM Removal
+        if (substr($headers[0], 0, 3) == "\xEF\xBB\xBF") {
+            $headers[0] = substr($headers[0], 3);
+        }
+
+        $headers = array_map(function ($h) {
+            return strtolower(trim($h));
+        }, $headers);
+
+        $colMap = [];
+        $headerKeywords = [
+            'nama' => ['nama', 'nama pelanggan', 'nama customer', 'name'],
+            'whatsapp' => ['whatsapp', 'no wa', 'phone', 'telepon', 'no. wa', 'nomor wa', 'wa'],
+            'alamat' => ['alamat', 'alamat lengkap', 'address'],
+            'latitude' => ['latitude', 'lat'],
+            'longitude' => ['longitude', 'lng', 'long'],
+            'provinsi' => ['provinsi', 'province', 'provinsi (gps)', 'provinsi customer (gps)'],
+            'kota' => ['kota', 'city', 'kota (gps)', 'kota customer (gps)']
+        ];
+
+        foreach ($headerKeywords as $key => $keywords) {
+            $colMap[$key] = -1;
+            foreach ($keywords as $kw) {
+                $idx = array_search($kw, $headers);
+                if ($idx !== false) {
+                    $colMap[$key] = $idx;
+                    break;
+                }
+            }
+        }
+
+        if ($colMap['nama'] === -1 || $colMap['whatsapp'] === -1) {
+            fclose($handle);
+            return back()->with('error', 'Kolom wajib "Nama" dan "WhatsApp" tidak ditemukan dalam header CSV.');
+        }
+
+        $inserted = 0;
+        $updated = 0;
+        $failed = [];
+        $rowNum = 1;
+
+        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+            $rowNum++;
+
+            $nama = trim($row[$colMap['nama']] ?? '');
+            $whatsapp = preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp']] ?? '');
+            $alamat = $colMap['alamat'] !== -1 ? trim($row[$colMap['alamat']] ?? '') : '';
+            $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
+            $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
+            $provinsi = $colMap['provinsi'] !== -1 ? trim($row[$colMap['provinsi']] ?? '') : null;
+            $kota = $colMap['kota'] !== -1 ? trim($row[$colMap['kota']] ?? '') : null;
+
+            if (empty($nama) || empty($whatsapp)) {
+                $failed[] = "Baris {$rowNum}: Nama dan WhatsApp wajib diisi.";
+                continue;
+            }
+
+            // Standardize WhatsApp format
+            if (str_starts_with($whatsapp, '0')) {
+                $whatsapp = '62' . substr($whatsapp, 1);
+            } elseif (str_starts_with($whatsapp, '8')) {
+                $whatsapp = '62' . $whatsapp;
+            }
+
+            $existing = CustomerProfile::where('whatsapp', $whatsapp)->first();
+
+            if ($existing) {
+                $existing->update([
+                    'nama' => $nama,
+                    'alamat' => $alamat ?: $existing->alamat,
+                    'latitude' => $latitude ?: $existing->latitude,
+                    'longitude' => $longitude ?: $existing->longitude,
+                    'provinsi' => $provinsi ?: $existing->provinsi,
+                    'kota' => $kota ?: $existing->kota,
+                ]);
+                $updated++;
+            } else {
+                CustomerProfile::create([
+                    'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                    'nama' => $nama,
+                    'whatsapp' => $whatsapp,
+                    'alamat' => $alamat,
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                    'provinsi' => $provinsi,
+                    'kota' => $kota
+                ]);
+                $inserted++;
+            }
+        }
+
+        fclose($handle);
+
+        $msg = "Impor CSV selesai! {$inserted} pelanggan baru ditambahkan, {$updated} data duplikat diperbarui.";
+        if (count($failed) > 0) {
+            $msg .= " Namun terdapat beberapa baris gagal: " . implode(' | ', array_slice($failed, 0, 3));
+            if (count($failed) > 3) {
+                $msg .= " (dan " . (count($failed) - 3) . " lainnya)";
+            }
+            return back()->with('warning', $msg);
+        }
+
+        return back()->with('success', $msg);
+    }
 }

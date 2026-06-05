@@ -247,7 +247,53 @@ class OutletController extends Controller
 
         // Read headers
         $headers = fgetcsv($handle, 1000, ',');
-        
+        if (!$headers) {
+            fclose($handle);
+            return back()->with('error', 'File CSV kosong atau tidak valid.');
+        }
+
+        // Remove UTF-8 BOM if present
+        if (substr($headers[0], 0, 3) == "\xEF\xBB\xBF") {
+            $headers[0] = substr($headers[0], 3);
+        }
+
+        // Clean headers (lowercase and trim)
+        $headers = array_map(function ($h) {
+            return strtolower(trim($h));
+        }, $headers);
+
+        // Map header titles to column indexes
+        $colMap = [];
+        $headerKeywords = [
+            'nama_outlet' => ['nama petshop', 'nama outlet', 'nama', 'outlet', 'petshop'],
+            'alamat' => ['alamat', 'alamat lengkap', 'address'],
+            'whatsapp' => ['no wa', 'whatsapp', 'phone', 'telepon', 'no. wa', 'nomor wa'],
+            'mitra' => ['mitra', 'is mitra', 'is_mitra', 'mitra resmi'],
+            'kota' => ['kota', 'city', 'kabupaten'],
+            'google_maps_url' => ['google maps link', 'google maps', 'maps link', 'link maps', 'maps_url', 'google_maps_url'],
+            'latitude' => ['latitude', 'lat'],
+            'longitude' => ['longitude', 'lng', 'long'],
+            'distributor' => ['distributor', 'nama distributor', 'distributor_id'],
+            'kurir' => ['kurir', 'courier', 'shipping_contact']
+        ];
+
+        foreach ($headerKeywords as $key => $keywords) {
+            $colMap[$key] = -1;
+            foreach ($keywords as $kw) {
+                $idx = array_search($kw, $headers);
+                if ($idx !== false) {
+                    $colMap[$key] = $idx;
+                    break;
+                }
+            }
+        }
+
+        // If 'nama_outlet' or 'whatsapp' is missing, return error
+        if ($colMap['nama_outlet'] === -1 || $colMap['whatsapp'] === -1) {
+            fclose($handle);
+            return back()->with('error', 'Kolom wajib "Nama Petshop" dan "No WA" tidak ditemukan dalam header CSV.');
+        }
+
         $inserted = 0;
         $updated = 0;
         $failed = [];
@@ -260,28 +306,34 @@ class OutletController extends Controller
 
         while (($row = fgetcsv($handle, 1000, ',')) !== false) {
             $rowNum++;
-            
-            // Check if row is empty or has insufficient columns
-            if (count($row) < 3) {
-                $failed[] = "Baris {$rowNum}: Format kolom tidak sesuai.";
-                continue;
-            }
 
-            $namaOutlet = trim($row[0] ?? '');
-            $alamat = trim($row[1] ?? '');
-            $whatsapp = preg_replace('/[^0-9]/', '', $row[2] ?? '');
-            $mitraRaw = strtolower(trim($row[3] ?? 'ya'));
-            $kotaName = trim($row[4] ?? '');
-            $distributorName = trim($row[5] ?? '');
-            $kurirRaw = trim($row[6] ?? '');
+            // Extract values using mapped indexes
+            $namaOutlet = $colMap['nama_outlet'] !== -1 ? trim($row[$colMap['nama_outlet']] ?? '') : '';
+            $alamat = $colMap['alamat'] !== -1 ? trim($row[$colMap['alamat']] ?? '') : '';
+            $whatsapp = $colMap['whatsapp'] !== -1 ? preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp']] ?? '') : '';
+            $mitraRaw = $colMap['mitra'] !== -1 ? strtolower(trim($row[$colMap['mitra']] ?? 'tidak')) : 'tidak';
+            $kotaName = $colMap['kota'] !== -1 ? trim($row[$colMap['kota']] ?? '') : '';
+            $distributorName = $colMap['distributor'] !== -1 ? trim($row[$colMap['distributor']] ?? '') : '';
+            $kurirRaw = $colMap['kurir'] !== -1 ? trim($row[$colMap['kurir']] ?? '') : '';
+
+            $googleMapsUrl = $colMap['google_maps_url'] !== -1 ? trim($row[$colMap['google_maps_url']] ?? '') : null;
+            $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
+            $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
 
             if (empty($namaOutlet) || empty($whatsapp)) {
                 $failed[] = "Baris {$rowNum}: Nama Petshop dan No WA wajib diisi.";
                 continue;
             }
 
+            // Standardize WA format
+            if (str_starts_with($whatsapp, '0')) {
+                $whatsapp = '62' . substr($whatsapp, 1);
+            } elseif (str_starts_with($whatsapp, '8')) {
+                $whatsapp = '62' . $whatsapp;
+            }
+
             // Determine is_mitra
-            $isMitra = in_array($mitraRaw, ['ya', 'yes', 'mitra', '1', 'true']);
+            $isMitra = in_array($mitraRaw, ['ya', 'yes', 'mitra', '1', 'true', 'aktif']);
 
             // Find or create city dynamically
             $city = null;
@@ -290,242 +342,113 @@ class OutletController extends Controller
                 if (!$city) {
                     $city = City::where('nama', $kotaName)->first();
                 }
-                
+
                 if (!$city) {
                     // Predefined mapping of common cities to provinces to populate them correctly
                     $cityProvinceMap = [
-                    'Madiun' => 'Jawa Timur',
-                    'Sukoharjo' => 'Jawa Tengah',
-                    'Ponorogo' => 'Jawa Timur',
-                    'Surakarta' => 'Jawa Tengah',
-                    'Banjar' => 'Jawa Barat',
-                    'Magelang' => 'Jawa Tengah',
-                    'Badung' => 'Bali',
-                    'Bandung' => 'Jawa Barat',
-                    'Bekasi' => 'Jawa Barat',
-                    'Bogor' => 'Jawa Barat',
-                    'Buleleng' => 'Bali',
-                    'Boyolali' => 'Jawa Tengah',
-                    'Kalten' => 'Lainnya',
-                    'Klaten' => 'Jawa Tengah',
-                    'Surabaya' => 'Jawa Timur',
-                    'Jakarta Pusat' => 'DKI Jakarta',
-                    'Tulungagung' => 'Jawa Timur',
-                    'Jambi' => 'Jambi',
-                    'Banda Aceh' => 'Aceh',
-                    'Denpasar' => 'Bali',
-                    'Kaltim' => 'Kalimantan Timur',
-                    'Banyuwangi' => 'Jawa Timur',
-                    'Sragen' => 'Jawa Tengah',
-                    'Jakarta Timur' => 'DKI Jakarta',
-                    'Cianjur' => 'Jawa Barat',
-                    'Sorong' => 'Lainnya',
-                    'Wonosobo' => 'Jawa Tengah',
-                    'Tasikmalaya' => 'Jawa Barat',
-                    'Depok' => 'Jawa Barat',
-                    'Sidoarjo' => 'Jawa Timur',
-                    'Garut' => 'Jawa Barat',
-                    'Pasuruan' => 'Jawa Timur',
-                    'Jakarta Selatan' => 'DKI Jakarta',
-                    'Lampung' => 'Lampung',
-                    'Tangerang' => 'Banten',
-                    'Macassar' => 'Sulawesi Selatan',
-                    'Bengkulu' => 'Bengkulu',
-                    'Tegal' => 'Jawa Tengah',
-                    'Kalsel' => 'Kalimantan Selatan',
-                    'Sleman' => 'DI Yogyakarta',
-                    'Samarinda' => 'Kalimantan Timur',
-                    'Tabanan' => 'Bali',
-                    'Karawang' => 'Jawa Barat',
-                    'Sulsel' => 'Sulawesi Selatan',
-                    'Pacitan' => 'Jawa Timur',
-                    'Trenggalek' => 'Jawa Timur',
-                    'Grosir' => 'Lainnya',
-                    'Sumedang' => 'Jawa Barat',
-                    'Bojonegoro' => 'Jawa Timur',
-                    'Padang' => 'Sumatera Barat',
-                    'Lamongan' => 'Jawa Timur',
-                    'Aksa' => 'Lainnya',
-                    'Kendari' => 'Sulawesi Tenggara',
-                    'Purigading' => 'Lainnya',
-                    'Tuban' => 'Jawa Timur',
-                    'Balikpapan' => 'Bali',
-                    'Banjarnegara' => 'Jawa Tengah',
-                    'Batu' => 'Jawa Timur',
-                    'Mojokerto' => 'Jawa Timur',
-                    'China' => 'Lainnya',
-                    'Batang' => 'Jawa Tengah',
-                    'Yogyakarta' => 'DI Yogyakarta',
-                    'Kediri' => 'Jawa Timur',
-                    'Cirebon' => 'Jawa Barat',
-                    'Semarang' => 'Jawa Tengah',
-                    'Bitung' => 'Lainnya',
-                    'Jember' => 'Jawa Timur',
-                    'Jakbar' => 'Lainnya',
-                    'Manado' => 'Aceh',
-                    'Utara' => 'Sulawesi Utara',
-                    'Kendal' => 'Jawa Tengah',
-                    'Magetan' => 'Jawa Timur',
-                    'Jaksel' => 'Lainnya',
-                    'Probolinggo' => 'Jawa Timur',
-                    'Batam' => 'Kepulauan Riau',
-                    'Purworejo' => 'Jawa Tengah',
-                    'Ntb' => 'Nusa Tenggara Barat',
-                    'Jakarta Barat' => 'DKI Jakarta',
-                    'Subang' => 'Jawa Barat',
-                    'Jaktim' => 'Lainnya',
-                    'Malaysia' => 'Lainnya',
-                    'Pekanbaru' => 'Riau',
-                    'Yogya' => 'Lainnya',
-                    'Ternate' => 'Lainnya',
-                    'Hewan' => 'Lainnya',
-                    'Ngawi' => 'Jawa Timur',
-                    'Kalut' => 'Lainnya',
-                    'Malang' => 'Jawa Timur',
-                    'Shop' => 'Lainnya',
-                    'Selatan' => 'Lainnya',
-                    'Pontianak' => 'Kalimantan Barat',
-                    'Kudus' => 'Jawa Tengah',
-                    'Prambanan' => 'Lainnya',
-                    'Parfum' => 'Lainnya',
-                    'Kaskus' => 'Lainnya',
-                    'Blitar' => 'Jawa Timur',
-                    '(nuraria)' => 'Lainnya',
-                    'Nganjuk' => 'Jawa Timur',
-                    'Palembang' => 'Sumatera Selatan',
-                    'Medan' => 'Sumatera Utara',
-                    'Papan' => 'Bali',
-                    'Tebet' => 'Lainnya',
-                    'Sumbar' => 'Sumatera Barat',
-                    'Cikarang' => 'Lainnya',
-                    'Ningsih' => 'Sulawesi Tengah',
-                    'Gresik' => 'Jawa Timur',
-                    'Purwakarta' => 'Jawa Barat',
-                    'Bantul' => 'DI Yogyakarta',
-                    'Jakarta Utara' => 'DKI Jakarta',
-                    'Temanggung' => 'Jawa Tengah',
-                    'Kebumen' => 'Jawa Tengah',
-                    'Kupang' => 'Nusa Tenggara Timur',
-                    'Salatiga' => 'Jawa Tengah',
-                    'Indramayu' => 'Jawa Barat',
-                    'Kuningan' => 'Jawa Barat',
-                    'Papua' => 'Lainnya',
-                    'Gorontalo' => 'Lainnya',
-                    'Petshop2' => 'Lainnya',
-                    'Malanv' => 'Lainnya',
-                    'Brebes' => 'Jawa Tengah',
-                    'Kalteng' => 'Kalimantan Tengah',
-                    'Ngaanjuk' => 'Lainnya',
-                    'Pinang' => 'Lainnya',
-                    'Lumajang' => 'Jawa Timur',
-                    'Sukabumi' => 'Jawa Barat',
-                    'Jepara' => 'Jawa Tengah',
-                    'Jakpus' => 'Lainnya',
-                    'Lombok' => 'Lainnya',
-                    'Rembang' => 'Jawa Tengah',
-                    'Unknown' => 'Lainnya',
-                    'Palopo' => 'Sulawesi Selatan',
-                    'Mataram' => 'Nusa Tenggara Barat',
-                    'Pekalongan' => 'Jawa Tengah',
-                    'Surabya' => 'Lainnya',
-                    'Sulteng' => 'Sulawesi Tengah',
-                    'Baubau' => 'Lainnya',
-                    'Lubuklinggau' => 'Sumatera Selatan',
-                    'Palu' => 'Sulawesi Tengah',
-                    'Bandar Lampung' => 'Lampung',
-                    'Banyumas' => 'Jawa Tengah',
-                    'Serang' => 'Banten',
-                    'Jombang' => 'Jawa Timur',
-                    'Karanganyar' => 'Jawa Tengah',
-                    'Cilegon' => 'Banten',
-                    'Parepare' => 'Sulawesi Selatan',
-                    'Majalengka' => 'Jawa Barat',
-                    'Bondowoso' => 'Jawa Timur',
-                    'Vetcare' => 'Lainnya',
-                    'Pati' => 'Jawa Tengah',
-                    'Situbondo' => 'Jawa Timur',
-                    'Miko' => 'Lainnya',
-                    'Produk' => 'Lainnya',
-                    'Bangli' => 'Bali',
-                    'Karangasem' => 'Bali',
-                    'Care' => 'Lainnya',
-                    'Indonesia' => 'Lainnya',
-                    'Cilacap' => 'Jawa Tengah',
-                    'Agung' => 'Lainnya',
-                    'Jayapura' => 'Lainnya',
-                    'Purbalingga' => 'Jawa Tengah',
-                    'Palangkaraya' => 'Kalimantan Tengah',
-                    'Purwokerto' => 'Jawa Tengah',
-                    'Barat' => 'Sumatera Barat',
-                    'Bajarmasin' => 'Lainnya',
-                    'Tanggerang' => 'Lainnya',
-                    'Tarakan' => 'Lainnya',
-                    'Bontang' => 'Kalimantan Timur',
-                    'House' => 'Lainnya',
-                    'Bangka' => 'Lainnya',
-                    'Blora' => 'Jawa Tengah',
-                    'Demak' => 'Jawa Tengah',
-                    'Kalimantan Timur' => 'Kalimantan Timur',
-                    'Waleri' => 'Lainnya',
-                    'Clow' => 'Lainnya',
-                    'Duri' => 'Lainnya',
-                    'Tengah' => 'Jawa Tengah',
-                    'Admin' => 'Lainnya',
-                    'May' => 'Lainnya',
-                    'Purwodadi' => 'Jawa Tengah',
-                    'Sby' => 'Lainnya',
-                    'Cileungsi' => 'Lainnya',
-                    'Tiban' => 'Lainnya',
-                    'Kedurus' => 'Lainnya',
-                    'Santos' => 'Lainnya',
-                    'Belitung' => 'Lainnya',
-                    'Gloria' => 'Lainnya',
-                    'Grace' => 'Lainnya',
-                    'Online' => 'Lainnya',
-                    'Lebak' => 'Banten',
-                    'Tanjungduren' => 'Lainnya',
-                    'Sulut' => 'Sulawesi Utara',
-                    'Purchasing' => 'Lainnya',
-                    'Bukittinggi' => 'Lainnya',
-                    'Kaliwungu' => 'Lainnya',
-                    'C' => 'Lainnya',
-                    'Id' => 'Lainnya',
-                    'Miftah' => 'Banten',
-                    'Jabodetabek' => 'Lainnya',
-                    'Jaya' => 'Lainnya',
-                    'Drpok' => 'Lainnya',
-                    'Catshop' => 'Lainnya',
-                    'Ntt' => 'Nusa Tenggara Timur',
-                    'Jambe' => 'Lainnya',
-                    'Pandeglang' => 'Banten',
-                    'Mayalsia' => 'Lainnya',
-                    'Majalah' => 'Lainnya',
-                    'Wonogiri' => 'Lainnya',
-                    'Klinik' => 'Lainnya',
-                    'Tinggi' => 'Lainnya',
-                    'Timur' => 'Jawa Timur',
-                    'Animalzone' => 'Lainnya',
-                    'Baru' => 'Lainnya',
-                    'Tenggara' => 'Lainnya',
-                    'Bogot' => 'Lainnya',
-                    'Lim' => 'Lainnya',
-                    'Cats' => 'Lainnya',
-                    'Safari' => 'Lainnya',
-                    'Grobokan' => 'Lainnya',
-                    'Bsnjarmasin' => 'Lainnya',
-                    'Cicendo' => 'Lainnya',
-                    'Affan' => 'Lainnya',
-                    'Pariaman' => 'Lainnya',
-                    'Pangandaran' => 'Jawa Barat',
-                    'Masamba' => 'Lainnya',
-                    'Sumsel' => 'Sumatera Selatan',
-                    'Gianyar' => 'Bali',
-                    'Ciamis' => 'Jawa Barat',
-                    'Ferry' => 'Lainnya',
-                    'Gudang' => 'Lainnya',
-                    'Maluku' => 'Lainnya',
+                        'Madiun' => 'Jawa Timur',
+                        'Sukoharjo' => 'Jawa Tengah',
+                        'Ponorogo' => 'Jawa Timur',
+                        'Surakarta' => 'Jawa Tengah',
+                        'Banjar' => 'Jawa Barat',
+                        'Magelang' => 'Jawa Tengah',
+                        'Badung' => 'Bali',
+                        'Bandung' => 'Jawa Barat',
+                        'Bekasi' => 'Jawa Barat',
+                        'Bogor' => 'Jawa Barat',
+                        'Buleleng' => 'Bali',
+                        'Boyolali' => 'Jawa Tengah',
+                        'Klaten' => 'Jawa Tengah',
+                        'Surabaya' => 'Jawa Timur',
+                        'Jakarta Pusat' => 'DKI Jakarta',
+                        'Tulungagung' => 'Jawa Timur',
+                        'Jambi' => 'Jambi',
+                        'Banda Aceh' => 'Aceh',
+                        'Denpasar' => 'Bali',
+                        'Banyuwangi' => 'Jawa Timur',
+                        'Sragen' => 'Jawa Tengah',
+                        'Jakarta Timur' => 'DKI Jakarta',
+                        'Cianjur' => 'Jawa Barat',
+                        'Sorong' => 'Lainnya',
+                        'Wonosobo' => 'Jawa Tengah',
+                        'Tasikmalaya' => 'Jawa Barat',
+                        'Depok' => 'Jawa Barat',
+                        'Sidoarjo' => 'Jawa Timur',
+                        'Garut' => 'Jawa Barat',
+                        'Pasuruan' => 'Jawa Timur',
+                        'Jakarta Selatan' => 'DKI Jakarta',
+                        'Lampung' => 'Lampung',
+                        'Tangerang' => 'Banten',
+                        'Bengkulu' => 'Bengkulu',
+                        'Tegal' => 'Jawa Tengah',
+                        'Sleman' => 'DI Yogyakarta',
+                        'Samarinda' => 'Kalimantan Timur',
+                        'Tabanan' => 'Bali',
+                        'Karawang' => 'Jawa Barat',
+                        'Pacitan' => 'Jawa Timur',
+                        'Trenggalek' => 'Jawa Timur',
+                        'Sumedang' => 'Jawa Barat',
+                        'Bojonegoro' => 'Jawa Timur',
+                        'Padang' => 'Sumatera Barat',
+                        'Lamongan' => 'Jawa Timur',
+                        'Kendari' => 'Sulawesi Tenggara',
+                        'Tuban' => 'Jawa Timur',
+                        'Balikpapan' => 'Kalimantan Timur',
+                        'Batu' => 'Jawa Timur',
+                        'Mojokerto' => 'Jawa Timur',
+                        'Batang' => 'Jawa Tengah',
+                        'Yogyakarta' => 'DI Yogyakarta',
+                        'Kediri' => 'Jawa Timur',
+                        'Cirebon' => 'Jawa Barat',
+                        'Semarang' => 'Jawa Tengah',
+                        'Jember' => 'Jawa Timur',
+                        'Manado' => 'Sulawesi Utara',
+                        'Magetan' => 'Jawa Timur',
+                        'Probolinggo' => 'Jawa Timur',
+                        'Batam' => 'Kepulauan Riau',
+                        'Purworejo' => 'Jawa Tengah',
+                        'Jakarta Barat' => 'DKI Jakarta',
+                        'Subang' => 'Jawa Barat',
+                        'Pekanbaru' => 'Riau',
+                        'Ngawi' => 'Jawa Timur',
+                        'Malang' => 'Jawa Timur',
+                        'Pontianak' => 'Kalimantan Barat',
+                        'Kudus' => 'Jawa Tengah',
+                        'Blitar' => 'Jawa Timur',
+                        'Nganjuk' => 'Jawa Timur',
+                        'Palembang' => 'Sumatera Selatan',
+                        'Medan' => 'Sumatera Utara',
+                        'Gresik' => 'Jawa Timur',
+                        'Purwakarta' => 'Jawa Barat',
+                        'Bantul' => 'DI Yogyakarta',
+                        'Jakarta Utara' => 'DKI Jakarta',
+                        'Temanggung' => 'Jawa Tengah',
+                        'Kebumen' => 'Jawa Tengah',
+                        'Kupang' => 'Nusa Tenggara Timur',
+                        'Salatiga' => 'Jawa Tengah',
+                        'Brebes' => 'Jawa Tengah',
+                        'Lumajang' => 'Jawa Timur',
+                        'Sukabumi' => 'Jawa Barat',
+                        'Rembang' => 'Jawa Tengah',
+                        'Palopo' => 'Sulawesi Selatan',
+                        'Mataram' => 'Nusa Tenggara Barat',
+                        'Pekalongan' => 'Jawa Tengah',
+                        'Lubuklinggau' => 'Sumatera Selatan',
+                        'Palu' => 'Sulawesi Tengah',
+                        'Banyumas' => 'Jawa Tengah',
+                        'Serang' => 'Banten',
+                        'Jombang' => 'Jawa Timur',
+                        'Karanganyar' => 'Jawa Tengah',
+                        'Cilegon' => 'Banten',
+                        'Parepare' => 'Sulawesi Selatan',
+                        'Majalengka' => 'Jawa Barat',
+                        'Bondowoso' => 'Jawa Timur',
+                        'Pati' => 'Jawa Tengah',
+                        'Gianyar' => 'Bali',
+                        'Ciamis' => 'Jawa Barat',
+                        'Pangandaran' => 'Jawa Barat'
                     ];
-                    
+
                     $provinceName = 'Lainnya';
                     foreach ($cityProvinceMap as $cName => $pName) {
                         if (stripos($kotaName, $cName) !== false) {
@@ -533,7 +456,7 @@ class OutletController extends Controller
                             break;
                         }
                     }
-                    
+
                     $province = Province::firstOrCreate(['nama' => $provinceName]);
                     $city = City::create([
                         'provinsi_id' => $province->id,
@@ -542,6 +465,7 @@ class OutletController extends Controller
                     ]);
                 }
             }
+
             if (!$city) {
                 $failed[] = "Baris {$rowNum}: Kota '{$kotaName}' wajib diisi.";
                 continue;
@@ -572,6 +496,9 @@ class OutletController extends Controller
                     'nama_outlet' => $namaOutlet,
                     'alamat_lengkap' => $alamat,
                     'is_mitra' => $isMitra,
+                    'google_maps_url' => $googleMapsUrl ?: $existing->google_maps_url,
+                    'latitude' => $latitude ?: $existing->latitude,
+                    'longitude' => $longitude ?: $existing->longitude,
                     'status' => 'AKTIF'
                 ]);
                 $outlet = $existing;
@@ -585,6 +512,9 @@ class OutletController extends Controller
                     'whatsapp' => $whatsapp,
                     'alamat_lengkap' => $alamat,
                     'is_mitra' => $isMitra,
+                    'google_maps_url' => $googleMapsUrl,
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
                     'status' => 'AKTIF',
                     'delivery_mode' => 'SELF_DELIVERY'
                 ]);
@@ -595,7 +525,7 @@ class OutletController extends Controller
             if (!empty($kurirRaw) && $outlet) {
                 $courierItems = explode(',', $kurirRaw);
                 $courierIds = [];
-                
+
                 foreach ($courierItems as $item) {
                     $item = trim($item);
                     if (empty($item)) continue;

@@ -78,15 +78,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/articles/upload-image', [ArticleController::class, 'uploadImage'])->name('articles.upload-image');
         Route::post('/articles/ai-assist', [ArticleController::class, 'aiAssist'])->name('articles.ai-assist');
 
-        // Leads View & CSV Export & Delete
+        // Leads View & CSV Export & Delete & Import
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
         Route::get('/leads/export', [LeadController::class, 'exportCsv'])->name('leads.export');
+        Route::post('/leads/import', [LeadController::class, 'importCsv'])->name('leads.import');
         Route::post('/leads/clear', [LeadController::class, 'clearLeads'])->name('leads.clear');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
 
         // Customer CRM (Full Resource)
         Route::get('/customers/export', [CustomerController::class, 'exportCsv'])->name('customers.export');
+        Route::post('/customers/import', [CustomerController::class, 'importCsv'])->name('customers.import');
         Route::post('/customers/clear', [CustomerController::class, 'clearCustomers'])->name('customers.clear');
         Route::resource('/customers', CustomerController::class);
 

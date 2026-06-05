@@ -21,6 +21,26 @@
         </div>
     </div>
 
+    <!-- CSV Bulk Import Panel -->
+    <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
+        <h2 class="text-md font-bold text-white mb-2 flex items-center gap-2">
+            <span>Impor Bulk Leads & Calon Pembeli dari CSV</span>
+            <span class="text-xs text-amber-500 font-normal">(Mencegah Duplikasi Otomatis & Menghubungkan Relasi)</span>
+        </h2>
+        <form action="{{ route('admin.leads.import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row items-end md:items-center gap-4">
+            @csrf
+            <div class="flex-1 w-full">
+                <input type="file" name="csv_file" required class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-750 border border-slate-800 bg-slate-950 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-amber-500">
+            </div>
+            <button type="submit" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2.5 rounded-xl shadow-lg text-sm transition-all whitespace-nowrap">
+                Unggah & Proses 🚀
+            </button>
+        </form>
+        <p class="text-[11px] text-slate-500 mt-2">
+            Format CSV: <strong>Tanggal, Nama Customer, WhatsApp Customer, Alamat Customer, Provinsi Customer (GPS), Kota Customer (GPS), Produk Pilihan, Varian 1 (Kategori), Varian 2 (Aroma), Varian 3 (Ukuran), Kota Outlet, Nama Outlet, Nama Distributor</strong>.
+        </p>
+    </div>
+
     <!-- Filters & Search -->
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
         <form action="{{ route('admin.leads.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
