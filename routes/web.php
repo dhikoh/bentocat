@@ -96,3 +96,37 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/audit/merge', [\App\Http\Controllers\Admin\AuditController::class, 'merge'])->name('audit.merge');
     });
 });
+
+Route::get('/debug-logs-bentocat', function () {
+    if (request('token') !== 'bentocatadmin123') {
+        abort(403);
+    }
+    
+    $output = "";
+    
+    if (request('migrate') === 'true') {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            $output .= "Migration Result:\n" . \Illuminate\Support\Facades\Artisan::output() . "\n\n";
+        } catch (\Exception $e) {
+            $output .= "Migration Error:\n" . $e->getMessage() . "\n\n";
+        }
+    }
+    
+    try {
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('products');
+        $output .= "Products Table Columns:\n" . implode(', ', $columns) . "\n\n";
+    } catch (\Exception $e) {
+        $output .= "Error checking table columns:\n" . $e->getMessage() . "\n\n";
+    }
+    
+    $logPath = storage_path('logs/laravel.log');
+    if (file_exists($logPath)) {
+        $logContent = file_get_contents($logPath);
+        $output .= "Latest Laravel Logs (Last 15000 chars):\n" . substr($logContent, -15000) . "\n";
+    } else {
+        $output .= "Log file not found at " . $logPath . "\n";
+    }
+    
+    return '<pre>' . e($output) . '</pre>';
+});
