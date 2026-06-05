@@ -151,26 +151,6 @@
                     <input type="hidden" name="latitude" id="latitude_input">
                     <input type="hidden" name="longitude" id="longitude_input">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <!-- Client Name -->
-                        <div>
-                            <label for="nama" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Lengkap Anda</label>
-                            <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required placeholder="Siapa nama panggilan Anda?" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
-                        </div>
-
-                        <!-- Client WhatsApp -->
-                        <div>
-                            <label for="whatsapp" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nomor WhatsApp Aktif</label>
-                            <input type="text" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}" required placeholder="Contoh: 08123456789" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
-                        </div>
-                    </div>
-
-                    <!-- Client Address -->
-                    <div>
-                        <label for="alamat" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat Pengiriman / Rumah Anda</label>
-                        <textarea name="alamat" id="alamat" rows="2" required placeholder="Tuliskan alamat lengkap pengiriman untuk perhitungan ongkir kurir lokal..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">{{ old('alamat') }}</textarea>
-                    </div>
-
                     <!-- Geolocation trigger (GPS Browser) -->
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="space-y-1 text-center sm:text-left">
@@ -270,7 +250,7 @@
                     <!-- Submit -->
                     <div class="pt-2">
                         <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all text-xs uppercase tracking-wide">
-                            Temukan Toko & Hubungi WA 🐾
+                            Temukan Toko Terdekat 🔍
                         </button>
                     </div>
 

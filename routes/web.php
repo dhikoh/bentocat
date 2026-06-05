@@ -18,7 +18,8 @@ use App\Http\Controllers\ClientController;
 Route::get('/', [ClientController::class, 'index'])->name('home');
 Route::get('/api/cities-by-province/{province_id}', [ClientController::class, 'getCities']);
 Route::get('/api/outlets-by-city/{city_id}', [ClientController::class, 'getOutletsByCity']);
-Route::post('/search-outlet', [ClientController::class, 'searchOutlets'])->name('search-outlet');
+Route::match(['get', 'post'], '/search-outlet', [ClientController::class, 'searchOutlets'])->name('search-outlet');
+Route::post('/api/leads/create-and-log', [ClientController::class, 'createLeadAndAction'])->name('leads.create-and-log');
 Route::post('/api/leads/action', [ClientController::class, 'logAction'])->name('leads.log-action');
 
 // Content Marketing / Blog Hub

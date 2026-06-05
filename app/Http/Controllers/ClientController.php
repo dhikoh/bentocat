@@ -58,11 +58,8 @@ class ClientController extends Controller
             return redirect('/');
         }
 
-        // 2. Validate input
+        // 2. Validate input (frictionless: no nama/whatsapp/alamat required for searching)
         $request->validate([
-            'nama' => 'required|string|max:100',
-            'whatsapp' => 'required|string|max:20',
-            'alamat' => 'required|string',
             'provinsi_id' => 'required|exists:provinces,id',
             'kota_id' => 'required|exists:cities,id',
             'produk_id' => 'required|exists:products,id',
@@ -73,9 +70,9 @@ class ClientController extends Controller
             'longitude' => 'nullable|numeric',
         ]);
 
-        // 3. Turnstile anti-spam check (if configured in .env)
+        // 3. Turnstile anti-spam check (if configured in .env and is POST form submission)
         $turnstileSecret = env('TURNSTILE_SECRET_KEY');
-        if ($turnstileSecret && $turnstileSecret !== '1x00000000000000000000000000000000') {
+        if ($turnstileSecret && $turnstileSecret !== '1x00000000000000000000000000000000' && $request->isMethod('post')) {
             $token = $request->input('cf-turnstile-response');
             if (!$token) {
                 return back()->withErrors(['turnstile' => 'Validasi keamanan Turnstile diperlukan.'])->withInput();
@@ -108,22 +105,16 @@ class ClientController extends Controller
         }
         RateLimiter::hit($rateKey, 600);
 
-        // 5. Save or update customer profile
+        // 5. Retrieve models
         $province = Province::find($request->provinsi_id);
         $city = City::find($request->kota_id);
-
-        $customer = CustomerProfile::updateOrCreate(
-            ['whatsapp' => $request->whatsapp],
-            [
-                'nama' => $request->nama,
-                'alamat' => $request->alamat,
-                'provinsi' => $province ? $province->nama : null,
-                'kota' => $city ? $city->nama : null,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'uuid' => (string) Str::uuid()
-            ]
-        );
+        $product = Product::find($request->produk_id);
+        
+        $chosenVariants = [
+            'level_1' => $request->varian_level_1,
+            'level_2' => $request->varian_level_2,
+            'level_3' => $request->varian_level_3,
+        ];
 
         // 6. Fetch active outlets in the chosen city
         $outletsQuery = Outlet::where('kota_id', $request->kota_id)
@@ -175,7 +166,67 @@ class ClientController extends Controller
             $allocatedDistributor = Distributor::where('status', 'ACTIVE')->first();
         }
 
-        // 9. Record Lead Request
+        // Return view without generating DB LeadRequest yet (Opsi A: Lead captured on WhatsApp click)
+        $lead = null;
+        $customer = null;
+
+        return view('outlet_search', compact(
+            'lead', 
+            'outlets', 
+            'allocatedDistributor', 
+            'customer', 
+            'city', 
+            'province', 
+            'product', 
+            'chosenVariants'
+        ));
+    }
+
+    // Dynamic Lead Capture API on WhatsApp redirection
+    public function createLeadAndAction(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:100',
+            'whatsapp' => 'required|string|max:25',
+            'alamat' => 'nullable|string',
+            'provinsi_id' => 'required|exists:provinces,id',
+            'kota_id' => 'required|exists:cities,id',
+            'produk_id' => 'required|exists:products,id',
+            'varian_level_1' => 'nullable|string',
+            'varian_level_2' => 'nullable|string',
+            'varian_level_3' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'outlet_id' => 'nullable|exists:outlets,id',
+            'distributor_id' => 'nullable|exists:distributors,id',
+            'action_type' => 'required|in:CLICK_WA_OUTLET,CLICK_WA_SHIPPING_CONTACT',
+        ]);
+
+        $province = Province::find($request->provinsi_id);
+        $city = City::find($request->kota_id);
+
+        // Save or update customer profile
+        $customer = CustomerProfile::updateOrCreate(
+            ['whatsapp' => $request->whatsapp],
+            [
+                'nama' => $request->nama,
+                'alamat' => $request->alamat ?? '',
+                'provinsi' => $province ? $province->nama : null,
+                'kota' => $city ? $city->nama : null,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'uuid' => (string) Str::uuid()
+            ]
+        );
+
+        // Determine allocated distributor
+        $distributorId = $request->distributor_id;
+        if (!$distributorId && $request->outlet_id) {
+            $outlet = Outlet::find($request->outlet_id);
+            $distributorId = $outlet ? $outlet->distributor_id : null;
+        }
+
+        // Record Lead Request
         $lead = LeadRequest::create([
             'customer_id' => $customer->id,
             'produk_id' => $request->produk_id,
@@ -183,20 +234,22 @@ class ClientController extends Controller
             'varian_level_2' => $request->varian_level_2,
             'varian_level_3' => $request->varian_level_3,
             'kota_id' => $request->kota_id,
-            'outlet_id' => $allocatedOutlet ? $allocatedOutlet->id : null,
-            'distributor_id' => $allocatedDistributor ? $allocatedDistributor->id : null,
+            'outlet_id' => $request->outlet_id,
+            'distributor_id' => $distributorId,
         ]);
 
-        // Record initial view event
-        if ($allocatedOutlet) {
-            LeadAction::create([
-                'lead_id' => $lead->id,
-                'action_type' => 'VIEW_OUTLET',
-                'created_at' => now(),
-            ]);
-        }
+        // Record click action
+        LeadAction::create([
+            'lead_id' => $lead->id,
+            'action_type' => $request->action_type,
+            'created_at' => now(),
+        ]);
 
-        return view('outlet_search', compact('lead', 'outlets', 'allocatedDistributor', 'customer', 'city'));
+        return response()->json([
+            'success' => true,
+            'lead_id' => $lead->id,
+            'customer_id' => $customer->id
+        ]);
     }
 
     // API to log click events via AJAX before WhatsApp redirection

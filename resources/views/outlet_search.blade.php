@@ -11,7 +11,7 @@
             <a href="{{ route('home') }}#cari-outlet" class="text-xs font-bold text-amber-650 hover:text-amber-750 hover:underline">← Ulangi Pencarian</a>
         </div>
         <h1 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Petshop Resmi di Kota {{ $city->nama }}</h1>
-        <p class="text-sm text-slate-600">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk {{ $lead->product->nama }}.</p>
+        <p class="text-sm text-slate-600">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk {{ $product->nama }}.</p>
     </div>
 
     <!-- Map Container (Optional, rendered if coordinates exist) -->
@@ -78,7 +78,7 @@
 
                 <div class="flex flex-col sm:flex-row gap-4 pt-2">
                     <!-- Action WA Redirect Button -->
-                    <button onclick="contactOutlet({{ $outlet->id }}, '{{ $outlet->whatsapp }}', '{{ $outlet->nama_outlet }}', {{ $outlet->is_mitra ? 'true' : 'false' }})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                    <button type="button" onclick="contactOutlet({{ $outlet->id }}, '{{ $outlet->whatsapp }}', '{{ $outlet->nama_outlet }}', {{ $outlet->is_mitra ? 'true' : 'false' }})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                         <span>Hubungi Petshop via WhatsApp</span> 💬
                     </button>
                     @if($outlet->maps_url)
@@ -100,10 +100,10 @@
                                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between gap-3 shadow-sm">
                                     <div class="space-y-1">
                                         <span class="block font-bold text-xs text-slate-900">{{ $courier->nama }}</span>
-                                        <p class="text-[11px] text-slate-500 leading-relaxed">{{ $courier->keterangan ?: 'Melayani area jangkauan toko.' }}</p>
+                                        <p class="text-[11px] text-slate-550 leading-relaxed">{{ $courier->keterangan ?: 'Melayani area jangkauan toko.' }}</p>
                                     </div>
-                                    <button onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-white border border-slate-200 hover:border-amber-500/30 hover:text-amber-650 text-slate-650 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm font-sans">
-                                        <span>Chat Kurir Mas Joko</span> 💬
+                                    <button type="button" onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-white border border-slate-200 hover:border-amber-500/30 hover:text-amber-650 text-slate-650 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm font-sans">
+                                        <span>Chat Kurir {{ $courier->nama }}</span> 💬
                                     </button>
                                 </div>
                             @endforeach
@@ -128,10 +128,10 @@
                         <span class="block text-[10px] font-bold text-slate-400 uppercase">Distributor Resmi Wilayah:</span>
                         <div class="space-y-1 text-xs">
                             <strong class="block text-slate-900 text-sm">{{ $allocatedDistributor->nama }}</strong>
-                            <span class="block text-slate-600">WhatsApp PIC: {{ $allocatedDistributor->whatsapp }} ({{ $allocatedDistributor->pic }})</span>
-                            <span class="block text-slate-600">Gudang Alamat: {{ $allocatedDistributor->alamat }}</span>
+                            <span class="block text-slate-650">WhatsApp PIC: {{ $allocatedDistributor->whatsapp }} ({{ $allocatedDistributor->pic }})</span>
+                            <span class="block text-slate-650">Gudang Alamat: {{ $allocatedDistributor->alamat }}</span>
                         </div>
-                        <button onclick="contactDistributor('{{ $allocatedDistributor->whatsapp }}', '{{ $allocatedDistributor->nama }}')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs">
+                        <button type="button" onclick="contactDistributor('{{ $allocatedDistributor->whatsapp }}', '{{ $allocatedDistributor->nama }}')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs">
                             <span>Hubungi Distributor Resmi</span> 💬
                         </button>
                     </div>
@@ -143,6 +143,52 @@
     </div>
 
 </div>
+
+<!-- Premium Lead Capture Modal Overlay -->
+<div id="lead-capture-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <!-- Backdrop blur -->
+    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeLeadModal()"></div>
+
+    <!-- Modal Centerer -->
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-md transform overflow-hidden rounded-3xl bg-white border border-slate-100 p-6 sm:p-8 text-left shadow-2xl transition-all space-y-6">
+            <!-- Close Button -->
+            <button type="button" onclick="closeLeadModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition-all text-lg">
+                ✕
+            </button>
+
+            <!-- Modal Header -->
+            <div class="space-y-2">
+                <h3 class="font-outfit font-black text-xl text-slate-900 flex items-center gap-2">
+                    <span>🐾 Satu Langkah Lagi!</span>
+                </h3>
+                <p class="text-xs text-slate-500">Silakan masukkan nama dan WhatsApp Anda untuk terhubung langsung dengan WhatsApp toko.</p>
+            </div>
+
+            <!-- Lead Capture Form -->
+            <form id="lead-capture-form" class="space-y-4" onsubmit="handleLeadSubmit(event)">
+                <div>
+                    <label for="lead_name" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
+                    <input type="text" id="lead_name" required placeholder="Nama panggilan Anda..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="lead_whatsapp" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nomor WhatsApp Aktif</label>
+                    <input type="text" id="lead_whatsapp" required placeholder="Contoh: 08123456789..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                </div>
+
+                <div>
+                    <label for="lead_address" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Alamat Lengkap (Opsional)</label>
+                    <textarea id="lead_address" rows="2" placeholder="Untuk mempermudah perhitungan ongkir kurir lokal..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg transition-all text-xs uppercase tracking-wide">
+                    Hubungi via WhatsApp 💬
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -151,25 +197,23 @@
 
 @php
     $variantDetails = [];
-    if (!empty($lead->varian_level_1) && $lead->varian_level_1 !== 'Default') {
-        $variantDetails[] = ($lead->product->label_level_1 ?: 'Kategori') . ': ' . $lead->varian_level_1;
+    if (!empty($chosenVariants['level_1']) && $chosenVariants['level_1'] !== 'Default') {
+        $variantDetails[] = ($product->label_level_1 ?: 'Kategori') . ': ' . $chosenVariants['level_1'];
     }
-    if (!empty($lead->varian_level_2)) {
-        $variantDetails[] = ($lead->product->label_level_2 ?: 'Aroma') . ': ' . $lead->varian_level_2;
+    if (!empty($chosenVariants['level_2'])) {
+        $variantDetails[] = ($product->label_level_2 ?: 'Aroma') . ': ' . $chosenVariants['level_2'];
     }
-    if (!empty($lead->varian_level_3)) {
-        $variantDetails[] = ($lead->product->label_level_3 ?: 'Ukuran') . ': ' . $lead->varian_level_3;
+    if (!empty($chosenVariants['level_3'])) {
+        $variantDetails[] = ($product->label_level_3 ?: 'Ukuran') . ': ' . $chosenVariants['level_3'];
     }
     $variantDetailsStr = implode(', ', $variantDetails);
 @endphp
 
 <script>
-    // Lead ID passed from controller
-    const leadId = {{ $lead->id }};
-    const customerName = "{{ $customer->nama }}";
-    const productName = "{{ $lead->product->nama }}";
+    // State variables from controller
+    const productName = "{{ $product->nama }}";
     const variantDetailsStr = "{{ $variantDetailsStr }}";
- 
+    
     // Setup Leaflet map
     const map = L.map('results-map').setView([-7.2575, 112.7521], 11); // Fallback Surabaya coordinates
  
@@ -180,8 +224,8 @@
     const markers = [];
  
     // Add user marker if coordinates are shared
-    const userLat = {{ $customer->latitude ?: 'null' }};
-    const userLon = {{ $customer->longitude ?: 'null' }};
+    const userLat = {{ request('latitude') ?: 'null' }};
+    const userLon = {{ request('longitude') ?: 'null' }};
  
     if (userLat && userLon) {
         const userIcon = L.divIcon({
@@ -210,20 +254,103 @@
         const group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
     }
- 
-    // AJAX Action loggers
-    function contactOutlet(outletId, whatsapp, outletName, isMitra) {
-        fetch('{{ route("leads.log-action") }}', {
+
+    // --- Dynamic Lead Capture Overlay Logic ---
+    let pendingAction = null;
+
+    function openLeadModal() {
+        const modal = document.getElementById('lead-capture-modal');
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeLeadModal() {
+        const modal = document.getElementById('lead-capture-modal');
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        pendingAction = null;
+    }
+
+    // Populate saved info into inputs if they exist in localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedName = localStorage.getItem('bentocat_customer_name');
+        const savedWa = localStorage.getItem('bentocat_customer_whatsapp');
+        const savedAddress = localStorage.getItem('bentocat_customer_address');
+        if (savedName) document.getElementById('lead_name').value = savedName;
+        if (savedWa) document.getElementById('lead_whatsapp').value = savedWa;
+        if (savedAddress) document.getElementById('lead_address').value = savedAddress;
+    });
+
+    function handleLeadSubmit(event) {
+        event.preventDefault();
+        const nameVal = document.getElementById('lead_name').value.trim();
+        const waVal = document.getElementById('lead_whatsapp').value.trim();
+        const addressVal = document.getElementById('lead_address').value.trim();
+
+        if (!nameVal || !waVal) return;
+
+        localStorage.setItem('bentocat_customer_name', nameVal);
+        localStorage.setItem('bentocat_customer_whatsapp', waVal);
+        localStorage.setItem('bentocat_customer_address', addressVal);
+
+        closeLeadModal();
+
+        // Resume the pending action
+        if (pendingAction) {
+            if (pendingAction.type === 'OUTLET') {
+                contactOutlet(pendingAction.id, pendingAction.wa, pendingAction.name, pendingAction.isMitra);
+            } else if (pendingAction.type === 'COURIER') {
+                contactCourier(pendingAction.id, pendingAction.wa, pendingAction.name);
+            } else if (pendingAction.type === 'DISTRIBUTOR') {
+                contactDistributor(pendingAction.wa, pendingAction.name);
+            }
+        }
+    }
+
+    // Send the dynamic AJAX call to create LeadRequest + LeadAction in backend
+    function sendLeadRequest(actionType, targetOutletId, targetDistributorId) {
+        const nameVal = localStorage.getItem('bentocat_customer_name') || '';
+        const waVal = localStorage.getItem('bentocat_customer_whatsapp') || '';
+        const addressVal = localStorage.getItem('bentocat_customer_address') || '';
+
+        return fetch('{{ route("leads.create-and-log") }}', {
             method: 'POST',
             body: JSON.stringify({
-                lead_id: leadId,
-                action_type: 'CLICK_WA_OUTLET'
+                nama: nameVal,
+                whatsapp: waVal,
+                alamat: addressVal,
+                provinsi_id: "{{ request('provinsi_id', $city->provinsi_id) }}",
+                kota_id: "{{ $city->id }}",
+                produk_id: "{{ $product->id }}",
+                varian_level_1: "{{ request('varian_level_1') }}",
+                varian_level_2: "{{ request('varian_level_2') }}",
+                varian_level_3: "{{ request('varian_level_3') }}",
+                latitude: userLat,
+                longitude: userLon,
+                outlet_id: targetOutletId,
+                distributor_id: targetDistributorId,
+                action_type: actionType
             }),
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
-        })
+        });
+    }
+ 
+    // AJAX Action loggers & WA redirection
+    function contactOutlet(outletId, whatsapp, outletName, isMitra) {
+        const savedName = localStorage.getItem('bentocat_customer_name');
+        const savedWa = localStorage.getItem('bentocat_customer_whatsapp');
+
+        if (!savedName || !savedWa) {
+            pendingAction = { type: 'OUTLET', id: outletId, wa: whatsapp, name: outletName, isMitra: isMitra };
+            openLeadModal();
+            return;
+        }
+
+        sendLeadRequest('CLICK_WA_OUTLET', outletId, null)
         .finally(() => {
             let message = '';
             let variantSuffix = variantDetailsStr ? ` (${variantDetailsStr})` : '';
@@ -238,18 +365,18 @@
     }
  
     function contactCourier(outletId, whatsapp, courierName) {
-        fetch('{{ route("leads.log-action") }}', {
-            method: 'POST',
-            body: JSON.stringify({
-                lead_id: leadId,
-                action_type: 'CLICK_WA_SHIPPING_CONTACT'
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
+        const savedName = localStorage.getItem('bentocat_customer_name');
+        const savedWa = localStorage.getItem('bentocat_customer_whatsapp');
+
+        if (!savedName || !savedWa) {
+            pendingAction = { type: 'COURIER', id: outletId, wa: whatsapp, name: courierName };
+            openLeadModal();
+            return;
+        }
+
+        sendLeadRequest('CLICK_WA_SHIPPING_CONTACT', outletId, null)
         .finally(() => {
+            const customerName = localStorage.getItem('bentocat_customer_name') || 'Pelanggan';
             const message = `Halo ${courierName}, saya ${customerName} merujuk dari website BentoCat. Ingin memesan pengantaran produk ${productName} dari petshop ke alamat rumah saya.`;
             const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
@@ -257,10 +384,23 @@
     }
  
     function contactDistributor(whatsapp, distName) {
-        let variantSuffix = variantDetailsStr ? ` dengan pilihan ${variantDetailsStr}` : '';
-        const message = `Halo ${distName}, saya ${customerName} melihat dari website BentoCat. Di kota saya belum ada petshop resmi terdaftar, apakah saya bisa membeli ${productName}${variantSuffix} langsung dikirim dari distributor?`;
-        const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-        window.open(waUrl, '_blank');
+        const savedName = localStorage.getItem('bentocat_customer_name');
+        const savedWa = localStorage.getItem('bentocat_customer_whatsapp');
+
+        if (!savedName || !savedWa) {
+            pendingAction = { type: 'DISTRIBUTOR', wa: whatsapp, name: distName };
+            openLeadModal();
+            return;
+        }
+
+        sendLeadRequest('CLICK_WA_OUTLET', null, "{{ $allocatedDistributor->id ?? '' }}")
+        .finally(() => {
+            const customerName = localStorage.getItem('bentocat_customer_name') || 'Pelanggan';
+            let variantSuffix = variantDetailsStr ? ` dengan pilihan ${variantDetailsStr}` : '';
+            const message = `Halo ${distName}, saya ${customerName} melihat dari website BentoCat. Di kota saya belum ada petshop resmi terdaftar, apakah saya bisa membeli ${productName}${variantSuffix} langsung dikirim dari distributor?`;
+            const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+        });
     }
 </script>
 @endsection

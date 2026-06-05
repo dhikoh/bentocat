@@ -128,10 +128,7 @@ class ClientDiscoveryTest extends TestCase
 
     public function test_search_outlet_and_logs_lead(): void
     {
-        $leadPayload = [
-            'nama' => 'John Doe Customer',
-            'whatsapp' => '089988887777',
-            'alamat' => 'Jl. Raya Darmo No. 100, Surabaya',
+        $searchPayload = [
             'provinsi_id' => $this->province->id,
             'kota_id' => $this->city->id,
             'produk_id' => $this->product->id,
@@ -142,11 +139,34 @@ class ClientDiscoveryTest extends TestCase
             'longitude' => 112.75100000,
         ];
 
-        $response = $this->post(route('search-outlet'), $leadPayload);
+        $response = $this->post(route('search-outlet'), $searchPayload);
 
         $response->assertStatus(200);
         $response->assertSee('Petshop Jaya Featured');
         $response->assertSee('Petshop Petani Regular');
+    }
+
+    public function test_create_lead_and_action_api(): void
+    {
+        $apiPayload = [
+            'nama' => 'John Doe Customer',
+            'whatsapp' => '089988887777',
+            'alamat' => 'Jl. Raya Darmo No. 100, Surabaya',
+            'provinsi_id' => $this->province->id,
+            'kota_id' => $this->city->id,
+            'produk_id' => $this->product->id,
+            'varian_level_1' => 'Premium Series',
+            'varian_level_2' => 'Lavender',
+            'latitude' => -7.26100000,
+            'longitude' => 112.75100000,
+            'outlet_id' => $this->outletFeatured->id,
+            'action_type' => 'CLICK_WA_OUTLET',
+        ];
+
+        $response = $this->postJson(route('leads.create-and-log'), $apiPayload);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
 
         // Verify customer profile created
         $this->assertDatabaseHas('customer_profiles', [
@@ -161,11 +181,12 @@ class ClientDiscoveryTest extends TestCase
             'varian_level_1' => 'Premium Series',
             'varian_level_2' => 'Lavender',
             'kota_id' => $this->city->id,
+            'outlet_id' => $this->outletFeatured->id,
         ]);
 
-        // Verify initial action View Outlet created
+        // Verify action log created
         $this->assertDatabaseHas('lead_actions', [
-            'action_type' => 'VIEW_OUTLET',
+            'action_type' => 'CLICK_WA_OUTLET',
         ]);
     }
 
