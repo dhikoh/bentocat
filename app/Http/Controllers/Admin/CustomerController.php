@@ -163,7 +163,7 @@ class CustomerController extends Controller
 
     public function importCsv(Request $request)
     {
-        @set_time_limit(300);
+        @set_time_limit(600);
 
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt|max:4096'
@@ -222,57 +222,65 @@ class CustomerController extends Controller
         $inserted = 0;
         $updated = 0;
         $failed = [];
-        $rowNum = 1;
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
-            $rowNum++;
+        // Load all customers in memory
+        $allCustomersByWa = CustomerProfile::all()->keyBy('whatsapp');
 
-            $nama = trim($row[$colMap['nama']] ?? '');
-            $whatsapp = preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp']] ?? '');
-            $alamat = $colMap['alamat'] !== -1 ? trim($row[$colMap['alamat']] ?? '') : '';
-            $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
-            $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
-            $provinsi = $colMap['provinsi'] !== -1 ? trim($row[$colMap['provinsi']] ?? '') : null;
-            $kota = $colMap['kota'] !== -1 ? trim($row[$colMap['kota']] ?? '') : null;
+        \Illuminate\Support\Facades\DB::transaction(function () use (
+            $handle, $colMap, &$inserted, &$updated, &$failed, $allCustomersByWa
+        ) {
+            $rowNum = 1;
+            while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+                $rowNum++;
 
-            if (empty($nama) || empty($whatsapp)) {
-                $failed[] = "Baris {$rowNum}: Nama dan WhatsApp wajib diisi.";
-                continue;
+                $nama = trim($row[$colMap['nama']] ?? '');
+                $whatsapp = preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp']] ?? '');
+                $alamat = $colMap['alamat'] !== -1 ? trim($row[$colMap['alamat']] ?? '') : '';
+                $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
+                $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
+                $provinsi = $colMap['provinsi'] !== -1 ? trim($row[$colMap['provinsi']] ?? '') : null;
+                $kota = $colMap['kota'] !== -1 ? trim($row[$colMap['kota']] ?? '') : null;
+
+                if (empty($nama) || empty($whatsapp)) {
+                    $failed[] = "Baris {$rowNum}: Nama dan WhatsApp wajib diisi.";
+                    continue;
+                }
+
+                // Standardize WhatsApp format
+                if (str_starts_with($whatsapp, '0')) {
+                    $whatsapp = '62' . substr($whatsapp, 1);
+                } elseif (str_starts_with($whatsapp, '8')) {
+                    $whatsapp = '62' . $whatsapp;
+                }
+
+                $existing = $allCustomersByWa->get($whatsapp);
+
+                if ($existing) {
+                    $existing->update([
+                        'nama' => $nama,
+                        'alamat' => $alamat ?: $existing->alamat,
+                        'latitude' => $latitude ?: $existing->latitude,
+                        'longitude' => $longitude ?: $existing->longitude,
+                        'provinsi' => $provinsi ?: $existing->provinsi,
+                        'kota' => $kota ?: $existing->kota,
+                    ]);
+                    $updated++;
+                } else {
+                    $newCust = CustomerProfile::create([
+                        'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                        'nama' => $nama,
+                        'whatsapp' => $whatsapp,
+                        'alamat' => $alamat,
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                        'provinsi' => $provinsi,
+                        'kota' => $kota
+                    ]);
+                    $allCustomersByWa->put($whatsapp, $newCust);
+                    $inserted++;
+                }
             }
-
-            // Standardize WhatsApp format
-            if (str_starts_with($whatsapp, '0')) {
-                $whatsapp = '62' . substr($whatsapp, 1);
-            } elseif (str_starts_with($whatsapp, '8')) {
-                $whatsapp = '62' . $whatsapp;
-            }
-
-            $existing = CustomerProfile::where('whatsapp', $whatsapp)->first();
-
-            if ($existing) {
-                $existing->update([
-                    'nama' => $nama,
-                    'alamat' => $alamat ?: $existing->alamat,
-                    'latitude' => $latitude ?: $existing->latitude,
-                    'longitude' => $longitude ?: $existing->longitude,
-                    'provinsi' => $provinsi ?: $existing->provinsi,
-                    'kota' => $kota ?: $existing->kota,
-                ]);
-                $updated++;
-            } else {
-                CustomerProfile::create([
-                    'uuid' => (string) \Illuminate\Support\Str::uuid(),
-                    'nama' => $nama,
-                    'whatsapp' => $whatsapp,
-                    'alamat' => $alamat,
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'provinsi' => $provinsi,
-                    'kota' => $kota
-                ]);
-                $inserted++;
-            }
-        }
+        });
 
         fclose($handle);
 

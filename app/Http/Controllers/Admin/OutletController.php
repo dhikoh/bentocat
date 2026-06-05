@@ -231,7 +231,7 @@ class OutletController extends Controller
 
     public function importCsv(Request $request)
     {
-        @set_time_limit(300);
+        @set_time_limit(600);
 
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt|max:4096'
@@ -297,274 +297,310 @@ class OutletController extends Controller
         $inserted = 0;
         $updated = 0;
         $failed = [];
-        $rowNum = 1;
 
         $centralDistributor = Distributor::where('nama', 'like', '%Pusat%')->first();
         if (!$centralDistributor) {
             $centralDistributor = Distributor::first();
         }
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
-            $rowNum++;
+        // Load lookups in-memory
+        $allCities = City::all()->keyBy(fn($c) => strtolower($c->nama));
+        $allProvinces = Province::all()->keyBy(fn($p) => strtolower($p->nama));
+        $allDistributors = Distributor::all();
+        $allOutletsByWa = Outlet::all()->keyBy('whatsapp');
+        $allOutletsByNameCity = Outlet::all()->groupBy(fn($o) => strtolower($o->nama_outlet) . '|' . $o->kota_id);
+        $allShippingContacts = ShippingContact::all()->keyBy('whatsapp');
 
-            // Extract values using mapped indexes
-            $namaOutlet = $colMap['nama_outlet'] !== -1 ? trim($row[$colMap['nama_outlet']] ?? '') : '';
-            $alamat = $colMap['alamat'] !== -1 ? trim($row[$colMap['alamat']] ?? '') : '';
-            $whatsapp = $colMap['whatsapp'] !== -1 ? preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp']] ?? '') : '';
-            $mitraRaw = $colMap['mitra'] !== -1 ? strtolower(trim($row[$colMap['mitra']] ?? 'tidak')) : 'tidak';
-            $kotaName = $colMap['kota'] !== -1 ? trim($row[$colMap['kota']] ?? '') : '';
-            $distributorName = $colMap['distributor'] !== -1 ? trim($row[$colMap['distributor']] ?? '') : '';
-            $kurirRaw = $colMap['kurir'] !== -1 ? trim($row[$colMap['kurir']] ?? '') : '';
+        $cityProvinceMap = [
+            'Madiun' => 'Jawa Timur',
+            'Sukoharjo' => 'Jawa Tengah',
+            'Ponorogo' => 'Jawa Timur',
+            'Surakarta' => 'Jawa Tengah',
+            'Banjar' => 'Jawa Barat',
+            'Magelang' => 'Jawa Tengah',
+            'Badung' => 'Bali',
+            'Bandung' => 'Jawa Barat',
+            'Bekasi' => 'Jawa Barat',
+            'Bogor' => 'Jawa Barat',
+            'Buleleng' => 'Bali',
+            'Boyolali' => 'Jawa Tengah',
+            'Klaten' => 'Jawa Tengah',
+            'Surabaya' => 'Jawa Timur',
+            'Jakarta Pusat' => 'DKI Jakarta',
+            'Tulungagung' => 'Jawa Timur',
+            'Jambi' => 'Jambi',
+            'Banda Aceh' => 'Aceh',
+            'Denpasar' => 'Bali',
+            'Banyuwangi' => 'Jawa Timur',
+            'Sragen' => 'Jawa Tengah',
+            'Jakarta Timur' => 'DKI Jakarta',
+            'Cianjur' => 'Jawa Barat',
+            'Sorong' => 'Lainnya',
+            'Wonosobo' => 'Jawa Tengah',
+            'Tasikmalaya' => 'Jawa Barat',
+            'Depok' => 'Jawa Barat',
+            'Sidoarjo' => 'Jawa Timur',
+            'Garut' => 'Jawa Barat',
+            'Pasuruan' => 'Jawa Timur',
+            'Jakarta Selatan' => 'DKI Jakarta',
+            'Lampung' => 'Lampung',
+            'Tangerang' => 'Banten',
+            'Bengkulu' => 'Bengkulu',
+            'Tegal' => 'Jawa Tengah',
+            'Sleman' => 'DI Yogyakarta',
+            'Samarinda' => 'Kalimantan Timur',
+            'Tabanan' => 'Bali',
+            'Karawang' => 'Jawa Barat',
+            'Pacitan' => 'Jawa Timur',
+            'Trenggalek' => 'Jawa Timur',
+            'Sumedang' => 'Jawa Barat',
+            'Bojonegoro' => 'Jawa Timur',
+            'Padang' => 'Sumatera Barat',
+            'Lamongan' => 'Jawa Timur',
+            'Kendari' => 'Sulawesi Tenggara',
+            'Tuban' => 'Jawa Timur',
+            'Balikpapan' => 'Kalimantan Timur',
+            'Batu' => 'Jawa Timur',
+            'Mojokerto' => 'Jawa Timur',
+            'Batang' => 'Jawa Tengah',
+            'Yogyakarta' => 'DI Yogyakarta',
+            'Kediri' => 'Jawa Timur',
+            'Cirebon' => 'Jawa Barat',
+            'Semarang' => 'Jawa Tengah',
+            'Jember' => 'Jawa Timur',
+            'Manado' => 'Sulawesi Utara',
+            'Magetan' => 'Jawa Timur',
+            'Probolinggo' => 'Jawa Timur',
+            'Batam' => 'Kepulauan Riau',
+            'Purworejo' => 'Jawa Tengah',
+            'Jakarta Barat' => 'DKI Jakarta',
+            'Subang' => 'Jawa Barat',
+            'Pekanbaru' => 'Riau',
+            'Ngawi' => 'Jawa Timur',
+            'Malang' => 'Jawa Timur',
+            'Pontianak' => 'Kalimantan Barat',
+            'Kudus' => 'Jawa Tengah',
+            'Blitar' => 'Jawa Timur',
+            'Nganjuk' => 'Jawa Timur',
+            'Palembang' => 'Sumatera Selatan',
+            'Medan' => 'Sumatera Utara',
+            'Gresik' => 'Jawa Timur',
+            'Purwakarta' => 'Jawa Barat',
+            'Bantul' => 'DI Yogyakarta',
+            'Jakarta Utara' => 'DKI Jakarta',
+            'Temanggung' => 'Jawa Tengah',
+            'Kebumen' => 'Jawa Tengah',
+            'Kupang' => 'Nusa Tenggara Timur',
+            'Salatiga' => 'Jawa Tengah',
+            'Brebes' => 'Jawa Tengah',
+            'Lumajang' => 'Jawa Timur',
+            'Sukabumi' => 'Jawa Barat',
+            'Rembang' => 'Jawa Tengah',
+            'Palopo' => 'Sulawesi Selatan',
+            'Mataram' => 'Nusa Tenggara Barat',
+            'Pekalongan' => 'Jawa Tengah',
+            'Lubuklinggau' => 'Sumatera Selatan',
+            'Palu' => 'Sulawesi Tengah',
+            'Banyumas' => 'Jawa Tengah',
+            'Serang' => 'Banten',
+            'Jombang' => 'Jawa Timur',
+            'Karanganyar' => 'Jawa Tengah',
+            'Cilegon' => 'Banten',
+            'Parepare' => 'Sulawesi Selatan',
+            'Majalengka' => 'Jawa Barat',
+            'Bondowoso' => 'Jawa Timur',
+            'Pati' => 'Jawa Tengah',
+            'Gianyar' => 'Bali',
+            'Ciamis' => 'Jawa Barat',
+            'Pangandaran' => 'Jawa Barat'
+        ];
 
-            $googleMapsUrl = $colMap['google_maps_url'] !== -1 ? trim($row[$colMap['google_maps_url']] ?? '') : null;
-            $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
-            $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
+        \Illuminate\Support\Facades\DB::transaction(function () use (
+            $handle, $colMap, &$inserted, &$updated, &$failed,
+            $centralDistributor, $allCities, $allProvinces, $allDistributors,
+            $allOutletsByWa, $allOutletsByNameCity, $allShippingContacts, $cityProvinceMap
+        ) {
+            $rowNum = 1;
+            while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+                $rowNum++;
 
-            if (empty($namaOutlet) || empty($whatsapp)) {
-                $failed[] = "Baris {$rowNum}: Nama Petshop dan No WA wajib diisi.";
-                continue;
-            }
+                // Extract values using mapped indexes
+                $namaOutlet = $colMap['nama_outlet'] !== -1 ? trim($row[$colMap['nama_outlet']] ?? '') : '';
+                $alamat = $colMap['alamat'] !== -1 ? trim($row[$colMap['alamat']] ?? '') : '';
+                $whatsapp = $colMap['whatsapp'] !== -1 ? preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp']] ?? '') : '';
+                $mitraRaw = $colMap['mitra'] !== -1 ? strtolower(trim($row[$colMap['mitra']] ?? 'tidak')) : 'tidak';
+                $kotaName = $colMap['kota'] !== -1 ? trim($row[$colMap['kota']] ?? '') : '';
+                $distributorName = $colMap['distributor'] !== -1 ? trim($row[$colMap['distributor']] ?? '') : '';
+                $kurirRaw = $colMap['kurir'] !== -1 ? trim($row[$colMap['kurir']] ?? '') : '';
 
-            // Standardize WA format
-            if (str_starts_with($whatsapp, '0')) {
-                $whatsapp = '62' . substr($whatsapp, 1);
-            } elseif (str_starts_with($whatsapp, '8')) {
-                $whatsapp = '62' . $whatsapp;
-            }
+                $googleMapsUrl = $colMap['google_maps_url'] !== -1 ? trim($row[$colMap['google_maps_url']] ?? '') : null;
+                $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
+                $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
 
-            // Determine is_mitra
-            $isMitra = in_array($mitraRaw, ['ya', 'yes', 'mitra', '1', 'true', 'aktif']);
+                if (empty($namaOutlet) || empty($whatsapp)) {
+                    $failed[] = "Baris {$rowNum}: Nama Petshop dan No WA wajib diisi.";
+                    continue;
+                }
 
-            // Find or create city dynamically
-            $city = null;
-            if (!empty($kotaName)) {
-                $city = City::where('nama', 'like', "%{$kotaName}%")->first();
-                if (!$city) {
-                    $city = City::where('nama', $kotaName)->first();
+                // Standardize WA format
+                if (str_starts_with($whatsapp, '0')) {
+                    $whatsapp = '62' . substr($whatsapp, 1);
+                } elseif (str_starts_with($whatsapp, '8')) {
+                    $whatsapp = '62' . $whatsapp;
+                }
+
+                // Determine is_mitra
+                $isMitra = in_array($mitraRaw, ['ya', 'yes', 'mitra', '1', 'true', 'aktif']);
+
+                // Find or create city dynamically in-memory
+                $city = null;
+                if (!empty($kotaName)) {
+                    $kotaNameLower = strtolower($kotaName);
+                    $city = $allCities->get($kotaNameLower);
+                    if (!$city) {
+                        $city = $allCities->first(fn($c) => stripos($c->nama, $kotaName) !== false);
+                    }
+
+                    if (!$city) {
+                        $provinceName = 'Lainnya';
+                        foreach ($cityProvinceMap as $cName => $pName) {
+                            if (stripos($kotaName, $cName) !== false) {
+                                $provinceName = $pName;
+                                break;
+                            }
+                        }
+
+                        $provLower = strtolower($provinceName);
+                        $province = $allProvinces->get($provLower);
+                        if (!$province) {
+                            $province = Province::create(['nama' => $provinceName]);
+                            $allProvinces->put($provLower, $province);
+                        }
+
+                        $city = City::create([
+                            'provinsi_id' => $province->id,
+                            'nama' => $kotaName,
+                            'slug' => \Illuminate\Support\Str::slug($kotaName)
+                        ]);
+                        $allCities->put($kotaNameLower, $city);
+                    }
                 }
 
                 if (!$city) {
-                    // Predefined mapping of common cities to provinces to populate them correctly
-                    $cityProvinceMap = [
-                        'Madiun' => 'Jawa Timur',
-                        'Sukoharjo' => 'Jawa Tengah',
-                        'Ponorogo' => 'Jawa Timur',
-                        'Surakarta' => 'Jawa Tengah',
-                        'Banjar' => 'Jawa Barat',
-                        'Magelang' => 'Jawa Tengah',
-                        'Badung' => 'Bali',
-                        'Bandung' => 'Jawa Barat',
-                        'Bekasi' => 'Jawa Barat',
-                        'Bogor' => 'Jawa Barat',
-                        'Buleleng' => 'Bali',
-                        'Boyolali' => 'Jawa Tengah',
-                        'Klaten' => 'Jawa Tengah',
-                        'Surabaya' => 'Jawa Timur',
-                        'Jakarta Pusat' => 'DKI Jakarta',
-                        'Tulungagung' => 'Jawa Timur',
-                        'Jambi' => 'Jambi',
-                        'Banda Aceh' => 'Aceh',
-                        'Denpasar' => 'Bali',
-                        'Banyuwangi' => 'Jawa Timur',
-                        'Sragen' => 'Jawa Tengah',
-                        'Jakarta Timur' => 'DKI Jakarta',
-                        'Cianjur' => 'Jawa Barat',
-                        'Sorong' => 'Lainnya',
-                        'Wonosobo' => 'Jawa Tengah',
-                        'Tasikmalaya' => 'Jawa Barat',
-                        'Depok' => 'Jawa Barat',
-                        'Sidoarjo' => 'Jawa Timur',
-                        'Garut' => 'Jawa Barat',
-                        'Pasuruan' => 'Jawa Timur',
-                        'Jakarta Selatan' => 'DKI Jakarta',
-                        'Lampung' => 'Lampung',
-                        'Tangerang' => 'Banten',
-                        'Bengkulu' => 'Bengkulu',
-                        'Tegal' => 'Jawa Tengah',
-                        'Sleman' => 'DI Yogyakarta',
-                        'Samarinda' => 'Kalimantan Timur',
-                        'Tabanan' => 'Bali',
-                        'Karawang' => 'Jawa Barat',
-                        'Pacitan' => 'Jawa Timur',
-                        'Trenggalek' => 'Jawa Timur',
-                        'Sumedang' => 'Jawa Barat',
-                        'Bojonegoro' => 'Jawa Timur',
-                        'Padang' => 'Sumatera Barat',
-                        'Lamongan' => 'Jawa Timur',
-                        'Kendari' => 'Sulawesi Tenggara',
-                        'Tuban' => 'Jawa Timur',
-                        'Balikpapan' => 'Kalimantan Timur',
-                        'Batu' => 'Jawa Timur',
-                        'Mojokerto' => 'Jawa Timur',
-                        'Batang' => 'Jawa Tengah',
-                        'Yogyakarta' => 'DI Yogyakarta',
-                        'Kediri' => 'Jawa Timur',
-                        'Cirebon' => 'Jawa Barat',
-                        'Semarang' => 'Jawa Tengah',
-                        'Jember' => 'Jawa Timur',
-                        'Manado' => 'Sulawesi Utara',
-                        'Magetan' => 'Jawa Timur',
-                        'Probolinggo' => 'Jawa Timur',
-                        'Batam' => 'Kepulauan Riau',
-                        'Purworejo' => 'Jawa Tengah',
-                        'Jakarta Barat' => 'DKI Jakarta',
-                        'Subang' => 'Jawa Barat',
-                        'Pekanbaru' => 'Riau',
-                        'Ngawi' => 'Jawa Timur',
-                        'Malang' => 'Jawa Timur',
-                        'Pontianak' => 'Kalimantan Barat',
-                        'Kudus' => 'Jawa Tengah',
-                        'Blitar' => 'Jawa Timur',
-                        'Nganjuk' => 'Jawa Timur',
-                        'Palembang' => 'Sumatera Selatan',
-                        'Medan' => 'Sumatera Utara',
-                        'Gresik' => 'Jawa Timur',
-                        'Purwakarta' => 'Jawa Barat',
-                        'Bantul' => 'DI Yogyakarta',
-                        'Jakarta Utara' => 'DKI Jakarta',
-                        'Temanggung' => 'Jawa Tengah',
-                        'Kebumen' => 'Jawa Tengah',
-                        'Kupang' => 'Nusa Tenggara Timur',
-                        'Salatiga' => 'Jawa Tengah',
-                        'Brebes' => 'Jawa Tengah',
-                        'Lumajang' => 'Jawa Timur',
-                        'Sukabumi' => 'Jawa Barat',
-                        'Rembang' => 'Jawa Tengah',
-                        'Palopo' => 'Sulawesi Selatan',
-                        'Mataram' => 'Nusa Tenggara Barat',
-                        'Pekalongan' => 'Jawa Tengah',
-                        'Lubuklinggau' => 'Sumatera Selatan',
-                        'Palu' => 'Sulawesi Tengah',
-                        'Banyumas' => 'Jawa Tengah',
-                        'Serang' => 'Banten',
-                        'Jombang' => 'Jawa Timur',
-                        'Karanganyar' => 'Jawa Tengah',
-                        'Cilegon' => 'Banten',
-                        'Parepare' => 'Sulawesi Selatan',
-                        'Majalengka' => 'Jawa Barat',
-                        'Bondowoso' => 'Jawa Timur',
-                        'Pati' => 'Jawa Tengah',
-                        'Gianyar' => 'Bali',
-                        'Ciamis' => 'Jawa Barat',
-                        'Pangandaran' => 'Jawa Barat'
-                    ];
+                    $failed[] = "Baris {$rowNum}: Kota '{$kotaName}' wajib diisi.";
+                    continue;
+                }
 
-                    $provinceName = 'Lainnya';
-                    foreach ($cityProvinceMap as $cName => $pName) {
-                        if (stripos($kotaName, $cName) !== false) {
-                            $provinceName = $pName;
-                            break;
-                        }
+                // Find distributor in-memory
+                $distributor = null;
+                if (!empty($distributorName)) {
+                    $distributor = $allDistributors->first(fn($d) => stripos($d->nama, $distributorName) !== false);
+                }
+                if (!$distributor) {
+                    $distributor = $centralDistributor;
+                }
+
+                // Check duplicate in-memory
+                $existing = $allOutletsByWa->get($whatsapp);
+                if (!$existing && $city) {
+                    $key = strtolower($namaOutlet) . '|' . $city->id;
+                    $group = $allOutletsByNameCity->get($key);
+                    if ($group && $group->count() > 0) {
+                        $existing = $group->first();
                     }
+                }
 
-                    $province = Province::firstOrCreate(['nama' => $provinceName]);
-                    $city = City::create([
-                        'provinsi_id' => $province->id,
-                        'nama' => $kotaName,
-                        'slug' => \Illuminate\Support\Str::slug($kotaName)
+                $outlet = null;
+                if ($existing) {
+                    $existing->update([
+                        'distributor_id' => $distributor->id,
+                        'nama_outlet' => $namaOutlet,
+                        'alamat_lengkap' => $alamat,
+                        'is_mitra' => $existing->is_mitra || $isMitra, // Preserve partnership status if already true
+                        'google_maps_url' => $googleMapsUrl ?: $existing->google_maps_url,
+                        'latitude' => $latitude ?: $existing->latitude,
+                        'longitude' => $longitude ?: $existing->longitude,
+                        'status' => 'AKTIF'
                     ]);
+                    $outlet = $existing;
+                    $updated++;
+                } else {
+                    $outlet = Outlet::create([
+                        'distributor_id' => $distributor->id,
+                        'kota_id' => $city->id,
+                        'nama_outlet' => $namaOutlet,
+                        'nama_pic' => 'PIC ' . $namaOutlet,
+                        'whatsapp' => $whatsapp,
+                        'alamat_lengkap' => $alamat,
+                        'is_mitra' => $isMitra,
+                        'google_maps_url' => $googleMapsUrl,
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                        'status' => 'AKTIF',
+                        'delivery_mode' => 'SELF_DELIVERY'
+                    ]);
+                    $inserted++;
                 }
-            }
 
-            if (!$city) {
-                $failed[] = "Baris {$rowNum}: Kota '{$kotaName}' wajib diisi.";
-                continue;
-            }
+                // Update in-memory caches to prevent duplicates within the same CSV
+                $allOutletsByWa->put($whatsapp, $outlet);
+                if ($city) {
+                    $key = strtolower($namaOutlet) . '|' . $city->id;
+                    $allOutletsByNameCity->put($key, collect([$outlet]));
+                }
 
-            // Find distributor
-            $distributor = null;
-            if (!empty($distributorName)) {
-                $distributor = Distributor::where('nama', 'like', "%{$distributorName}%")->first();
-            }
-            if (!$distributor) {
-                $distributor = $centralDistributor;
-            }
+                // Sync Couriers if provided
+                if (!empty($kurirRaw) && $outlet) {
+                    $courierItems = explode(',', $kurirRaw);
+                    $courierIds = [];
 
-            // Check duplicate
-            // Rule: Same WA OR Same Name + City
-            $existing = Outlet::where('whatsapp', $whatsapp)
-                ->orWhere(function ($query) use ($namaOutlet, $city) {
-                    $query->where('nama_outlet', $namaOutlet)
-                          ->where('kota_id', $city->id);
-                })
-                ->first();
+                    foreach ($courierItems as $item) {
+                        $item = trim($item);
+                        if (empty($item)) continue;
 
-            $outlet = null;
-            if ($existing) {
-                $existing->update([
-                    'distributor_id' => $distributor->id,
-                    'nama_outlet' => $namaOutlet,
-                    'alamat_lengkap' => $alamat,
-                    'is_mitra' => $isMitra,
-                    'google_maps_url' => $googleMapsUrl ?: $existing->google_maps_url,
-                    'latitude' => $latitude ?: $existing->latitude,
-                    'longitude' => $longitude ?: $existing->longitude,
-                    'status' => 'AKTIF'
-                ]);
-                $outlet = $existing;
-                $updated++;
-            } else {
-                $outlet = Outlet::create([
-                    'distributor_id' => $distributor->id,
-                    'kota_id' => $city->id,
-                    'nama_outlet' => $namaOutlet,
-                    'nama_pic' => 'PIC ' . $namaOutlet,
-                    'whatsapp' => $whatsapp,
-                    'alamat_lengkap' => $alamat,
-                    'is_mitra' => $isMitra,
-                    'google_maps_url' => $googleMapsUrl,
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'status' => 'AKTIF',
-                    'delivery_mode' => 'SELF_DELIVERY'
-                ]);
-                $inserted++;
-            }
+                        // Try to match "Name (Phone)"
+                        $cName = $item;
+                        $cPhone = '';
 
-            // Sync Couriers if provided
-            if (!empty($kurirRaw) && $outlet) {
-                $courierItems = explode(',', $kurirRaw);
-                $courierIds = [];
+                        if (preg_match('/^(.*?)\s*\((.*?)\)$/', $item, $matches)) {
+                            $cName = trim($matches[1]);
+                            $cPhone = preg_replace('/[^0-9]/', '', $matches[2]);
+                        } else {
+                            // Just phone number or just name
+                            $digitsOnly = preg_replace('/[^0-9]/', '', $item);
+                            if (strlen($digitsOnly) >= 10) {
+                                $cPhone = $digitsOnly;
+                                $cName = 'Kurir ' . $digitsOnly;
+                            }
+                        }
 
-                foreach ($courierItems as $item) {
-                    $item = trim($item);
-                    if (empty($item)) continue;
-
-                    // Try to match "Name (Phone)"
-                    $cName = $item;
-                    $cPhone = '';
-
-                    if (preg_match('/^(.*?)\s*\((.*?)\)$/', $item, $matches)) {
-                        $cName = trim($matches[1]);
-                        $cPhone = preg_replace('/[^0-9]/', '', $matches[2]);
-                    } else {
-                        // Just phone number or just name
-                        $digitsOnly = preg_replace('/[^0-9]/', '', $item);
-                        if (strlen($digitsOnly) >= 10) {
-                            $cPhone = $digitsOnly;
-                            $cName = 'Kurir ' . $digitsOnly;
+                        if (!empty($cPhone)) {
+                            $courier = $allShippingContacts->get($cPhone);
+                            if (!$courier) {
+                                $courier = ShippingContact::create([
+                                    'whatsapp' => $cPhone,
+                                    'nama' => $cName,
+                                    'aktif' => true
+                                ]);
+                                $allShippingContacts->put($cPhone, $courier);
+                            } else {
+                                $courier->update(['nama' => $cName, 'aktif' => true]);
+                            }
+                            $courierIds[] = $courier->id;
                         }
                     }
 
-                    if (!empty($cPhone)) {
-                        $courier = ShippingContact::firstOrCreate(
-                            ['whatsapp' => $cPhone],
-                            ['nama' => $cName, 'aktif' => true]
-                        );
-                        $courierIds[] = $courier->id;
+                    if (count($courierIds) > 0) {
+                        $outlet->update(['delivery_mode' => 'RECOMMENDED_SHIPPING_CONTACT']);
+                        $syncData = [];
+                        foreach ($courierIds as $idx => $cid) {
+                            $syncData[$cid] = ['urutan' => $idx + 1];
+                        }
+                        $outlet->shippingContacts()->syncWithoutDetaching($syncData);
                     }
-                }
-
-                if (count($courierIds) > 0) {
-                    $outlet->update(['delivery_mode' => 'RECOMMENDED_SHIPPING_CONTACT']);
-                    $syncData = [];
-                    foreach ($courierIds as $idx => $cid) {
-                        $syncData[$cid] = ['urutan' => $idx + 1];
-                    }
-                    $outlet->shippingContacts()->syncWithoutDetaching($syncData);
                 }
             }
-        }
+        });
 
         fclose($handle);
 

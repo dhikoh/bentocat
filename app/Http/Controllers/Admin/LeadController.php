@@ -156,7 +156,7 @@ class LeadController extends Controller
 
     public function importCsv(Request $request)
     {
-        @set_time_limit(300);
+        @set_time_limit(600);
 
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt|max:4096'
@@ -223,163 +223,195 @@ class LeadController extends Controller
         $inserted = 0;
         $skipped = 0;
         $failed = [];
-        $rowNum = 1;
 
         $defaultProduct = Product::first();
         $defaultCity = City::first();
         $defaultDistributor = \App\Models\Distributor::where('nama', 'like', '%Pusat%')->first() ?: \App\Models\Distributor::first();
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
-            $rowNum++;
+        // Load lookups in-memory
+        $allCustomersByWa = \App\Models\CustomerProfile::all()->keyBy('whatsapp');
+        $allProducts = Product::all();
+        $allCities = City::all()->keyBy(fn($c) => strtolower($c->nama));
+        $allDistributors = \App\Models\Distributor::all();
+        $allOutletsByNameCity = \App\Models\Outlet::all()->groupBy(fn($o) => strtolower($o->nama_outlet) . '|' . $o->kota_id);
+        $allOutletsByWa = \App\Models\Outlet::all()->keyBy('whatsapp');
+        
+        // Load recent leads for duplicate checking (last 60 days to keep memory usage reasonable)
+        $recentLeads = LeadRequest::where('created_at', '>=', now()->subDays(60))->get();
 
-            $tanggalRaw = $colMap['tanggal'] !== -1 ? trim($row[$colMap['tanggal']] ?? '') : '';
-            $namaCustomer = trim($row[$colMap['nama_customer']] ?? '');
-            $whatsappCustomer = preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp_customer']] ?? '');
-            $alamatCustomer = $colMap['alamat_customer'] !== -1 ? trim($row[$colMap['alamat_customer']] ?? '') : '';
-            $provinsiCustomer = $colMap['provinsi_customer'] !== -1 ? trim($row[$colMap['provinsi_customer']] ?? '') : '';
-            $kotaCustomer = $colMap['kota_customer'] !== -1 ? trim($row[$colMap['kota_customer']] ?? '') : '';
-            $produkName = trim($row[$colMap['produk']] ?? '');
-            $varian1 = $colMap['varian_1'] !== -1 ? trim($row[$colMap['varian_1']] ?? '') : null;
-            $varian2 = $colMap['varian_2'] !== -1 ? trim($row[$colMap['varian_2']] ?? '') : null;
-            $varian3 = $colMap['varian_3'] !== -1 ? trim($row[$colMap['varian_3']] ?? '') : null;
-            $kotaOutletName = $colMap['kota_outlet'] !== -1 ? trim($row[$colMap['kota_outlet']] ?? '') : '';
-            $namaOutlet = $colMap['nama_outlet'] !== -1 ? trim($row[$colMap['nama_outlet']] ?? '') : '';
-            $whatsappOutlet = $colMap['whatsapp_outlet'] !== -1 ? preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp_outlet']] ?? '') : '';
-            $distributorName = $colMap['nama_distributor'] !== -1 ? trim($row[$colMap['nama_distributor']] ?? '') : '';
+        \Illuminate\Support\Facades\DB::transaction(function () use (
+            $handle, $colMap, &$inserted, &$skipped, &$failed,
+            $defaultProduct, $defaultCity, $defaultDistributor,
+            $allCustomersByWa, $allProducts, $allCities, $allDistributors,
+            $allOutletsByNameCity, $allOutletsByWa, $recentLeads
+        ) {
+            $rowNum = 1;
+            while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+                $rowNum++;
 
-            if (empty($namaCustomer) || empty($whatsappCustomer) || empty($produkName)) {
-                $failed[] = "Baris {$rowNum}: Data customer & produk wajib diisi.";
-                continue;
-            }
+                $tanggalRaw = $colMap['tanggal'] !== -1 ? trim($row[$colMap['tanggal']] ?? '') : '';
+                $namaCustomer = trim($row[$colMap['nama_customer']] ?? '');
+                $whatsappCustomer = preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp_customer']] ?? '');
+                $alamatCustomer = $colMap['alamat_customer'] !== -1 ? trim($row[$colMap['alamat_customer']] ?? '') : '';
+                $provinsiCustomer = $colMap['provinsi_customer'] !== -1 ? trim($row[$colMap['provinsi_customer']] ?? '') : '';
+                $kotaCustomer = $colMap['kota_customer'] !== -1 ? trim($row[$colMap['kota_customer']] ?? '') : '';
+                $produkName = trim($row[$colMap['produk']] ?? '');
+                $varian1 = $colMap['varian_1'] !== -1 ? trim($row[$colMap['varian_1']] ?? '') : null;
+                $varian2 = $colMap['varian_2'] !== -1 ? trim($row[$colMap['varian_2']] ?? '') : null;
+                $varian3 = $colMap['varian_3'] !== -1 ? trim($row[$colMap['varian_3']] ?? '') : null;
+                $kotaOutletName = $colMap['kota_outlet'] !== -1 ? trim($row[$colMap['kota_outlet']] ?? '') : '';
+                $namaOutlet = $colMap['nama_outlet'] !== -1 ? trim($row[$colMap['nama_outlet']] ?? '') : '';
+                $whatsappOutlet = $colMap['whatsapp_outlet'] !== -1 ? preg_replace('/[^0-9]/', '', $row[$colMap['whatsapp_outlet']] ?? '') : '';
+                $distributorName = $colMap['nama_distributor'] !== -1 ? trim($row[$colMap['nama_distributor']] ?? '') : '';
 
-            // Standardize WA Customer
-            if (str_starts_with($whatsappCustomer, '0')) {
-                $whatsappCustomer = '62' . substr($whatsappCustomer, 1);
-            } elseif (str_starts_with($whatsappCustomer, '8')) {
-                $whatsappCustomer = '62' . $whatsappCustomer;
-            }
-
-            // Find or create Customer
-            $customer = \App\Models\CustomerProfile::where('whatsapp', $whatsappCustomer)->first();
-            if (!$customer) {
-                $customer = \App\Models\CustomerProfile::create([
-                    'uuid' => (string) \Illuminate\Support\Str::uuid(),
-                    'nama' => $namaCustomer,
-                    'whatsapp' => $whatsappCustomer,
-                    'alamat' => $alamatCustomer,
-                    'provinsi' => $provinsiCustomer,
-                    'kota' => $kotaCustomer
-                ]);
-            } else {
-                // Update empty fields
-                $customer->update([
-                    'nama' => $namaCustomer,
-                    'alamat' => $customer->alamat ?: $alamatCustomer,
-                    'provinsi' => $customer->provinsi ?: $provinsiCustomer,
-                    'kota' => $customer->kota ?: $kotaCustomer
-                ]);
-            }
-
-            // Find Product
-            $product = Product::where('nama', 'like', "%{$produkName}%")->first();
-            if (!$product) {
-                $product = Product::where('nama', $produkName)->first() ?: $defaultProduct;
-            }
-
-            // Find City
-            $city = null;
-            if (!empty($kotaOutletName)) {
-                $city = City::where('nama', 'like', "%{$kotaOutletName}%")->first();
-            }
-            if (!$city && !empty($kotaCustomer)) {
-                $city = City::where('nama', 'like', "%{$kotaCustomer}%")->first();
-            }
-            if (!$city) {
-                $city = $defaultCity;
-            }
-
-            // Find Distributor
-            $distributor = null;
-            if (!empty($distributorName)) {
-                $distributor = \App\Models\Distributor::where('nama', 'like', "%{$distributorName}%")->first();
-            }
-            if (!$distributor) {
-                $distributor = $defaultDistributor;
-            }
-
-            // Find or create Outlet if outlet name is provided
-            $outlet = null;
-            if (!empty($namaOutlet)) {
-                $outlet = \App\Models\Outlet::where('nama_outlet', $namaOutlet)
-                    ->where('kota_id', $city->id)
-                    ->first();
-                if (!$outlet && !empty($whatsappOutlet)) {
-                    // Standardize WA Outlet
-                    if (str_starts_with($whatsappOutlet, '0')) {
-                        $whatsappOutlet = '62' . substr($whatsappOutlet, 1);
-                    } elseif (str_starts_with($whatsappOutlet, '8')) {
-                        $whatsappOutlet = '62' . $whatsappOutlet;
-                    }
-                    $outlet = \App\Models\Outlet::where('whatsapp', $whatsappOutlet)->first();
+                if (empty($namaCustomer) || empty($whatsappCustomer) || empty($produkName)) {
+                    $failed[] = "Baris {$rowNum}: Data customer & produk wajib diisi.";
+                    continue;
                 }
 
-                if (!$outlet) {
-                    $outlet = \App\Models\Outlet::create([
-                        'distributor_id' => $distributor->id,
-                        'kota_id' => $city->id,
-                        'nama_outlet' => $namaOutlet,
-                        'nama_pic' => 'PIC ' . $namaOutlet,
-                        'whatsapp' => $whatsappOutlet ?: ('628' . rand(100000000, 999999999)),
-                        'alamat_lengkap' => $alamatCustomer ?: 'Alamat Outlet ' . $namaOutlet,
-                        'is_mitra' => false,
-                        'status' => 'AKTIF',
-                        'delivery_mode' => 'SELF_DELIVERY'
+                // Standardize WA Customer
+                if (str_starts_with($whatsappCustomer, '0')) {
+                    $whatsappCustomer = '62' . substr($whatsappCustomer, 1);
+                } elseif (str_starts_with($whatsappCustomer, '8')) {
+                    $whatsappCustomer = '62' . $whatsappCustomer;
+                }
+
+                // Find or create Customer in-memory
+                $customer = $allCustomersByWa->get($whatsappCustomer);
+                if (!$customer) {
+                    $customer = \App\Models\CustomerProfile::create([
+                        'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                        'nama' => $namaCustomer,
+                        'whatsapp' => $whatsappCustomer,
+                        'alamat' => $alamatCustomer,
+                        'provinsi' => $provinsiCustomer,
+                        'kota' => $kotaCustomer
+                    ]);
+                    $allCustomersByWa->put($whatsappCustomer, $customer);
+                } else {
+                    // Update empty fields
+                    $customer->update([
+                        'nama' => $namaCustomer,
+                        'alamat' => $customer->alamat ?: $alamatCustomer,
+                        'provinsi' => $customer->provinsi ?: $provinsiCustomer,
+                        'kota' => $customer->kota ?: $kotaCustomer
                     ]);
                 }
-            }
 
-            // Parse Date
-            $createdAt = now();
-            if (!empty($tanggalRaw)) {
-                try {
-                    $createdAt = \Carbon\Carbon::parse($tanggalRaw);
-                } catch (\Exception $e) {
-                    $createdAt = now();
+                // Find Product in-memory
+                $product = $allProducts->first(fn($p) => stripos($p->nama, $produkName) !== false);
+                if (!$product) {
+                    $product = $allProducts->first(fn($p) => strtolower($p->nama) === strtolower($produkName)) ?: $defaultProduct;
                 }
+
+                // Find City in-memory
+                $city = null;
+                if (!empty($kotaOutletName)) {
+                    $city = $allCities->get(strtolower($kotaOutletName));
+                    if (!$city) {
+                        $city = $allCities->first(fn($c) => stripos($c->nama, $kotaOutletName) !== false);
+                    }
+                }
+                if (!$city && !empty($kotaCustomer)) {
+                    $city = $allCities->get(strtolower($kotaCustomer));
+                    if (!$city) {
+                        $city = $allCities->first(fn($c) => stripos($c->nama, $kotaCustomer) !== false);
+                    }
+                }
+                if (!$city) {
+                    $city = $defaultCity;
+                }
+
+                // Find Distributor in-memory
+                $distributor = null;
+                if (!empty($distributorName)) {
+                    $distributor = $allDistributors->first(fn($d) => stripos($d->nama, $distributorName) !== false);
+                }
+                if (!$distributor) {
+                    $distributor = $defaultDistributor;
+                }
+
+                // Find or create Outlet if outlet name is provided
+                $outlet = null;
+                if (!empty($namaOutlet)) {
+                    // Match by name and city in-memory
+                    $key = strtolower($namaOutlet) . '|' . $city->id;
+                    $group = $allOutletsByNameCity->get($key);
+                    if ($group && $group->count() > 0) {
+                        $outlet = $group->first();
+                    }
+
+                    if (!$outlet && !empty($whatsappOutlet)) {
+                        // Standardize WA Outlet
+                        if (str_starts_with($whatsappOutlet, '0')) {
+                            $whatsappOutlet = '62' . substr($whatsappOutlet, 1);
+                        } elseif (str_starts_with($whatsappOutlet, '8')) {
+                            $whatsappOutlet = '62' . $whatsappOutlet;
+                        }
+                        $outlet = $allOutletsByWa->get($whatsappOutlet);
+                    }
+
+                    if (!$outlet) {
+                        $outlet = \App\Models\Outlet::create([
+                            'distributor_id' => $distributor->id,
+                            'kota_id' => $city->id,
+                            'nama_outlet' => $namaOutlet,
+                            'nama_pic' => 'PIC ' . $namaOutlet,
+                            'whatsapp' => $whatsappOutlet ?: ('628' . rand(100000000, 999999999)),
+                            'alamat_lengkap' => $alamatCustomer ?: 'Alamat Outlet ' . $namaOutlet,
+                            'is_mitra' => false,
+                            'status' => 'AKTIF',
+                            'delivery_mode' => 'SELF_DELIVERY'
+                        ]);
+                        // Update cache
+                        $allOutletsByWa->put($outlet->whatsapp, $outlet);
+                        $allOutletsByNameCity->put($key, collect([$outlet]));
+                    }
+                }
+
+                // Parse Date
+                $createdAt = now();
+                if (!empty($tanggalRaw)) {
+                    try {
+                        $createdAt = \Carbon\Carbon::parse($tanggalRaw);
+                    } catch (\Exception $e) {
+                        $createdAt = now();
+                    }
+                }
+
+                // Check duplicate Lead in-memory to prevent double logs
+                $existingLead = $recentLeads->first(function ($l) use ($customer, $product, $outlet, $createdAt) {
+                    return $l->customer_id == $customer->id &&
+                           $l->produk_id == $product->id &&
+                           $l->outlet_id == ($outlet ? $outlet->id : null) &&
+                           abs($l->created_at->timestamp - $createdAt->timestamp) <= 60;
+                });
+
+                if ($existingLead) {
+                    $skipped++;
+                    continue;
+                }
+
+                // Create Lead Request
+                $lead = new LeadRequest();
+                $lead->customer_id = $customer->id;
+                $lead->produk_id = $product->id;
+                $lead->kota_id = $city->id;
+                $lead->outlet_id = $outlet ? $outlet->id : null;
+                $lead->distributor_id = $distributor ? $distributor->id : null;
+                $lead->varian_1 = $varian1;
+                $lead->varian_2 = $varian2;
+                $lead->varian_3 = $varian3;
+                $lead->created_at = $createdAt;
+                $lead->updated_at = $createdAt;
+                $lead->save();
+
+                // Add to recentLeads in-memory cache to prevent internal duplicate in same CSV upload
+                $recentLeads->push($lead);
+
+                $inserted++;
             }
-
-            // Check duplicate Lead to prevent double logs
-            // A duplicate lead matches same customer, product, outlet, and within 1 minute of same timestamp
-            $timeStart = $createdAt->copy()->subMinute();
-            $timeEnd = $createdAt->copy()->addMinute();
-
-            $existingLead = LeadRequest::where('customer_id', $customer->id)
-                ->where('produk_id', $product->id)
-                ->where('outlet_id', $outlet ? $outlet->id : null)
-                ->whereBetween('created_at', [$timeStart, $timeEnd])
-                ->first();
-
-            if ($existingLead) {
-                $skipped++;
-                continue;
-            }
-
-            // Create Lead Request
-            $lead = new LeadRequest();
-            $lead->customer_id = $customer->id;
-            $lead->produk_id = $product->id;
-            $lead->kota_id = $city->id;
-            $lead->outlet_id = $outlet ? $outlet->id : null;
-            $lead->distributor_id = $distributor ? $distributor->id : null;
-            $lead->varian_1 = $varian1;
-            $lead->varian_2 = $varian2;
-            $lead->varian_3 = $varian3;
-            $lead->created_at = $createdAt;
-            $lead->updated_at = $createdAt;
-            $lead->save();
-
-            $inserted++;
-        }
+        });
 
         fclose($handle);
 
@@ -391,7 +423,6 @@ class LeadController extends Controller
             }
             return back()->with('warning', $msg);
         }
-
         return back()->with('success', $msg);
     }
 }
