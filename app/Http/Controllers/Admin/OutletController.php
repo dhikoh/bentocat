@@ -421,6 +421,8 @@ class OutletController extends Controller
             $allOutletsByWa, $allOutletsByNameCity, $allShippingContacts, $cityProvinceMap
         ) {
             $rowNum = 1;
+            $distributorCache = [];
+
             while (($row = fgetcsv($handle, 1000, ',')) !== false) {
                 $rowNum++;
 
@@ -459,6 +461,9 @@ class OutletController extends Controller
                     $city = $allCities->get($kotaNameLower);
                     if (!$city) {
                         $city = $allCities->first(fn($c) => stripos($c->nama, $kotaName) !== false);
+                        if ($city) {
+                            $allCities->put($kotaNameLower, $city);
+                        }
                     }
 
                     if (!$city) {
@@ -491,10 +496,18 @@ class OutletController extends Controller
                     continue;
                 }
 
-                // Find distributor in-memory
+                // Find distributor in-memory with caching
                 $distributor = null;
                 if (!empty($distributorName)) {
-                    $distributor = $allDistributors->first(fn($d) => stripos($d->nama, $distributorName) !== false);
+                    $distLower = strtolower($distributorName);
+                    if (isset($distributorCache[$distLower])) {
+                        $distributor = $distributorCache[$distLower];
+                    } else {
+                        $distributor = $allDistributors->first(fn($d) => stripos($d->nama, $distributorName) !== false);
+                        if ($distributor) {
+                            $distributorCache[$distLower] = $distributor;
+                        }
+                    }
                 }
                 if (!$distributor) {
                     $distributor = $centralDistributor;
@@ -512,20 +525,24 @@ class OutletController extends Controller
 
                 $outlet = null;
                 if ($existing) {
-                    $existing->update([
+                    $existing->fill([
                         'distributor_id' => $distributor->id,
                         'nama_outlet' => $namaOutlet,
                         'alamat_lengkap' => $alamat,
-                        'is_mitra' => $existing->is_mitra || $isMitra, // Preserve partnership status if already true
+                        'is_mitra' => $existing->is_mitra || $isMitra,
                         'google_maps_url' => $googleMapsUrl ?: $existing->google_maps_url,
                         'latitude' => $latitude ?: $existing->latitude,
                         'longitude' => $longitude ?: $existing->longitude,
                         'status' => 'AKTIF'
                     ]);
+                    if ($existing->isDirty()) {
+                        // Use saveQuietly() to bypass geocoding observer that triggers Nominatim HTTP requests & sleep
+                        $existing->saveQuietly();
+                        $updated++;
+                    }
                     $outlet = $existing;
-                    $updated++;
                 } else {
-                    $outlet = Outlet::create([
+                    $outlet = new Outlet([
                         'distributor_id' => $distributor->id,
                         'kota_id' => $city->id,
                         'nama_outlet' => $namaOutlet,
@@ -539,6 +556,8 @@ class OutletController extends Controller
                         'status' => 'AKTIF',
                         'delivery_mode' => 'SELF_DELIVERY'
                     ]);
+                    // Use saveQuietly() to bypass geocoding observer that triggers Nominatim HTTP requests & sleep
+                    $outlet->saveQuietly();
                     $inserted++;
                 }
 
@@ -584,14 +603,18 @@ class OutletController extends Controller
                                 ]);
                                 $allShippingContacts->put($cPhone, $courier);
                             } else {
-                                $courier->update(['nama' => $cName, 'aktif' => true]);
+                                if ($courier->nama !== $cName || !$courier->aktif) {
+                                    $courier->update(['nama' => $cName, 'aktif' => true]);
+                                }
                             }
                             $courierIds[] = $courier->id;
                         }
                     }
 
                     if (count($courierIds) > 0) {
-                        $outlet->update(['delivery_mode' => 'RECOMMENDED_SHIPPING_CONTACT']);
+                        if ($outlet->delivery_mode !== 'RECOMMENDED_SHIPPING_CONTACT') {
+                            $outlet->update(['delivery_mode' => 'RECOMMENDED_SHIPPING_CONTACT']);
+                        }
                         $syncData = [];
                         foreach ($courierIds as $idx => $cid) {
                             $syncData[$cid] = ['urutan' => $idx + 1];
