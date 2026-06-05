@@ -34,6 +34,7 @@ class ProductController extends Controller
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
             'thumbnail_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi,webm|max:20480',
+            'cropped_image_data' => 'nullable|string',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
             'label_level_1' => 'nullable|string|max:100',
@@ -47,7 +48,34 @@ class ProductController extends Controller
             $validated['slug'] = $validated['slug'] . '-' . ($count + 1);
         }
 
-        if ($request->hasFile('thumbnail_file')) {
+        if ($request->filled('cropped_image_data')) {
+            try {
+                $base64Data = $request->input('cropped_image_data');
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
+                    $base64Data = substr($base64Data, strpos($base64Data, ',') + 1);
+                    $type = strtolower($type[1]); // png, jpg, jpeg
+                    if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        throw new \Exception('Format gambar tidak valid.');
+                    }
+                    $data = base64_decode($base64Data);
+                    if ($data === false) {
+                        throw new \Exception('Gagal mendekode berkas gambar.');
+                    }
+
+                    $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $type;
+                    $uploadPath = public_path('uploads/products');
+                    if (!file_exists($uploadPath)) {
+                        if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+                            throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server.");
+                        }
+                    }
+                    file_put_contents($uploadPath . '/' . $filename, $data);
+                    $validated['thumbnail'] = '/uploads/products/' . $filename;
+                }
+            } catch (\Exception $e) {
+                return back()->withInput()->with('error', 'Gagal memproses gambar crop: ' . $e->getMessage());
+            }
+        } elseif ($request->hasFile('thumbnail_file')) {
             try {
                 $file = $request->file('thumbnail_file');
                 $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
@@ -65,6 +93,7 @@ class ProductController extends Controller
         }
 
         unset($validated['thumbnail_file']);
+        unset($validated['cropped_image_data']);
 
         Product::create($validated);
 
@@ -82,6 +111,7 @@ class ProductController extends Controller
             'nama' => 'required|string|max:255',
             'thumbnail' => 'nullable|string|max:255',
             'thumbnail_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi,webm|max:20480',
+            'cropped_image_data' => 'nullable|string',
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:ACTIVE,INACTIVE',
             'label_level_1' => 'nullable|string|max:100',
@@ -95,7 +125,42 @@ class ProductController extends Controller
             $validated['slug'] = $validated['slug'] . '-' . ($count + 1);
         }
 
-        if ($request->hasFile('thumbnail_file')) {
+        if ($request->filled('cropped_image_data')) {
+            try {
+                $base64Data = $request->input('cropped_image_data');
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
+                    $base64Data = substr($base64Data, strpos($base64Data, ',') + 1);
+                    $type = strtolower($type[1]); // png, jpg, jpeg
+                    if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        throw new \Exception('Format gambar tidak valid.');
+                    }
+                    $data = base64_decode($base64Data);
+                    if ($data === false) {
+                        throw new \Exception('Gagal mendekode berkas gambar.');
+                    }
+
+                    // Clean up old file if it exists and is a local upload
+                    if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
+                        $oldPath = public_path($product->thumbnail);
+                        if (file_exists($oldPath)) {
+                            @unlink($oldPath);
+                        }
+                    }
+
+                    $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $type;
+                    $uploadPath = public_path('uploads/products');
+                    if (!file_exists($uploadPath)) {
+                        if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+                            throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server.");
+                        }
+                    }
+                    file_put_contents($uploadPath . '/' . $filename, $data);
+                    $validated['thumbnail'] = '/uploads/products/' . $filename;
+                }
+            } catch (\Exception $e) {
+                return back()->withInput()->with('error', 'Gagal memproses gambar crop: ' . $e->getMessage());
+            }
+        } elseif ($request->hasFile('thumbnail_file')) {
             try {
                 // Clean up old file if it exists and is a local upload
                 if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
@@ -121,6 +186,7 @@ class ProductController extends Controller
         }
 
         unset($validated['thumbnail_file']);
+        unset($validated['cropped_image_data']);
 
         $product->update($validated);
 

@@ -51,7 +51,7 @@
                                         @if(preg_match('/\.(mp4|mov|avi|webm)$/i', $product->thumbnail))
                                             <video src="{{ $product->thumbnail }}" class="w-full h-full object-cover" muted autoplay loop></video>
                                         @else
-                                            <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-cover">
+                                            <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-contain p-1">
                                         @endif
                                     @else
                                         🐱

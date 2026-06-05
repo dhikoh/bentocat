@@ -60,42 +60,91 @@
             <p class="text-sm text-slate-500 max-w-xl mx-auto">Varian pasir kucing bentonit premium dengan penawaran kualitas gumpalan tinggi.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @forelse($products as $product)
-                <div class="bg-white border border-amber-100/50 rounded-3xl overflow-hidden group hover:border-amber-500 hover:shadow-lg transition-all flex flex-col justify-between">
-                    <div class="p-6 space-y-4">
-                        <div class="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-5xl">
-                            @if($product->thumbnail)
-                                <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-cover">
-                            @else
-                                🐈
-                            @endif
-                        </div>
-                        <div>
-                            <h3 class="font-outfit font-bold text-lg text-slate-900 group-hover:text-amber-600 transition-all">{{ $product->nama }}</h3>
-                            <span class="block text-[10px] text-slate-400 font-mono mt-0.5">ID: PROD-00{{ $product->id }}</span>
-                        </div>
-                        <p class="text-xs text-slate-550 leading-relaxed">
-                            {{ $product->deskripsi ? strip_tags($product->deskripsi) : 'Pasir bentonit wangi gumpal kualitas premium.' }}
-                        </p>
+        @if($products->count() === 1)
+            @php $product = $products->first(); @endphp
+            <div class="max-w-4xl mx-auto bg-white border border-amber-100/50 rounded-3xl overflow-hidden group hover:border-amber-500 hover:shadow-xl transition-all p-6 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <!-- Left: Large Image Container -->
+                    <div class="md:col-span-5 aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center p-4 relative">
+                        @if($product->thumbnail)
+                            <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300">
+                        @else
+                            <span class="text-6xl">🐈</span>
+                        @endif
                     </div>
-                    <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-                        <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Varian Tersedia:</span>
-                        <div class="flex flex-wrap gap-1">
-                            @forelse($product->variants->whereNull('parent_id') as $v1)
-                                <span class="bg-white text-slate-650 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-200">{{ $v1->nama }}</span>
-                            @empty
-                                <span class="text-xs text-slate-400 italic">Varian standar saja.</span>
-                            @endforelse
+                    
+                    <!-- Right: Product Information & CTAs -->
+                    <div class="md:col-span-7 space-y-5 flex flex-col justify-between h-full py-2">
+                        <div class="space-y-3">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                Produk Unggulan
+                            </span>
+                            <h3 class="font-outfit font-black text-2xl md:text-3xl text-slate-900 group-hover:text-amber-600 transition-all">
+                                {{ $product->nama }}
+                            </h3>
+                            <span class="inline-block text-xs text-slate-400 font-mono">ID: PROD-00{{ $product->id }}</span>
+                            <p class="text-sm text-slate-650 leading-relaxed pt-2">
+                                {{ $product->deskripsi ? strip_tags($product->deskripsi) : 'Pasir bentonit wangi gumpal kualitas premium.' }}
+                            </p>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-slate-100">
+                            <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Varian Tersedia:</span>
+                            <div class="flex flex-wrap gap-2">
+                                @forelse($product->variants->whereNull('parent_id') as $v1)
+                                    <span class="bg-slate-50 hover:bg-amber-50 hover:text-amber-700 text-slate-650 text-xs font-medium px-3 py-1 rounded-lg border border-slate-200 transition-colors cursor-default">{{ $v1->nama }}</span>
+                                @empty
+                                    <span class="text-xs text-slate-400 italic">Varian standar saja.</span>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button onclick="openSearchModal()" class="inline-flex items-center gap-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 hover:scale-[1.02] text-slate-950 font-black py-3.5 px-6 rounded-xl shadow-lg shadow-amber-500/10 transition-all text-xs uppercase tracking-wider">
+                                <span>📍</span> Cari Toko Terdekat
+                            </button>
                         </div>
                     </div>
                 </div>
-            @empty
-                <div class="col-span-full text-center py-16 text-slate-400 italic">
-                    Belum ada katalog produk terdaftar.
-                </div>
-            @endforelse
-        </div>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @forelse($products as $product)
+                    <div class="bg-white border border-amber-100/50 rounded-3xl overflow-hidden group hover:border-amber-500 hover:shadow-lg transition-all flex flex-col justify-between">
+                        <div class="p-6 space-y-4">
+                            <div class="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-5xl">
+                                @if($product->thumbnail)
+                                    <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300">
+                                @else
+                                    🐈
+                                @endif
+                            </div>
+                            <div>
+                                <h3 class="font-outfit font-bold text-lg text-slate-900 group-hover:text-amber-600 transition-all">{{ $product->nama }}</h3>
+                                <span class="block text-[10px] text-slate-400 font-mono mt-0.5">ID: PROD-00{{ $product->id }}</span>
+                            </div>
+                            <p class="text-xs text-slate-550 leading-relaxed">
+                                {{ $product->deskripsi ? strip_tags($product->deskripsi) : 'Pasir bentonit wangi gumpal kualitas premium.' }}
+                            </p>
+                        </div>
+                        <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Varian Tersedia:</span>
+                            <div class="flex flex-wrap gap-1">
+                                @forelse($product->variants->whereNull('parent_id') as $v1)
+                                    <span class="bg-white text-slate-650 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-200">{{ $v1->nama }}</span>
+                                @empty
+                                    <span class="text-xs text-slate-400 italic">Varian standar saja.</span>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full text-center py-16 text-slate-400 italic">
+                        Belum ada katalog produk terdaftar.
+                    </div>
+                @endforelse
+            </div>
+        @endif
     </section>
 
     <!-- 4. Discovery Search Modal & FAB -->

@@ -17,6 +17,7 @@
         <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
+            <input type="hidden" name="cropped_image_data" id="cropped_image_data">
 
             <div class="space-y-6">
                 <div>
@@ -117,36 +118,146 @@
     </div>
 </div>
 
+<!-- Cropper.js (Client-side Image Cropping) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+<style>
+    .cropper-view-box,
+    .cropper-face {
+        border-radius: 8px;
+    }
+    .cropper-line, .cropper-point {
+        background-color: #f59e0b;
+    }
+</style>
+
+<!-- Cropper Modal -->
+<div id="cropper-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg font-bold text-white">Sesuaikan Potongan Gambar (1:1)</h3>
+            <button type="button" onclick="closeCropperModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+        </div>
+        <div class="overflow-hidden rounded-2xl bg-slate-950 max-h-[300px] flex justify-center items-center">
+            <img id="cropper-image" src="" alt="Source Image" class="max-w-full block">
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="closeCropperModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all">Batal</button>
+            <button type="button" onclick="cropAndSave()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-amber-500/10 transition-all">Potong & Simpan</button>
+        </div>
+    </div>
+</div>
+
 <script>
+let cropper = null;
+let currentFileInput = null;
+
 function previewImage(input) {
     const file = input.files[0];
     const previewContainer = document.getElementById('thumbnail-preview-container');
     const nameLabel = document.getElementById('file-name-label');
     const urlInput = document.getElementById('thumbnail');
+    const croppedInput = document.getElementById('cropped_image_data');
 
     if (file) {
         nameLabel.textContent = file.name;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            previewContainer.innerHTML = '';
-            let mediaHtml = '';
-            if (file.type.startsWith('video/')) {
-                mediaHtml = `<video id="thumbnail-preview" src="${e.target.result}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
-            } else {
-                mediaHtml = `<img id="thumbnail-preview" src="${e.target.result}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
-            }
-            mediaHtml += `
-                <div class="overflow-hidden">
-                    <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
-                    <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${file.name} (Siap diunggah)</span>
-                </div>
-            `;
-            previewContainer.innerHTML = mediaHtml;
-            previewContainer.classList.remove('hidden');
-            urlInput.value = '';
+
+        if (file.type.startsWith('image/')) {
+            currentFileInput = input;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const cropperImage = document.getElementById('cropper-image');
+                cropperImage.src = e.target.result;
+
+                document.getElementById('cropper-modal').classList.remove('hidden');
+                document.getElementById('cropper-modal').classList.add('flex');
+
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false
+                });
+            };
+            reader.readAsDataURL(file);
+        } else {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContainer.innerHTML = '';
+                let mediaHtml = '';
+                if (file.type.startsWith('video/')) {
+                    mediaHtml = `<video id="thumbnail-preview" src="${e.target.result}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
+                } else {
+                    mediaHtml = `<img id="thumbnail-preview" src="${e.target.result}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+                }
+                mediaHtml += `
+                    <div class="overflow-hidden">
+                        <span class="block text-[10px] font-bold text-emerald-450 uppercase">Preview Aktif</span>
+                        <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${file.name} (Siap diunggah)</span>
+                    </div>
+                `;
+                previewContainer.innerHTML = mediaHtml;
+                previewContainer.classList.remove('hidden');
+                urlInput.value = '';
+                croppedInput.value = '';
+            };
+            reader.readAsDataURL(file);
         }
-        reader.readAsDataURL(file);
     }
+}
+
+function closeCropperModal() {
+    document.getElementById('cropper-modal').classList.add('hidden');
+    document.getElementById('cropper-modal').classList.remove('flex');
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    if (currentFileInput && !document.getElementById('cropped_image_data').value) {
+        currentFileInput.value = '';
+        document.getElementById('file-name-label').textContent = 'Maks. 20MB';
+    }
+}
+
+function cropAndSave() {
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({
+        width: 800,
+        height: 800,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+    });
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    document.getElementById('cropped_image_data').value = dataUrl;
+
+    const previewContainer = document.getElementById('thumbnail-preview-container');
+    const urlInput = document.getElementById('thumbnail');
+
+    previewContainer.innerHTML = `
+        <img id="thumbnail-preview" src="${dataUrl}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">
+        <div class="overflow-hidden">
+            <span class="block text-[10px] font-bold text-emerald-450 uppercase">Preview Terpotong (1:1)</span>
+            <span class="block text-[10px] text-slate-450 truncate" id="preview-path">Gambar berhasil dipotong</span>
+        </div>
+    `;
+    previewContainer.classList.remove('hidden');
+    urlInput.value = '';
+
+    closeCropperModal();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -168,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         mediaHtml += `
             <div class="overflow-hidden">
-                <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
+                <span class="block text-[10px] font-bold text-emerald-450 uppercase">Preview Aktif</span>
                 <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${initialUrl}</span>
             </div>
         `;
@@ -189,13 +300,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             mediaHtml += `
                 <div class="overflow-hidden">
-                    <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
+                    <span class="block text-[10px] font-bold text-emerald-450 uppercase">Preview Aktif</span>
                     <span class="block text-[10px] text-slate-400 truncate" id="preview-path">${val}</span>
                 </div>
             `;
             previewContainer.innerHTML = mediaHtml;
             previewContainer.classList.remove('hidden');
             fileInput.value = '';
+            document.getElementById('cropped_image_data').value = '';
             nameLabel.textContent = 'Maks. 20MB';
         } else {
             previewContainer.classList.add('hidden');
