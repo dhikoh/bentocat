@@ -240,7 +240,7 @@ function cropAndSave() {
         imageSmoothingQuality: 'high'
     });
 
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    const dataUrl = canvas.toDataURL('image/png');
     document.getElementById('cropped_image_data').value = dataUrl;
 
     const previewContainer = document.getElementById('thumbnail-preview-container');
