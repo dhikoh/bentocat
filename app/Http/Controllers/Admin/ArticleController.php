@@ -120,17 +120,17 @@ class ArticleController extends Controller
             try {
                 $file = $request->file('image');
                 $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-                $uploadPath = public_path('uploads');
+                $uploadPath = storage_path('app/public/uploads');
                 if (!file_exists($uploadPath)) {
                     if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
-                        throw new \Exception("Tidak dapat membuat folder 'public/uploads' di server. Harap periksa izin akses penulisan (write permissions) folder 'public' di server.");
+                        throw new \Exception("Tidak dapat membuat folder 'storage/app/public/uploads' di server.");
                     }
                 }
                 $file->move($uploadPath, $filename);
 
                 return response()->json([
                     'success' => true,
-                    'url' => asset('uploads/' . $filename)
+                    'url' => asset('storage/uploads/' . $filename)
                 ]);
             } catch (\Exception $e) {
                 return response()->json([

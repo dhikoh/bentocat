@@ -63,14 +63,14 @@ class ProductController extends Controller
                     }
 
                     $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $type;
-                    $uploadPath = public_path('uploads/products');
+                    $uploadPath = storage_path('app/public/uploads/products');
                     if (!file_exists($uploadPath)) {
                         if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
-                            throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server.");
+                            throw new \Exception("Tidak dapat membuat folder 'storage/app/public/uploads/products' di server.");
                         }
                     }
                     file_put_contents($uploadPath . '/' . $filename, $data);
-                    $validated['thumbnail'] = '/uploads/products/' . $filename;
+                    $validated['thumbnail'] = '/storage/uploads/products/' . $filename;
                 }
             } catch (\Exception $e) {
                 return back()->withInput()->with('error', 'Gagal memproses gambar crop: ' . $e->getMessage());
@@ -79,14 +79,14 @@ class ProductController extends Controller
             try {
                 $file = $request->file('thumbnail_file');
                 $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
-                $uploadPath = public_path('uploads/products');
+                $uploadPath = storage_path('app/public/uploads/products');
                 if (!file_exists($uploadPath)) {
                     if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
-                        throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server. Harap periksa izin akses penulisan (write permissions) folder 'public' di server.");
+                        throw new \Exception("Tidak dapat membuat folder 'storage/app/public/uploads/products' di server.");
                     }
                 }
                 $file->move($uploadPath, $filename);
-                $validated['thumbnail'] = '/uploads/products/' . $filename;
+                $validated['thumbnail'] = '/storage/uploads/products/' . $filename;
             } catch (\Exception $e) {
                 return back()->withInput()->with('error', 'Gagal mengunggah berkas: ' . $e->getMessage());
             }
@@ -141,21 +141,25 @@ class ProductController extends Controller
 
                     // Clean up old file if it exists and is a local upload
                     if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
-                        $oldPath = public_path($product->thumbnail);
+                        if (Str::startsWith($product->thumbnail, '/storage/')) {
+                            $oldPath = storage_path('app/public/' . Str::after($product->thumbnail, '/storage/'));
+                        } else {
+                            $oldPath = public_path($product->thumbnail);
+                        }
                         if (file_exists($oldPath)) {
                             @unlink($oldPath);
                         }
                     }
 
                     $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $type;
-                    $uploadPath = public_path('uploads/products');
+                    $uploadPath = storage_path('app/public/uploads/products');
                     if (!file_exists($uploadPath)) {
                         if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
-                            throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server.");
+                            throw new \Exception("Tidak dapat membuat folder 'storage/app/public/uploads/products' di server.");
                         }
                     }
                     file_put_contents($uploadPath . '/' . $filename, $data);
-                    $validated['thumbnail'] = '/uploads/products/' . $filename;
+                    $validated['thumbnail'] = '/storage/uploads/products/' . $filename;
                 }
             } catch (\Exception $e) {
                 return back()->withInput()->with('error', 'Gagal memproses gambar crop: ' . $e->getMessage());
@@ -164,7 +168,11 @@ class ProductController extends Controller
             try {
                 // Clean up old file if it exists and is a local upload
                 if ($product->thumbnail && !Str::startsWith($product->thumbnail, ['http://', 'https://'])) {
-                    $oldPath = public_path($product->thumbnail);
+                    if (Str::startsWith($product->thumbnail, '/storage/')) {
+                        $oldPath = storage_path('app/public/' . Str::after($product->thumbnail, '/storage/'));
+                    } else {
+                        $oldPath = public_path($product->thumbnail);
+                    }
                     if (file_exists($oldPath)) {
                         @unlink($oldPath);
                     }
@@ -172,14 +180,14 @@ class ProductController extends Controller
 
                 $file = $request->file('thumbnail_file');
                 $filename = 'product-' . $validated['slug'] . '-' . time() . '.' . $file->getClientOriginalExtension();
-                $uploadPath = public_path('uploads/products');
+                $uploadPath = storage_path('app/public/uploads/products');
                 if (!file_exists($uploadPath)) {
                     if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
-                        throw new \Exception("Tidak dapat membuat folder 'public/uploads/products' di server. Harap periksa izin akses penulisan (write permissions) folder 'public' di server.");
+                        throw new \Exception("Tidak dapat membuat folder 'storage/app/public/uploads/products' di server.");
                     }
                 }
                 $file->move($uploadPath, $filename);
-                $validated['thumbnail'] = '/uploads/products/' . $filename;
+                $validated['thumbnail'] = '/storage/uploads/products/' . $filename;
             } catch (\Exception $e) {
                 return back()->withInput()->with('error', 'Gagal mengunggah berkas: ' . $e->getMessage());
             }
