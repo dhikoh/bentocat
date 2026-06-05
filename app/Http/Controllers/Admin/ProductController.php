@@ -117,6 +117,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus produk.');
+        }
+
         if ($product->leadRequests()->exists()) {
             return back()->with('error', 'Produk tidak dapat dihapus karena memiliki log data lead.');
         }
@@ -166,6 +170,10 @@ class ProductController extends Controller
 
     public function destroyVariant(ProductVariant $variant)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus varian produk.');
+        }
+
         $productId = $variant->produk_id;
         $variant->delete(); // Cascades children in DB foreign key
 

@@ -40,10 +40,12 @@ class OutletController extends Controller
         $countDistributors = Distributor::count();
         $countMitra = Outlet::where('is_mitra', true)->count();
         $countNonMitra = Outlet::where('is_mitra', false)->count();
+        $distributorsList = Distributor::orderBy('nama')->get();
 
         return view('admin.outlets.index', compact(
             'outlets', 'search', 'isMitra', 
-            'countDistributors', 'countMitra', 'countNonMitra'
+            'countDistributors', 'countMitra', 'countNonMitra',
+            'distributorsList'
         ));
     }
 
@@ -142,6 +144,10 @@ class OutletController extends Controller
 
     public function destroy(Outlet $outlet)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus outlet.');
+        }
+
         if ($outlet->leadRequests()->exists()) {
             return back()->with('error', 'Outlet tidak dapat dihapus karena memiliki log data lead.');
         }
@@ -365,5 +371,60 @@ class OutletController extends Controller
         }
 
         return back()->with('success', $msg);
+    }
+
+    public function batchDelete(Request $request)
+    {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus outlet.');
+        }
+
+        $ids = $request->input('outlet_ids', []);
+        if (empty($ids)) {
+            return back()->with('error', 'Tidak ada outlet yang dipilih.');
+        }
+
+        $outlets = Outlet::whereIn('id', $ids)->get();
+        $deletedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($outlets as $outlet) {
+            if ($outlet->leadRequests()->exists()) {
+                $skippedCount++;
+            } else {
+                $outlet->shippingContacts()->detach();
+                $outlet->delete();
+                $deletedCount++;
+            }
+        }
+
+        if ($skippedCount > 0) {
+            return redirect()->route('admin.outlets.index')->with('warning', "Berhasil menghapus {$deletedCount} outlet. {$skippedCount} outlet dilewati karena memiliki log data lead.");
+        }
+
+        return redirect()->route('admin.outlets.index')->with('success', "Berhasil menghapus {$deletedCount} outlet terpilih.");
+    }
+
+    public function batchReassign(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['superadmin', 'editor'])) {
+            return back()->with('error', 'Anda tidak memiliki wewenang untuk memindahkan distributor outlet.');
+        }
+
+        $validated = $request->validate([
+            'outlet_ids' => 'required|array',
+            'outlet_ids.*' => 'exists:outlets,id',
+            'distributor_id' => 'required|exists:distributors,id',
+        ]);
+
+        $ids = $validated['outlet_ids'];
+        $distributorId = $validated['distributor_id'];
+
+        $count = Outlet::whereIn('id', $ids)->update(['distributor_id' => $distributorId]);
+
+        $distributor = Distributor::find($distributorId);
+
+        return redirect()->route('admin.outlets.index')->with('success', "Berhasil memindahkan {$count} outlet ke distributor: {$distributor->nama}.");
     }
 }

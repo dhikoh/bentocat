@@ -53,13 +53,15 @@
                                 <button onclick="openAddModal({{ $level1->id }}, '{{ $level1->nama }}', 2)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
                                     + {{ $product->label_level_2 }} (Lvl 2)
                                 </button>
-                                <form action="{{ route('admin.variants.destroy', $level1->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-                                        Hapus
-                                    </button>
-                                </form>
+                                @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                    <form action="{{ route('admin.variants.destroy', $level1->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
 
@@ -76,13 +78,15 @@
                                             <button onclick="openAddModal({{ $level2->id }}, '{{ $level2->nama }}', 3)" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
                                                 + {{ $product->label_level_3 }} (Lvl 3)
                                             </button>
-                                            <form action="{{ route('admin.variants.destroy', $level2->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2 py-1 rounded-lg text-xs font-bold transition-all">
-                                                    Hapus
-                                                </button>
-                                            </form>
+                                            @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                                <form action="{{ route('admin.variants.destroy', $level2->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2 py-1 rounded-lg text-xs font-bold transition-all">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -94,13 +98,15 @@
                                                     <span class="bg-violet-500/20 text-violet-400 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Level 3: {{ $product->label_level_3 }}</span>
                                                     <span class="text-xs font-medium text-slate-300">{{ $level3->nama }}</span>
                                                 </div>
-                                                <form action="{{ route('admin.variants.destroy', $level3->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus varian ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-rose-500 hover:text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded transition-all">
-                                                        Hapus
-                                                    </button>
-                                                </form>
+                                                @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                                    <form action="{{ route('admin.variants.destroy', $level3->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus varian ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-rose-500 hover:text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded transition-all">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         @empty
                                             <p class="text-[11px] text-slate-600 italic">Belum ada {{ strtolower($product->label_level_3) }} (Level 3) ditambahkan untuk {{ strtolower($product->label_level_2) }} ini.</p>

@@ -94,6 +94,9 @@
             <table class="w-full text-left text-sm text-slate-300">
                 <thead class="text-xs text-slate-500 uppercase bg-slate-900/40 border-b border-slate-800">
                     <tr>
+                        <th class="px-6 py-4 w-10">
+                            <input type="checkbox" id="select-all-outlets" class="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-amber-500">
+                        </th>
                         <th class="px-6 py-4">Outlet / Kota</th>
                         <th class="px-6 py-4 text-center">Status Mitra</th>
                         <th class="px-6 py-4">Distributor Penyuplai</th>
@@ -106,6 +109,9 @@
                 <tbody class="divide-y divide-slate-850">
                     @forelse($outlets as $outlet)
                         <tr class="hover:bg-slate-900/20">
+                            <td class="px-6 py-4 w-10">
+                                <input type="checkbox" name="outlet_ids[]" value="{{ $outlet->id }}" class="outlet-checkbox rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-amber-500">
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-semibold text-white">{{ $outlet->nama_outlet }}</span>
@@ -160,19 +166,21 @@
                                     <a href="{{ route('admin.outlets.edit', $outlet->id) }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </a>
-                                    <form action="{{ route('admin.outlets.destroy', $outlet->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus outlet ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                    @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                        <form action="{{ route('admin.outlets.destroy', $outlet->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus outlet ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan outlet/petshop terdaftar.</td>
+                            <td colspan="8" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan outlet/petshop terdaftar.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -186,5 +194,151 @@
             </div>
         @endif
     </div>
+
+    <!-- Hidden Bulk Action Forms -->
+    <form id="bulk-reassign-form" action="{{ route('admin.outlets.batch-reassign') }}" method="POST" class="hidden">
+        @csrf
+        <input type="hidden" name="distributor_id" id="reassign-distributor-id">
+        <div id="reassign-ids-container"></div>
+    </form>
+
+    <form id="bulk-delete-form" action="{{ route('admin.outlets.batch-delete') }}" method="POST" class="hidden">
+        @csrf
+        <div id="delete-ids-container"></div>
+    </form>
+
+    <!-- Floating Bulk Action Bar -->
+    <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-slate-800 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col md:flex-row items-center gap-4 z-50 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none max-w-4xl w-[90%] md:w-auto">
+        <div class="text-xs font-semibold text-slate-300 whitespace-nowrap">
+            <span id="selected-count" class="text-amber-500 font-extrabold text-sm">0</span> outlet dipilih
+        </div>
+        <div class="h-6 w-px bg-slate-800 hidden md:block"></div>
+        <div class="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+            <!-- Reassign Distributor -->
+            <div class="flex items-center gap-2 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/85 w-full md:w-auto">
+                <select id="bulk-distributor-select" class="bg-transparent border-none focus:ring-0 text-xs text-slate-350 py-1 pl-2 pr-8 focus:outline-none">
+                    <option value="" class="bg-slate-900 text-slate-400">Pindahkan ke Distributor...</option>
+                    @foreach($distributorsList as $dist)
+                        <option value="{{ $dist->id }}" class="bg-slate-900 text-slate-200">{{ $dist->nama }}</option>
+                    @endforeach
+                </select>
+                <button type="button" onclick="submitBulkReassign()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                    Pindahkan 🚚
+                </button>
+            </div>
+
+            <!-- Batch Delete (restricted to superadmin) -->
+            @if(Auth::user() && Auth::user()->role === 'superadmin')
+                <button type="button" onclick="submitBulkDelete()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-rose-500/10 transition-all w-full md:w-auto whitespace-nowrap">
+                    Hapus Terpilih 🗑️
+                </button>
+            @endif
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('select-all-outlets');
+    const checkboxes = document.querySelectorAll('.outlet-checkbox');
+    const bulkBar = document.getElementById('bulk-action-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    function updateBulkBar() {
+        const checkedBoxes = document.querySelectorAll('.outlet-checkbox:checked');
+        const count = checkedBoxes.length;
+        selectedCountSpan.textContent = count;
+
+        if (count > 0) {
+            bulkBar.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+        } else {
+            bulkBar.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            if (selectAllCheckbox) selectAllCheckbox.checked = false;
+        }
+    }
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+            updateBulkBar();
+        });
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            if (!this.checked && selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+            }
+            updateBulkBar();
+        });
+    });
+});
+
+function getCheckedOutletIds() {
+    const ids = [];
+    document.querySelectorAll('.outlet-checkbox:checked').forEach(cb => {
+        ids.push(cb.value);
+    });
+    return ids;
+}
+
+function submitBulkReassign() {
+    const ids = getCheckedOutletIds();
+    const distributorSelect = document.getElementById('bulk-distributor-select');
+    const distributorId = distributorSelect.value;
+
+    if (!distributorId) {
+        alert('Silakan pilih distributor tujuan terlebih dahulu.');
+        return;
+    }
+
+    if (ids.length === 0) {
+        alert('Tidak ada outlet yang dipilih.');
+        return;
+    }
+
+    const distributorName = distributorSelect.options[distributorSelect.selectedIndex].text;
+    if (confirm(`Apakah Anda yakin ingin memindahkan ${ids.length} outlet terpilih ke distributor "${distributorName}"?`)) {
+        const form = document.getElementById('bulk-reassign-form');
+        document.getElementById('reassign-distributor-id').value = distributorId;
+        
+        const container = document.getElementById('reassign-ids-container');
+        container.innerHTML = '';
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'outlet_ids[]';
+            input.value = id;
+            container.appendChild(input);
+        });
+
+        form.submit();
+    }
+}
+
+function submitBulkDelete() {
+    const ids = getCheckedOutletIds();
+    if (ids.length === 0) {
+        alert('Tidak ada outlet yang dipilih.');
+        return;
+    }
+
+    if (confirm(`Apakah Anda yakin ingin menghapus ${ids.length} outlet terpilih? Outlet yang memiliki data lead terhubung akan otomatis dilewati untuk menjaga integritas data.`)) {
+        const form = document.getElementById('bulk-delete-form');
+        const container = document.getElementById('delete-ids-container');
+        container.innerHTML = '';
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'outlet_ids[]';
+            input.value = id;
+            container.appendChild(input);
+        });
+
+        form.submit();
+    }
+}
+</script>
 @endsection

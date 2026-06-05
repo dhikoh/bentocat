@@ -65,6 +65,10 @@ class ShippingContactController extends Controller
 
     public function destroy(ShippingContact $shippingContact)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus kontak pengiriman.');
+        }
+
         if ($shippingContact->outlets()->exists()) {
             return back()->with('error', 'Kontak Pengiriman tidak dapat dihapus karena masih dikaitkan dengan Outlet.');
         }

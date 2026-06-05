@@ -78,6 +78,10 @@ class DistributorController extends Controller
 
     public function destroy(Distributor $distributor)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus distributor.');
+        }
+
         if ($distributor->outlets()->exists()) {
             return back()->with('error', 'Distributor tidak dapat dihapus karena memiliki relasi ke Outlet.');
         }

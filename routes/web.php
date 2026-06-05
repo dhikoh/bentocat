@@ -59,6 +59,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Outlet CSV Import/Export (defined before resource)
         Route::get('/outlets/export', [OutletController::class, 'exportCsv'])->name('outlets.export');
         Route::post('/outlets/import', [OutletController::class, 'importCsv'])->name('outlets.import');
+        Route::post('/outlets/batch-delete', [OutletController::class, 'batchDelete'])->name('outlets.batch-delete');
+        Route::post('/outlets/batch-reassign', [OutletController::class, 'batchReassign'])->name('outlets.batch-reassign');
         Route::resource('/outlets', OutletController::class);
         
         Route::resource('/shipping-contacts', ShippingContactController::class);

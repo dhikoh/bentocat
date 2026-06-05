@@ -11,6 +11,10 @@ class SettingController extends Controller
 {
     public function index()
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            abort(403, 'Unauthorized action. Hanya Superadmin yang dapat mengakses halaman pengaturan.');
+        }
+
         $settings = [
             'site_name' => Setting::get('site_name', 'BentoCat'),
             'site_description' => Setting::get('site_description', ''),
@@ -26,6 +30,10 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan mengubah pengaturan website.');
+        }
+
         $request->validate([
             'site_name' => 'required|string|max:255',
             'site_description' => 'nullable|string',

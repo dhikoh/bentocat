@@ -47,6 +47,10 @@ class RegionController extends Controller
 
     public function destroyProvince(Province $province)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus provinsi.');
+        }
+
         if ($province->cities()->exists()) {
             return back()->with('error', 'Provinsi tidak dapat dihapus karena memiliki data kota.');
         }
@@ -112,6 +116,10 @@ class RegionController extends Controller
 
     public function destroyCity(City $city)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus kota.');
+        }
+
         if ($city->outlets()->exists() || $city->distributors()->exists()) {
             return back()->with('error', 'Kota tidak dapat dihapus karena memiliki relasi ke Outlet atau Distributor.');
         }

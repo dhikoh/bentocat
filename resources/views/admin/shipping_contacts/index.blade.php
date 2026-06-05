@@ -66,13 +66,15 @@
                                     <a href="{{ route('admin.shipping-contacts.edit', $contact->id) }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </a>
-                                    <form action="{{ route('admin.shipping-contacts.destroy', $contact->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kontak pengiriman ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                    @if(Auth::user() && Auth::user()->role === 'superadmin')
+                                        <form action="{{ route('admin.shipping-contacts.destroy', $contact->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kontak pengiriman ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
