@@ -23,6 +23,9 @@ class OutletController extends Controller
             $cityIds = $cityIds ? [$cityIds] : [];
         }
         
+        $perPage = $request->input('per_page', 10);
+        $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
+        
         $outlets = Outlet::with(['distributor', 'city'])
             ->when($search, function ($query, $search) {
                 $query->where(function($q) use ($search) {
@@ -52,7 +55,7 @@ class OutletController extends Controller
                 $query->whereIn('kota_id', $cityIds);
             })
             ->orderBy('nama_outlet')
-            ->paginate(10);
+            ->paginate($perPageLimit);
 
         // Fetch counts for summary cards
         $countDistributors = Distributor::count();
@@ -63,7 +66,7 @@ class OutletController extends Controller
         $citiesList = $provinceId ? City::where('provinsi_id', $provinceId)->orderBy('nama')->get() : [];
 
         return view('admin.outlets.index', compact(
-            'outlets', 'search', 'isMitra', 'provinceId', 'cityIds',
+            'outlets', 'search', 'isMitra', 'provinceId', 'cityIds', 'perPage',
             'countDistributors', 'countMitra', 'countNonMitra',
             'distributorsList', 'provincesList', 'citiesList'
         ));
@@ -700,5 +703,41 @@ class OutletController extends Controller
         $distributor = Distributor::find($distributorId);
 
         return redirect()->route('admin.outlets.index')->with('success', "Berhasil memindahkan {$count} outlet ke distributor: {$distributor->nama}.");
+    }
+
+    public function clearOutlets(Request $request)
+    {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            return back()->with('error', 'Hanya Superadmin yang diperbolehkan mengosongkan data outlet.');
+        }
+
+        $type = $request->input('type', 'all');
+
+        $query = Outlet::query();
+        if ($type === 'non-mitra') {
+            $query->where('is_mitra', false);
+        }
+
+        $outlets = $query->get();
+        $deletedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($outlets as $outlet) {
+            if ($outlet->leadRequests()->exists()) {
+                $skippedCount++;
+            } else {
+                $outlet->shippingContacts()->detach();
+                $outlet->delete();
+                $deletedCount++;
+            }
+        }
+
+        $msg = "Berhasil menghapus {$deletedCount} data outlet.";
+        if ($skippedCount > 0) {
+            $msg .= " Sebanyak {$skippedCount} outlet dilewati karena memiliki riwayat lead.";
+            return redirect()->route('admin.outlets.index')->with('warning', $msg);
+        }
+
+        return redirect()->route('admin.outlets.index')->with('success', $msg);
     }
 }

@@ -10,6 +10,11 @@
             <p class="text-sm text-slate-400">Daftar mitra toko retail (petshop) yang menyediakan stok BentoCat maupun toko prospek.</p>
         </div>
         <div class="flex flex-wrap gap-2">
+            @if(Auth::user() && Auth::user()->role === 'superadmin')
+                <button type="button" onclick="openClearModal()" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm">
+                    <span>Kosongkan Data</span> 🗑️
+                </button>
+            @endif
             <a href="{{ route('admin.outlets.export') }}" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm">
                 <span>Ekspor CSV</span> 📥
             </a>
@@ -71,12 +76,12 @@
         <form action="{{ route('admin.outlets.index') }}" method="GET" class="space-y-4">
             <!-- Row 1: Search & Base Filters -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                <div class="md:col-span-4">
+                <div class="md:col-span-3">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cari Outlet</label>
                     <input type="text" name="search" value="{{ $search }}" placeholder="Nama outlet, PIC, kota, distributor..." class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-200 placeholder:text-slate-605 focus:outline-none transition-all">
                 </div>
                 
-                <div class="md:col-span-3">
+                <div class="md:col-span-2">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hubungan</label>
                     <select name="is_mitra" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
                         <option value="">Semua Hubungan</option>
@@ -95,11 +100,22 @@
                     </select>
                 </div>
 
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tampilkan</label>
+                    <select name="per_page" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10 Baris</option>
+                        <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50 Baris</option>
+                        <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100 Baris</option>
+                        <option value="500" {{ $perPage == 500 ? 'selected' : '' }}>500 Baris</option>
+                        <option value="all" {{ $perPage === 'all' ? 'selected' : '' }}>Semua Baris</option>
+                    </select>
+                </div>
+
                 <div class="md:col-span-2 flex items-end gap-2">
                     <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl text-sm transition-all text-center">
                         Cari
                     </button>
-                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds))
+                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds) || $perPage != 10)
                         <a href="{{ route('admin.outlets.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 p-2.5 rounded-xl text-sm flex items-center justify-center transition-all" title="Reset Filter">
                             ✕
                         </a>
@@ -285,6 +301,46 @@
             @endif
         </div>
     </div>
+
+    <!-- Clear Data Modal -->
+    @if(Auth::user() && Auth::user()->role === 'superadmin')
+        <div id="clear-data-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-[90%] shadow-2xl space-y-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span>Hapus & Kosongkan Data Outlet</span> ⚠️
+                    </h3>
+                    <p class="text-sm text-slate-400 mt-1">Pilih jenis penghapusan data secara massal. Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                
+                <div class="space-y-2">
+                    <form action="{{ route('admin.outlets.clear') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus seluruh outlet NON-MITRA?')">
+                        @csrf
+                        <input type="hidden" name="type" value="non-mitra">
+                        <button type="submit" class="w-full bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-between text-left">
+                            <span>Hapus Hanya Non-Mitra (Google Maps)</span>
+                            <span class="text-[10px] text-rose-400 font-semibold px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20">Hapus {{ $countNonMitra }} Data</span>
+                        </button>
+                    </form>
+                    
+                    <form action="{{ route('admin.outlets.clear') }}" method="POST" onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin menghapus seluruh outlet, termasuk mitra resmi?')">
+                        @csrf
+                        <input type="hidden" name="type" value="all">
+                        <button type="submit" class="w-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-450 font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-between text-left">
+                            <span>Hapus Seluruh Data Outlet</span>
+                            <span class="text-[10px] text-rose-400 font-semibold px-2 py-0.5 rounded bg-rose-500/25 border border-rose-500/30">Hapus {{ $countMitra + $countNonMitra }} Data</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="button" onclick="closeClearModal()" class="bg-slate-800 hover:bg-slate-750 text-slate-350 font-semibold px-4 py-2 rounded-xl text-xs transition-all">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 <script>
@@ -475,6 +531,20 @@ function submitBulkDelete() {
         });
 
         form.submit();
+    }
+}
+
+function openClearModal() {
+    const modal = document.getElementById('clear-data-modal');
+    if (modal) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+}
+
+function closeClearModal() {
+    const modal = document.getElementById('clear-data-modal');
+    if (modal) {
+        modal.classList.add('opacity-0', 'pointer-events-none');
     }
 }
 </script>
