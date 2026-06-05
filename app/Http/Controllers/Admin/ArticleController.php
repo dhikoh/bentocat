@@ -117,14 +117,27 @@ class ArticleController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads'), $filename);
+            try {
+                $file = $request->file('image');
+                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $uploadPath = public_path('uploads');
+                if (!file_exists($uploadPath)) {
+                    if (!@mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+                        throw new \Exception("Tidak dapat membuat folder 'public/uploads' di server. Harap periksa izin akses penulisan (write permissions) folder 'public' di server.");
+                    }
+                }
+                $file->move($uploadPath, $filename);
 
-            return response()->json([
-                'success' => true,
-                'url' => asset('uploads/' . $filename)
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'url' => asset('uploads/' . $filename)
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Image upload failed: ' . $e->getMessage()
+                ], 500);
+            }
         }
 
         return response()->json(['success' => false, 'message' => 'Image upload failed.'], 400);
