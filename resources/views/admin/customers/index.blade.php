@@ -56,7 +56,7 @@
                                 {{ $customer->nama }}
                             </td>
                             <td class="px-6 py-4">
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customer->whatsapp) }}" target="_blank" class="text-slate-300 hover:text-amber-500 font-medium hover:underline flex items-center gap-1.5">
+                                <a href="https://wa.me/{{ $customer->formatted_whatsapp }}" target="_blank" class="text-slate-300 hover:text-amber-500 font-medium hover:underline flex items-center gap-1.5">
                                     💬 {{ $customer->whatsapp }}
                                 </a>
                             </td>

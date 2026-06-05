@@ -28,4 +28,22 @@ class Distributor extends Model
     {
         return $this->hasMany(Outlet::class, 'distributor_id');
     }
+
+    public function setWhatsappAttribute($value)
+    {
+        $clean = preg_replace('/[^0-9]/', '', $value);
+        if (str_starts_with($clean, '0')) {
+            $clean = '62' . substr($clean, 1);
+        }
+        $this->attributes['whatsapp'] = $clean;
+    }
+
+    public function getFormattedWhatsappAttribute()
+    {
+        $clean = preg_replace('/[^0-9]/', '', $this->whatsapp);
+        if (str_starts_with($clean, '0')) {
+            $clean = '62' . substr($clean, 1);
+        }
+        return $clean;
+    }
 }

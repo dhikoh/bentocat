@@ -51,7 +51,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <span class="block font-medium text-slate-200">{{ $distributor->pic }}</span>
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $distributor->whatsapp) }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500 flex items-center gap-1">
+                                <a href="https://wa.me/{{ $distributor->formatted_whatsapp }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500 flex items-center gap-1">
                                     💬 {{ $distributor->whatsapp }}
                                 </a>
                             </td>

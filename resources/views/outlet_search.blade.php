@@ -339,6 +339,14 @@
         });
     }
  
+    function formatWhatsappNumber(num) {
+        let clean = num.replace(/[^0-9]/g, '');
+        if (clean.startsWith('0')) {
+            clean = '62' + clean.substring(1);
+        }
+        return clean;
+    }
+
     // AJAX Action loggers & WA redirection
     function contactOutlet(outletId, whatsapp, outletName, isMitra) {
         const savedName = localStorage.getItem('bentocat_customer_name');
@@ -359,7 +367,7 @@
             } else {
                 message = `Halo ${outletName}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan produk ${productName}? Saya sangat tertarik untuk membelinya.`;
             }
-            const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            const waUrl = `https://wa.me/${formatWhatsappNumber(whatsapp)}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
         });
     }
@@ -378,7 +386,7 @@
         .finally(() => {
             const customerName = localStorage.getItem('bentocat_customer_name') || 'Pelanggan';
             const message = `Halo ${courierName}, saya ${customerName} merujuk dari website BentoCat. Ingin memesan pengantaran produk ${productName} dari petshop ke alamat rumah saya.`;
-            const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            const waUrl = `https://wa.me/${formatWhatsappNumber(whatsapp)}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
         });
     }
@@ -398,7 +406,7 @@
             const customerName = localStorage.getItem('bentocat_customer_name') || 'Pelanggan';
             let variantSuffix = variantDetailsStr ? ` dengan pilihan ${variantDetailsStr}` : '';
             const message = `Halo ${distName}, saya ${customerName} melihat dari website BentoCat. Di kota saya belum ada petshop resmi terdaftar, apakah saya bisa membeli ${productName}${variantSuffix} langsung dikirim dari distributor?`;
-            const waUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            const waUrl = `https://wa.me/${formatWhatsappNumber(whatsapp)}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
         });
     }

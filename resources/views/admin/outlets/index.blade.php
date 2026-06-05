@@ -187,7 +187,7 @@
                              </td>
                             <td class="px-6 py-4">
                                 <span class="block font-medium text-slate-200">{{ $outlet->nama_pic }}</span>
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $outlet->whatsapp) }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500 flex items-center gap-1">
+                                <a href="https://wa.me/{{ $outlet->formatted_whatsapp }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500 flex items-center gap-1">
                                     💬 {{ $outlet->whatsapp }}
                                 </a>
                             </td>

@@ -59,11 +59,11 @@
                 <!-- WA Direct (logs via simulated lead trigger if not filled, or simple wa.me link directly for guest routing) -->
                 @php
                     if ($outlet->is_mitra) {
-                        $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda terdaftar di website BentoCat {$city->nama}. Apakah stok pasir BentoCat sedang ready?";
+                         $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda terdaftar di website BentoCat {$city->nama}. Apakah stok pasir BentoCat sedang ready?";
                     } else {
-                        $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan pasir kucing BentoCat? Saya sangat tertarik untuk membelinya.";
+                         $message = "Halo {$outlet->nama_outlet}, saya melihat toko Anda di bentocat.id. Apakah Anda menyediakan pasir kucing BentoCat? Saya sangat tertarik untuk membelinya.";
                     }
-                    $waUrl = "https://wa.me/" . preg_replace('/[^0-9]/', '', $outlet->whatsapp) . "?text=" . urlencode($message);
+                    $waUrl = "https://wa.me/" . $outlet->formatted_whatsapp . "?text=" . urlencode($message);
                 @endphp
                 <a href="{{ $waUrl }}" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-6 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0">
                     <span>Chat WhatsApp Toko</span> 💬
@@ -89,7 +89,7 @@
                             </div>
                             @php
                                 $messageDist = "Halo {$distributor->nama}, saya ingin bertanya tentang ketersediaan pasir kucing BentoCat di wilayah {$city->nama}.";
-                                $waDistUrl = "https://wa.me/" . preg_replace('/[^0-9]/', '', $distributor->whatsapp) . "?text=" . urlencode($messageDist);
+                                $waDistUrl = "https://wa.me/" . $distributor->formatted_whatsapp . "?text=" . urlencode($messageDist);
                             @endphp
                             <a href="{{ $waDistUrl }}" target="_blank" class="w-full bg-white border border-slate-200 hover:border-amber-500/30 hover:text-amber-650 text-slate-650 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm">
                                 <span>Hubungi Distributor</span> 💬

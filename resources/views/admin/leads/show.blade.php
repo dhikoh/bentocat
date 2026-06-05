@@ -43,7 +43,7 @@
                 </div>
                 <div>
                     <span class="block text-xs font-bold text-slate-500 uppercase">Nomor WhatsApp</span>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $lead->customer->whatsapp) }}" target="_blank" class="text-amber-400 hover:underline font-semibold block text-base mt-0.5">
+                    <a href="https://wa.me/{{ $lead->customer->formatted_whatsapp }}" target="_blank" class="text-amber-400 hover:underline font-semibold block text-base mt-0.5">
                         💬 {{ $lead->customer->whatsapp }}
                     </a>
                 </div>

@@ -74,7 +74,7 @@
                         <tr class="hover:bg-slate-900/20">
                             <td class="px-6 py-4">
                                 <span class="block font-semibold text-white">{{ $lead->customer->nama }}</span>
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $lead->customer->whatsapp) }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500">
+                                <a href="https://wa.me/{{ $lead->customer->formatted_whatsapp }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500">
                                     💬 {{ $lead->customer->whatsapp }}
                                 </a>
                             </td>
