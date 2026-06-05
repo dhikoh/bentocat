@@ -67,24 +67,74 @@
     </div>
 
     <!-- Filter & Search -->
-    <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl">
-        <form action="{{ route('admin.outlets.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
-            <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama outlet, PIC, kota, atau distributor..." class="flex-1 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
-            
-            <select name="is_mitra" class="bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
-                <option value="">Semua Hubungan</option>
-                <option value="1" {{ $isMitra === '1' ? 'selected' : '' }}>Mitra Resmi BentoCat</option>
-                <option value="0" {{ $isMitra === '0' ? 'selected' : '' }}>Toko Terdaftar (Non-Mitra)</option>
-            </select>
+    <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
+        <form action="{{ route('admin.outlets.index') }}" method="GET" class="space-y-4">
+            <!-- Row 1: Search & Base Filters -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cari Outlet</label>
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Nama outlet, PIC, kota, distributor..." class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-200 placeholder:text-slate-605 focus:outline-none transition-all">
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hubungan</label>
+                    <select name="is_mitra" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Hubungan</option>
+                        <option value="1" {{ $isMitra === '1' ? 'selected' : '' }}>Mitra Resmi BentoCat</option>
+                        <option value="0" {{ $isMitra === '0' ? 'selected' : '' }}>Toko Terdaftar (Non-Mitra)</option>
+                    </select>
+                </div>
 
-            <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-2 rounded-xl text-sm transition-all">
-                Cari
-            </button>
-            @if($search || $isMitra !== null)
-                <a href="{{ route('admin.outlets.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 px-4 py-2 rounded-xl text-sm flex items-center justify-center transition-all">
-                    Reset
-                </a>
-            @endif
+                <div class="md:col-span-3">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Provinsi</label>
+                    <select name="provinsi_id" id="filter-province" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Provinsi</option>
+                        @foreach($provincesList as $prov)
+                            <option value="{{ $prov->id }}" {{ $provinceId == $prov->id ? 'selected' : '' }}>{{ $prov->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="md:col-span-2 flex items-end gap-2">
+                    <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl text-sm transition-all text-center">
+                        Cari
+                    </button>
+                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds))
+                        <a href="{{ route('admin.outlets.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 p-2.5 rounded-xl text-sm flex items-center justify-center transition-all" title="Reset Filter">
+                            ✕
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Row 2: Dynamic City Checkboxes -->
+            <div id="city-filter-wrapper" class="border-t border-slate-800/60 pt-3 {{ $provinceId ? '' : 'hidden' }}">
+                <div class="space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-slate-400">Pilih Kota:</span>
+                        <div class="flex items-center gap-4">
+                            <!-- Local Search Box inside Cities checklist -->
+                            <input type="text" id="city-local-search" placeholder="Cari kota..." class="bg-slate-950 border border-slate-850 focus:border-amber-500 rounded-lg px-2.5 py-1 text-xs text-slate-350 placeholder:text-slate-700 focus:outline-none transition-all">
+                            <label class="inline-flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer select-none">
+                                <input type="checkbox" id="check-all-cities" class="rounded border-slate-800 bg-slate-950 text-amber-500 focus:ring-0 focus:ring-offset-0">
+                                Pilih Semua
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable checklist grid -->
+                    <div id="city-checkboxes-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-40 overflow-y-auto p-3 bg-slate-950/60 border border-slate-850 rounded-xl">
+                        @if($provinceId && isset($citiesList))
+                            @foreach($citiesList as $city)
+                                <label class="city-checkbox-item inline-flex items-center gap-2 text-xs text-slate-300 cursor-pointer hover:text-white transition-colors">
+                                    <input type="checkbox" name="city_ids[]" value="{{ $city->id }}" class="city-checkbox rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0 focus:ring-offset-0" {{ in_array($city->id, $cityIds) ? 'checked' : '' }}>
+                                    <span class="city-name truncate">{{ $city->nama }}</span>
+                                </label>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -274,6 +324,93 @@ document.addEventListener('DOMContentLoaded', function() {
             updateBulkBar();
         });
     });
+
+    // Province and City Filters Dynamic Loading & Handling
+    const provinceSelect = document.getElementById('filter-province');
+    const cityFilterWrapper = document.getElementById('city-filter-wrapper');
+    const cityCheckboxesContainer = document.getElementById('city-checkboxes-container');
+    const checkAllCities = document.getElementById('check-all-cities');
+    const cityLocalSearch = document.getElementById('city-local-search');
+
+    if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+            const provinceId = this.value;
+            if (!provinceId) {
+                cityFilterWrapper.classList.add('hidden');
+                cityCheckboxesContainer.innerHTML = '';
+                return;
+            }
+
+            // Show loading state
+            cityFilterWrapper.classList.remove('hidden');
+            cityCheckboxesContainer.innerHTML = '<div class="col-span-full text-xs text-slate-500 py-2">Memuat kota...</div>';
+
+            fetch(`/api/cities-by-province/${provinceId}`)
+                .then(res => res.json())
+                .then(cities => {
+                    cityCheckboxesContainer.innerHTML = '';
+                    if (cities.length === 0) {
+                        cityCheckboxesContainer.innerHTML = '<div class="col-span-full text-xs text-slate-500 py-2">Tidak ada kota di provinsi ini.</div>';
+                        return;
+                    }
+
+                    cities.forEach(city => {
+                        const label = document.createElement('label');
+                        label.className = 'city-checkbox-item inline-flex items-center gap-2 text-xs text-slate-350 cursor-pointer hover:text-white transition-colors';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = 'city_ids[]';
+                        checkbox.value = city.id;
+                        checkbox.className = 'city-checkbox rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0 focus:ring-offset-0';
+                        
+                        const span = document.createElement('span');
+                        span.className = 'city-name truncate';
+                        span.textContent = city.nama;
+
+                        label.appendChild(checkbox);
+                        label.appendChild(span);
+                        cityCheckboxesContainer.appendChild(label);
+                    });
+
+                    // Reset search and check all
+                    if (cityLocalSearch) cityLocalSearch.value = '';
+                    if (checkAllCities) checkAllCities.checked = false;
+                })
+                .catch(err => {
+                    console.error('Error fetching cities:', err);
+                    cityCheckboxesContainer.innerHTML = '<div class="col-span-full text-xs text-rose-500 py-2">Gagal memuat kota.</div>';
+                });
+        });
+    }
+
+    if (checkAllCities) {
+        checkAllCities.addEventListener('change', function() {
+            const isChecked = this.checked;
+            const visibleItems = cityCheckboxesContainer.querySelectorAll('.city-checkbox-item:not(.hidden) input[type="checkbox"]');
+            visibleItems.forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+
+    if (cityLocalSearch) {
+        cityLocalSearch.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const items = cityCheckboxesContainer.querySelectorAll('.city-checkbox-item');
+            
+            items.forEach(item => {
+                const name = item.querySelector('.city-name').textContent.toLowerCase();
+                if (name.includes(query)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            if (checkAllCities) checkAllCities.checked = false;
+        });
+    }
 });
 
 function getCheckedOutletIds() {

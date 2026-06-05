@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Outlet;
 use App\Models\Distributor;
 use App\Models\City;
+use App\Models\Province;
 use App\Models\ShippingContact;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -16,6 +17,11 @@ class OutletController extends Controller
     {
         $search = $request->input('search');
         $isMitra = $request->input('is_mitra');
+        $provinceId = $request->input('provinsi_id');
+        $cityIds = $request->input('city_ids', []);
+        if (!is_array($cityIds)) {
+            $cityIds = $cityIds ? [$cityIds] : [];
+        }
         
         $outlets = Outlet::with(['distributor', 'city'])
             ->when($search, function ($query, $search) {
@@ -33,6 +39,18 @@ class OutletController extends Controller
             ->when($isMitra !== null && $isMitra !== '', function ($query) use ($isMitra) {
                 $query->where('is_mitra', $isMitra);
             })
+            ->when($provinceId, function ($query, $provinceId) use ($cityIds) {
+                if (!empty($cityIds)) {
+                    $query->whereIn('kota_id', $cityIds);
+                } else {
+                    $query->whereHas('city', function ($c) use ($provinceId) {
+                        $c->where('provinsi_id', $provinceId);
+                    });
+                }
+            })
+            ->when(!$provinceId && !empty($cityIds), function ($query) use ($cityIds) {
+                $query->whereIn('kota_id', $cityIds);
+            })
             ->orderBy('nama_outlet')
             ->paginate(10);
 
@@ -41,11 +59,13 @@ class OutletController extends Controller
         $countMitra = Outlet::where('is_mitra', true)->count();
         $countNonMitra = Outlet::where('is_mitra', false)->count();
         $distributorsList = Distributor::orderBy('nama')->get();
+        $provincesList = Province::orderBy('nama')->get();
+        $citiesList = $provinceId ? City::where('provinsi_id', $provinceId)->orderBy('nama')->get() : [];
 
         return view('admin.outlets.index', compact(
-            'outlets', 'search', 'isMitra', 
+            'outlets', 'search', 'isMitra', 'provinceId', 'cityIds',
             'countDistributors', 'countMitra', 'countNonMitra',
-            'distributorsList'
+            'distributorsList', 'provincesList', 'citiesList'
         ));
     }
 
