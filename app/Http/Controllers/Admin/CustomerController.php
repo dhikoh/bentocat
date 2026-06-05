@@ -13,6 +13,9 @@ class CustomerController extends Controller
     {
         $search = $request->input('search');
 
+        $perPage = $request->input('per_page', 15);
+        $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
+
         $customers = CustomerProfile::withCount('leadRequests')
             ->when($search, function ($query, $search) {
                 $query->where('nama', 'like', "%{$search}%")
@@ -22,9 +25,12 @@ class CustomerController extends Controller
                       ->orWhere('kota', 'like', "%{$search}%");
             })
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->paginate($perPageLimit);
 
-        return view('admin.customers.index', compact('customers', 'search'));
+        $countTotalCustomers = CustomerProfile::count();
+        $countNoActivityCustomers = CustomerProfile::doesntHave('leadRequests')->count();
+
+        return view('admin.customers.index', compact('customers', 'search', 'perPage', 'countTotalCustomers', 'countNoActivityCustomers'));
     }
 
     public function exportCsv(Request $request)
@@ -134,5 +140,24 @@ class CustomerController extends Controller
         $customer->delete();
 
         return redirect()->route('admin.customers.index')->with('success', 'Pelanggan beserta seluruh log lead & aktivitas terkait berhasil dihapus.');
+    }
+
+    public function clearCustomers(Request $request)
+    {
+        if (auth()->user()->role !== 'superadmin') {
+            return redirect()->back()->with('error', 'Hanya Superadmin yang memiliki izin untuk mengosongkan data pelanggan.');
+        }
+
+        $type = $request->input('type', 'all');
+
+        if ($type === 'no-activity') {
+            $count = CustomerProfile::doesntHave('leadRequests')->count();
+            CustomerProfile::doesntHave('leadRequests')->delete();
+            return redirect()->route('admin.customers.index')->with('success', "Berhasil menghapus {$count} data pelanggan tanpa aktivitas.");
+        }
+
+        $count = CustomerProfile::count();
+        CustomerProfile::query()->delete();
+        return redirect()->route('admin.customers.index')->with('success', "Berhasil mengosongkan {$count} data pelanggan.");
     }
 }

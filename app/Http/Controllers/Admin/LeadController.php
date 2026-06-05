@@ -18,6 +18,9 @@ class LeadController extends Controller
         $cityId = $request->input('city_id');
         $productId = $request->input('product_id');
 
+        $perPage = $request->input('per_page', 15);
+        $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
+
         $leads = LeadRequest::with(['customer', 'product', 'city', 'outlet', 'distributor'])
             ->withCount('actions')
             ->when($search, function ($query, $search) {
@@ -33,12 +36,15 @@ class LeadController extends Controller
                 $query->where('produk_id', $productId);
             })
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->paginate($perPageLimit);
 
         $cities = City::orderBy('nama')->get();
         $products = Product::orderBy('nama')->get();
 
-        return view('admin.leads.index', compact('leads', 'cities', 'products', 'search', 'cityId', 'productId'));
+        $countTotalLeads = LeadRequest::count();
+        $countNoInteractionLeads = LeadRequest::doesntHave('actions')->count();
+
+        return view('admin.leads.index', compact('leads', 'cities', 'products', 'search', 'cityId', 'productId', 'perPage', 'countTotalLeads', 'countNoInteractionLeads'));
     }
 
     public function show(LeadRequest $lead)
@@ -127,5 +133,24 @@ class LeadController extends Controller
         $lead->delete();
 
         return redirect()->route('admin.leads.index')->with('success', 'Data Lead berhasil dihapus.');
+    }
+
+    public function clearLeads(Request $request)
+    {
+        if (auth()->user()->role !== 'superadmin') {
+            return redirect()->back()->with('error', 'Hanya Superadmin yang memiliki izin untuk mengosongkan data lead.');
+        }
+
+        $type = $request->input('type', 'all');
+
+        if ($type === 'no-interaction') {
+            $count = LeadRequest::doesntHave('actions')->count();
+            LeadRequest::doesntHave('actions')->delete();
+            return redirect()->route('admin.leads.index')->with('success', "Berhasil menghapus {$count} data lead tanpa interaksi.");
+        }
+
+        $count = LeadRequest::count();
+        LeadRequest::query()->delete();
+        return redirect()->route('admin.leads.index')->with('success', "Berhasil mengosongkan {$count} data lead.");
     }
 }

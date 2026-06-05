@@ -9,11 +9,16 @@
             <h1 class="text-2xl font-bold text-white">Database Pelanggan BentoCat (CRM)</h1>
             <p class="text-sm text-slate-400">Daftar pelanggan (cat owners) yang melakukan pencarian outlet melalui website.</p>
         </div>
-        <div class="flex items-center gap-3 self-start md:self-auto">
-            <a href="{{ route('admin.customers.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2 text-sm">
+        <div class="flex flex-wrap items-center gap-3 self-start md:self-auto">
+            @if(Auth::user() && Auth::user()->role === 'superadmin')
+                <button type="button" onclick="openClearModal()" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-450 font-bold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm">
+                    <span>Kosongkan Data</span> 🗑️
+                </button>
+            @endif
+            <a href="{{ route('admin.customers.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2 text-sm whitespace-nowrap">
                 <span>Tambah Pelanggan</span> ➕
             </a>
-            <a href="{{ route('admin.customers.export', ['search' => $search]) }}" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm">
+            <a href="{{ route('admin.customers.export', ['search' => $search]) }}" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm whitespace-nowrap">
                 <span>Ekspor CSV</span> 📥
             </a>
         </div>
@@ -23,10 +28,19 @@
     <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl">
         <form action="{{ route('admin.customers.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
             <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama pelanggan, nomor WA, alamat..." class="flex-1 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none transition-all">
+            
+            <select name="per_page" onchange="this.form.submit()" class="bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                <option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15 Baris</option>
+                <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50 Baris</option>
+                <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100 Baris</option>
+                <option value="500" {{ $perPage == 500 ? 'selected' : '' }}>500 Baris</option>
+                <option value="all" {{ $perPage === 'all' ? 'selected' : '' }}>Semua Baris</option>
+            </select>
+
             <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-2 rounded-xl text-sm transition-all">
                 Cari
             </button>
-            @if($search)
+            @if($search || $perPage != 15)
                 <a href="{{ route('admin.customers.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 px-4 py-2 rounded-xl text-sm flex items-center justify-center transition-all">
                     Reset
                 </a>
@@ -104,5 +118,61 @@
             </div>
         @endif
     </div>
+
+    <!-- Clear Data Modal -->
+    @if(Auth::user() && Auth::user()->role === 'superadmin')
+        <div id="clear-data-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-md w-[90%] shadow-2xl space-y-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span>Hapus & Kosongkan Data Pelanggan</span> ⚠️
+                    </h3>
+                    <p class="text-sm text-slate-400 mt-1">Pilih jenis penghapusan data secara massal. Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                
+                <div class="space-y-2">
+                    <form action="{{ route('admin.customers.clear') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus seluruh data pelanggan yang TIDAK MEMILIKI riwayat leads/aktivitas?')">
+                        @csrf
+                        <input type="hidden" name="type" value="no-activity">
+                        <button type="submit" class="w-full bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-between text-left">
+                            <span>Hapus Tanpa Aktivitas (0 Leads)</span>
+                            <span class="text-[10px] text-rose-450 font-semibold px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20">Hapus {{ $countNoActivityCustomers }} Data</span>
+                        </button>
+                    </form>
+                    
+                    <form action="{{ route('admin.customers.clear') }}" method="POST" onsubmit="return confirm('PERINGATAN KERAS: Tindakan ini akan menghapus SELURUH data pelanggan CRM beserta data leads dan tindakan WhatsApp yang terhubung dengannya secara permanen!')">
+                        @csrf
+                        <input type="hidden" name="type" value="all">
+                        <button type="submit" class="w-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-450 font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-between text-left">
+                            <span>Hapus Seluruh Data Pelanggan</span>
+                            <span class="text-[10px] text-rose-450 font-semibold px-2 py-0.5 rounded bg-rose-500/25 border border-rose-500/30">Hapus {{ $countTotalCustomers }} Data</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="button" onclick="closeClearModal()" class="bg-slate-800 hover:bg-slate-750 text-slate-350 font-semibold px-4 py-2 rounded-xl text-xs transition-all">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function openClearModal() {
+            const modal = document.getElementById('clear-data-modal');
+            if (modal) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function closeClearModal() {
+            const modal = document.getElementById('clear-data-modal');
+            if (modal) {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+        </script>
+    @endif
 </div>
 @endsection
