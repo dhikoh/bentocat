@@ -22,7 +22,20 @@ class ClientController extends Controller
     public function index()
     {
         $products = Product::where('status', 'ACTIVE')->with('variants')->get();
-        $provinces = Province::where('is_hidden', false)->orderBy('nama')->get();
+        $provinces = Province::where('is_hidden', false)
+            ->whereHas('cities', function ($query) {
+                $query->where('is_hidden', false)
+                    ->where(function ($q) {
+                        $q->whereHas('outlets', function ($qo) {
+                            $qo->where('status', 'AKTIF')
+                               ->where('is_hidden', false);
+                        })->orWhereHas('distributors', function ($qd) {
+                            $qd->where('status', 'ACTIVE');
+                        });
+                    });
+            })
+            ->orderBy('nama')
+            ->get();
         $articles = Article::where('status', 'PUBLISHED')
             ->orderBy('published_at', 'desc')
             ->take(3)
@@ -37,7 +50,15 @@ class ClientController extends Controller
         $query = City::where('provinsi_id', $province_id);
         
         if (!$request->has('all') && !$request->has('admin')) {
-            $query->where('is_hidden', false);
+            $query->where('is_hidden', false)
+                ->where(function ($q) {
+                    $q->whereHas('outlets', function ($qo) {
+                        $qo->where('status', 'AKTIF')
+                           ->where('is_hidden', false);
+                    })->orWhereHas('distributors', function ($qd) {
+                        $qd->where('status', 'ACTIVE');
+                    });
+                });
         }
         
         $cities = $query->orderBy('nama')->get();
@@ -311,7 +332,20 @@ class ClientController extends Controller
         }
 
         $products = Product::where('status', 'ACTIVE')->get();
-        $provinces = Province::where('is_hidden', false)->orderBy('nama')->get();
+        $provinces = Province::where('is_hidden', false)
+            ->whereHas('cities', function ($query) {
+                $query->where('is_hidden', false)
+                    ->where(function ($q) {
+                        $q->whereHas('outlets', function ($qo) {
+                            $qo->where('status', 'AKTIF')
+                               ->where('is_hidden', false);
+                        })->orWhereHas('distributors', function ($qd) {
+                            $qd->where('status', 'ACTIVE');
+                        });
+                    });
+            })
+            ->orderBy('nama')
+            ->get();
 
         return view('city_routing', compact('city', 'province', 'outlets', 'distributor', 'products', 'provinces'));
     }

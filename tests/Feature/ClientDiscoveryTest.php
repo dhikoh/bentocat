@@ -276,4 +276,60 @@ class ClientDiscoveryTest extends TestCase
             'nama_outlet' => 'Petshop Jaya Featured'
         ]);
     }
+
+    public function test_dropdown_only_contains_provinces_and_cities_with_active_outlets_or_distributors(): void
+    {
+        // 1. Create a province and a city that are empty (no outlets, no distributors)
+        $emptyProvince = Province::create([
+            'nama' => 'Provinsi Kosong',
+            'slug' => 'provinsi-kosong'
+        ]);
+
+        $emptyCity = City::create([
+            'provinsi_id' => $emptyProvince->id,
+            'nama' => 'Kota Kosong',
+            'slug' => 'kota-kosong'
+        ]);
+
+        // 2. Create a province and city that only has an active distributor (no outlets)
+        $distributorProvince = Province::create([
+            'nama' => 'Provinsi Distributor',
+            'slug' => 'provinsi-distributor'
+        ]);
+
+        $distributorCity = City::create([
+            'provinsi_id' => $distributorProvince->id,
+            'nama' => 'Kota Distributor Only',
+            'slug' => 'kota-distributor-only'
+        ]);
+
+        Distributor::create([
+            'kota_id' => $distributorCity->id,
+            'nama' => 'Distributor Solo Raya',
+            'pic' => 'Slamet',
+            'whatsapp' => '081222224444',
+            'alamat' => 'Jl. Solo Baru No. 1',
+            'status' => 'ACTIVE'
+        ]);
+
+        // 3. Request home (landing page) - should see Jawa Timur and Provinsi Distributor, but not Provinsi Kosong
+        $responseHome = $this->get(route('home'));
+        $responseHome->assertStatus(200);
+        $responseHome->assertSee('Jawa Timur');
+        $responseHome->assertSee('Provinsi Distributor');
+        $responseHome->assertDontSee('Provinsi Kosong');
+
+        // 4. Request cities by province for empty province - should return empty list
+        $responseEmptyCities = $this->get('/api/cities-by-province/' . $emptyProvince->id);
+        $responseEmptyCities->assertStatus(200);
+        $responseEmptyCities->assertExactJson([]);
+
+        // 5. Request cities by province for distributor province - should return Kota Distributor Only
+        $responseDistributorCities = $this->get('/api/cities-by-province/' . $distributorProvince->id);
+        $responseDistributorCities->assertStatus(200);
+        $responseDistributorCities->assertJsonFragment([
+            'id' => $distributorCity->id,
+            'nama' => 'Kota Distributor Only'
+        ]);
+    }
 }
