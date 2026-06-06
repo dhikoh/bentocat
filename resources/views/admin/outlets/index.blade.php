@@ -386,13 +386,13 @@
                 <!-- Featured / Toko Rekomendasi -->
                 <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
                     <input type="checkbox" id="check-update-featured" onchange="toggleModalField('featured')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
-                    <div class="flex-1 space-y-1.5">
+                    <div class="flex-1 space-y-2">
                         <label for="check-update-featured" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Rekomendasi (Featured)</label>
-                        <div id="field-container-featured" class="hidden pl-1 flex items-center gap-2">
-                            <label class="inline-flex items-center gap-2 text-xs text-slate-450 cursor-pointer">
-                                <input type="checkbox" id="input-featured" class="rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0">
-                                <span class="text-xs font-semibold text-slate-350">Aktifkan sebagai Rekomendasi</span>
-                            </label>
+                        <div id="field-container-featured" class="hidden pl-1">
+                            <select id="input-featured" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none transition-all">
+                                <option value="1">Aktifkan sebagai Rekomendasi (Featured)</option>
+                                <option value="0">Nonaktifkan Rekomendasi</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -400,13 +400,13 @@
                 <!-- Mitra Resmi BentoCat -->
                 <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
                     <input type="checkbox" id="check-update-is-mitra" onchange="toggleModalField('is-mitra')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
-                    <div class="flex-1 space-y-1.5">
+                    <div class="flex-1 space-y-2">
                         <label for="check-update-is-mitra" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Kemitraan (Mitra Resmi)</label>
-                        <div id="field-container-is-mitra" class="hidden pl-1 flex items-center gap-2">
-                            <label class="inline-flex items-center gap-2 text-xs text-slate-450 cursor-pointer">
-                                <input type="checkbox" id="input-is-mitra" class="rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0">
-                                <span class="text-xs font-semibold text-slate-350">Jadikan Mitra Resmi BentoCat</span>
-                            </label>
+                        <div id="field-container-is-mitra" class="hidden pl-1">
+                            <select id="input-is-mitra" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none transition-all">
+                                <option value="1">Jadikan Mitra Resmi BentoCat</option>
+                                <option value="0">Batalkan Status Mitra Resmi</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -414,13 +414,13 @@
                 <!-- Sembunyikan dari Pencarian -->
                 <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
                     <input type="checkbox" id="check-update-is-hidden" onchange="toggleModalField('is-hidden')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
-                    <div class="flex-1 space-y-1.5">
-                        <label for="check-update-is-hidden" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Pencarian (Sembunyikan)</label>
-                        <div id="field-container-is-hidden" class="hidden pl-1 flex items-center gap-2">
-                            <label class="inline-flex items-center gap-2 text-xs text-slate-450 cursor-pointer">
-                                <input type="checkbox" id="input-is-hidden" class="rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0">
-                                <span class="text-xs font-semibold text-slate-355">Sembunyikan outlet dari alat pencarian</span>
-                            </label>
+                    <div class="flex-1 space-y-2">
+                        <label for="check-update-is-hidden" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Pencarian (Sembunyikan/Tampilkan)</label>
+                        <div id="field-container-is-hidden" class="hidden pl-1">
+                            <select id="input-is-hidden" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none transition-all">
+                                <option value="1">Sembunyikan outlet dari alat pencarian (Hidden)</option>
+                                <option value="0">Tampilkan outlet di alat pencarian (Visible)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -740,7 +740,7 @@ function openBulkStatusModal() {
         alert('Tidak ada outlet yang dipilih.');
         return;
     }
-    
+
     document.getElementById('modal-selected-count').innerText = ids.length;
     
     // Reset checkboxes
@@ -748,6 +748,12 @@ function openBulkStatusModal() {
     document.getElementById('check-update-is-mitra').checked = false;
     document.getElementById('check-update-is-hidden').checked = false;
     document.getElementById('check-update-status').checked = false;
+
+    // Reset select values
+    document.getElementById('input-featured').value = '1';
+    document.getElementById('input-is-mitra').value = '1';
+    document.getElementById('input-is-hidden').value = '1';
+    document.getElementById('input-status').value = 'AKTIF';
     
     // Hide all input containers
     toggleModalField('featured');
@@ -826,7 +832,7 @@ function submitBulkUpdateStatus() {
             const valFeatured = document.createElement('input');
             valFeatured.type = 'hidden';
             valFeatured.name = 'featured';
-            valFeatured.value = document.getElementById('input-featured').checked ? '1' : '0';
+            valFeatured.value = document.getElementById('input-featured').value;
             container.appendChild(valFeatured);
         }
 
@@ -840,7 +846,7 @@ function submitBulkUpdateStatus() {
             const valMitra = document.createElement('input');
             valMitra.type = 'hidden';
             valMitra.name = 'is_mitra';
-            valMitra.value = document.getElementById('input-is-mitra').checked ? '1' : '0';
+            valMitra.value = document.getElementById('input-is-mitra').value;
             container.appendChild(valMitra);
         }
 
@@ -854,7 +860,7 @@ function submitBulkUpdateStatus() {
             const valHidden = document.createElement('input');
             valHidden.type = 'hidden';
             valHidden.name = 'is_hidden';
-            valHidden.value = document.getElementById('input-is-hidden').checked ? '1' : '0';
+            valHidden.value = document.getElementById('input-is-hidden').value;
             container.appendChild(valHidden);
         }
 
