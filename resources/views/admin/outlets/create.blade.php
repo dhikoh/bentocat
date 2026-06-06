@@ -31,7 +31,7 @@
                             class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
                         <option value="">-- Pilih Distributor --</option>
                         @foreach($distributors as $distributor)
-                            <option value="{{ $distributor->id }}" {{ old('distributor_id') == $distributor->id ? 'selected' : '' }}>
+                            <option value="{{ $distributor->id }}" data-whatsapp="{{ $distributor->whatsapp }}" {{ old('distributor_id') == $distributor->id ? 'selected' : '' }}>
                                 {{ $distributor->nama }} ({{ $distributor->city->nama }})
                             </option>
                         @endforeach
@@ -76,7 +76,12 @@
                 </div>
 
                 <div>
-                    <label for="whatsapp" class="block text-xs font-bold text-slate-400 uppercase mb-2">WhatsApp Outlet</label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="whatsapp" class="block text-xs font-bold text-slate-400 uppercase">WhatsApp Outlet</label>
+                        <button type="button" id="btn-use-distributor-wa" class="text-[10px] font-bold text-amber-500 hover:text-amber-400 hover:underline transition-colors focus:outline-none">
+                            📞 Gunakan WA Distributor
+                        </button>
+                    </div>
                     <input type="text" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}" required 
                            placeholder="Contoh: 628987654321" 
                            class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
@@ -203,6 +208,24 @@
     // Call on load
     document.addEventListener('DOMContentLoaded', () => {
         handleDeliveryModeChange();
+        
+        const btnUseDistributorWa = document.getElementById('btn-use-distributor-wa');
+        if (btnUseDistributorWa) {
+            btnUseDistributorWa.addEventListener('click', function() {
+                const select = document.getElementById('distributor_id');
+                const selectedOption = select.options[select.selectedIndex];
+                if (!selectedOption || !selectedOption.value) {
+                    alert('Silakan pilih Distributor Penyuplai terlebih dahulu.');
+                    return;
+                }
+                const wa = selectedOption.getAttribute('data-whatsapp');
+                if (!wa) {
+                    alert('Distributor yang dipilih tidak memiliki nomor WhatsApp.');
+                    return;
+                }
+                document.getElementById('whatsapp').value = wa;
+            });
+        }
         
         document.getElementById('provinsi_id').addEventListener('change', function() {
             const provinceId = this.value;
