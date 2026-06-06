@@ -204,20 +204,24 @@ class AdminOutletTest extends TestCase
             'tampil_ke_publik' => true
         ]);
 
-        $response = $this->actingAs($this->admin)->post('/admin/outlets/batch-reassign-shipping', [
-            'outlet_ids' => [$outlet1->id, $outlet2->id],
-            'shipping_contact_id' => $shippingContact->id
-        ]);
+        $response = $this->actingAs($this->admin)
+            ->from(route('admin.outlets.index'))
+            ->post('/admin/outlets/batch-reassign-shipping', [
+                'outlet_ids' => [$outlet1->id, $outlet2->id],
+                'shipping_contact_id' => $shippingContact->id
+            ]);
 
         $response->assertRedirect(route('admin.outlets.index'));
         $this->assertTrue($outlet1->fresh()->shippingContacts->contains($shippingContact->id));
         $this->assertTrue($outlet2->fresh()->shippingContacts->contains($shippingContact->id));
 
         // Clear all contacts test
-        $responseClear = $this->actingAs($this->admin)->post('/admin/outlets/batch-reassign-shipping', [
-            'outlet_ids' => [$outlet1->id, $outlet2->id],
-            'shipping_contact_id' => null
-        ]);
+        $responseClear = $this->actingAs($this->admin)
+            ->from(route('admin.outlets.index'))
+            ->post('/admin/outlets/batch-reassign-shipping', [
+                'outlet_ids' => [$outlet1->id, $outlet2->id],
+                'shipping_contact_id' => null
+            ]);
 
         $responseClear->assertRedirect(route('admin.outlets.index'));
         $this->assertCount(0, $outlet1->fresh()->shippingContacts);

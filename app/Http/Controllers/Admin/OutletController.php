@@ -763,10 +763,10 @@ class OutletController extends Controller
         }
 
         if ($skippedCount > 0) {
-            return redirect()->route('admin.outlets.index')->with('warning', "Berhasil menghapus {$deletedCount} outlet. {$skippedCount} outlet dilewati karena memiliki log data lead.");
+            return back()->with('warning', "Berhasil menghapus {$deletedCount} outlet. {$skippedCount} outlet dilewati karena memiliki log data lead.");
         }
 
-        return redirect()->route('admin.outlets.index')->with('success', "Berhasil menghapus {$deletedCount} outlet terpilih.");
+        return back()->with('success', "Berhasil menghapus {$deletedCount} outlet terpilih.");
     }
 
     public function batchReassign(Request $request)
@@ -789,7 +789,7 @@ class OutletController extends Controller
 
         $distributor = Distributor::find($distributorId);
 
-        return redirect()->route('admin.outlets.index')->with('success', "Berhasil memindahkan {$count} outlet ke distributor: {$distributor->nama}.");
+        return back()->with('success', "Berhasil memindahkan {$count} outlet ke distributor: {$distributor->nama}.");
     }
 
     public function batchReassignShipping(Request $request)
@@ -819,10 +819,10 @@ class OutletController extends Controller
 
         if ($shippingContactId) {
             $contact = ShippingContact::find($shippingContactId);
-            return redirect()->route('admin.outlets.index')->with('success', "Berhasil menghubungkan " . count($ids) . " outlet ke kontak pengiriman: {$contact->nama}.");
+            return back()->with('success', "Berhasil menghubungkan " . count($ids) . " outlet ke kontak pengiriman: {$contact->nama}.");
         }
 
-        return redirect()->route('admin.outlets.index')->with('success', "Berhasil menghapus kontak pengiriman dari " . count($ids) . " outlet.");
+        return back()->with('success', "Berhasil menghapus kontak pengiriman dari " . count($ids) . " outlet.");
     }
 
     public function clearOutlets(Request $request)
@@ -855,10 +855,10 @@ class OutletController extends Controller
         $msg = "Berhasil menghapus {$deletedCount} data outlet.";
         if ($skippedCount > 0) {
             $msg .= " Sebanyak {$skippedCount} outlet dilewati karena memiliki riwayat lead.";
-            return redirect()->route('admin.outlets.index')->with('warning', $msg);
+            return back()->with('warning', $msg);
         }
 
-        return redirect()->route('admin.outlets.index')->with('success', $msg);
+        return back()->with('success', $msg);
     }
 
     /**
@@ -906,7 +906,7 @@ class OutletController extends Controller
 
         try {
             $count = Outlet::whereIn('id', $ids)->update($updateData);
-            return redirect()->route('admin.outlets.index')->with('success', "Berhasil memperbarui status {$count} outlet secara massal.");
+            return back()->with('success', "Berhasil memperbarui status {$count} outlet secara massal.");
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan saat memperbarui status outlet: ' . $e->getMessage());
         }
