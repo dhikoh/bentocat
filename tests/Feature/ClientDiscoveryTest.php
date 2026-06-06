@@ -168,9 +168,8 @@ class ClientDiscoveryTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        // Verify customer profile created
         $this->assertDatabaseHas('customer_profiles', [
-            'whatsapp' => '089988887777',
+            'whatsapp' => '6289988887777',
             'nama' => 'John Doe Customer',
             'kota' => 'Surabaya',
         ]);

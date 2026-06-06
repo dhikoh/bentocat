@@ -111,7 +111,7 @@ class AdminAuditTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Petshop Pertama');
         $response->assertSee('Petshop Kedua');
-        $response->assertSee('081234567890');
+        $response->assertSee('6281234567890');
     }
 
     public function test_merge_petshops_remaps_leads_and_deletes_duplicate()

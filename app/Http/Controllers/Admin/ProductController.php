@@ -15,7 +15,8 @@ class ProductController extends Controller
         $search = $request->input('search');
         $products = Product::withCount('variants')
             ->when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
             })
             ->orderBy('nama')
             ->paginate(10);

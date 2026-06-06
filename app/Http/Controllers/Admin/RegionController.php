@@ -15,7 +15,8 @@ class RegionController extends Controller
         $search = $request->input('search');
         $provinces = Province::withCount('cities')
             ->when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
             })
             ->orderBy('nama')
             ->paginate(10);
@@ -70,7 +71,8 @@ class RegionController extends Controller
         $search = $request->input('search');
         $cities = $province->cities()
             ->when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
             })
             ->orderBy('nama')
             ->paginate(15);

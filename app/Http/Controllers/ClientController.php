@@ -32,9 +32,15 @@ class ClientController extends Controller
     }
 
     // Get cities under a province for AJAX select
-    public function getCities($province_id)
+    public function getCities(Request $request, $province_id)
     {
-        $cities = City::where('provinsi_id', $province_id)->where('is_hidden', false)->orderBy('nama')->get();
+        $query = City::where('provinsi_id', $province_id);
+        
+        if (!$request->has('all') && !$request->has('admin')) {
+            $query->where('is_hidden', false);
+        }
+        
+        $cities = $query->orderBy('nama')->get();
         return response()->json($cities);
     }
 

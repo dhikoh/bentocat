@@ -46,7 +46,9 @@ class AdminProductTest extends TestCase
         $this->assertStringContainsString('uploads/products/product-bentocat-premium-lavender', $product->thumbnail);
         
         // Verify file is saved in public directory
-        $expectedPath = public_path($product->thumbnail);
+        $expectedPath = str_starts_with($product->thumbnail, '/storage/')
+            ? storage_path('app/public/' . \Illuminate\Support\Str::after($product->thumbnail, '/storage/'))
+            : public_path($product->thumbnail);
         $this->assertTrue(file_exists($expectedPath));
 
         // Clean up created file
@@ -83,7 +85,9 @@ class AdminProductTest extends TestCase
         ]);
 
         $product = Product::first();
-        $oldPath = public_path($product->thumbnail);
+        $oldPath = str_starts_with($product->thumbnail, '/storage/')
+            ? storage_path('app/public/' . \Illuminate\Support\Str::after($product->thumbnail, '/storage/'))
+            : public_path($product->thumbnail);
         $this->assertTrue(file_exists($oldPath));
 
         // Update with new file
@@ -101,7 +105,9 @@ class AdminProductTest extends TestCase
         $this->assertFalse(file_exists($oldPath));
 
         $product->refresh();
-        $newPath = public_path($product->thumbnail);
+        $newPath = str_starts_with($product->thumbnail, '/storage/')
+            ? storage_path('app/public/' . \Illuminate\Support\Str::after($product->thumbnail, '/storage/'))
+            : public_path($product->thumbnail);
         $this->assertTrue(file_exists($newPath));
 
         // Clean up final file

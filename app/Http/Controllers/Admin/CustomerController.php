@@ -18,11 +18,14 @@ class CustomerController extends Controller
 
         $customers = CustomerProfile::withCount('leadRequests')
             ->when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%")
-                      ->orWhere('whatsapp', 'like', "%{$search}%")
-                      ->orWhere('alamat', 'like', "%{$search}%")
-                      ->orWhere('provinsi', 'like', "%{$search}%")
-                      ->orWhere('kota', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->where(function($q) use ($lowered) {
+                    $q->whereRaw('LOWER(nama) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(whatsapp) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(alamat) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(provinsi) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(kota) LIKE ?', [$lowered]);
+                });
             })
             ->orderByDesc('created_at')
             ->paginate($perPageLimit);
@@ -39,8 +42,11 @@ class CustomerController extends Controller
 
         $customers = CustomerProfile::withCount('leadRequests')
             ->when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%")
-                      ->orWhere('whatsapp', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->where(function($q) use ($lowered) {
+                    $q->whereRaw('LOWER(nama) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(whatsapp) LIKE ?', [$lowered]);
+                });
             })
             ->orderByDesc('created_at')
             ->get();

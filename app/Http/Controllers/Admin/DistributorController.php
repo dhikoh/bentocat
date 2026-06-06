@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Distributor;
 use App\Models\City;
+use App\Models\Province;
 use Illuminate\Http\Request;
 
 class DistributorController extends Controller
@@ -14,11 +15,14 @@ class DistributorController extends Controller
         $search = $request->input('search');
         $distributors = Distributor::with('city')
             ->when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%")
-                    ->orWhere('pic', 'like', "%{$search}%")
-                    ->orWhereHas('city', function ($q) use ($search) {
-                        $q->where('nama', 'like', "%{$search}%");
-                    });
+                $lowered = '%' . strtolower($search) . '%';
+                $query->where(function ($q) use ($lowered) {
+                    $q->whereRaw('LOWER(nama) LIKE ?', [$lowered])
+                        ->orWhereRaw('LOWER(pic) LIKE ?', [$lowered])
+                        ->orWhereHas('city', function ($c) use ($lowered) {
+                            $c->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
+                        });
+                });
             })
             ->orderBy('nama')
             ->paginate(10);
@@ -28,8 +32,10 @@ class DistributorController extends Controller
 
     public function create()
     {
-        $cities = City::orderBy('nama')->get();
-        return view('admin.distributors.create', compact('cities'));
+        $provinces = Province::orderBy('nama')->get();
+        $oldProvinceId = old('provinsi_id');
+        $cities = $oldProvinceId ? City::where('provinsi_id', $oldProvinceId)->orderBy('nama')->get() : [];
+        return view('admin.distributors.create', compact('provinces', 'cities'));
     }
 
     public function store(Request $request)
@@ -53,8 +59,10 @@ class DistributorController extends Controller
 
     public function edit(Distributor $distributor)
     {
-        $cities = City::orderBy('nama')->get();
-        return view('admin.distributors.edit', compact('distributor', 'cities'));
+        $provinces = Province::orderBy('nama')->get();
+        $currentProvinceId = old('provinsi_id', $distributor->city ? $distributor->city->provinsi_id : null);
+        $cities = $currentProvinceId ? City::where('provinsi_id', $currentProvinceId)->orderBy('nama')->get() : [];
+        return view('admin.distributors.edit', compact('distributor', 'provinces', 'cities'));
     }
 
     public function update(Request $request, Distributor $distributor)

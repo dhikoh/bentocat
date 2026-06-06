@@ -12,8 +12,11 @@ class ShippingContactController extends Controller
     {
         $search = $request->input('search');
         $contacts = ShippingContact::when($search, function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%")
-                    ->orWhere('whatsapp', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->where(function($q) use ($lowered) {
+                    $q->whereRaw('LOWER(nama) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(whatsapp) LIKE ?', [$lowered]);
+                });
             })
             ->orderBy('nama')
             ->paginate(10);

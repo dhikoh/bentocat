@@ -16,8 +16,11 @@ class ArticleController extends Controller
         $search = $request->input('search');
         $articles = Article::with('author')
             ->when($search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('summary', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->where(function($q) use ($lowered) {
+                    $q->whereRaw('LOWER(title) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(summary) LIKE ?', [$lowered]);
+                });
             })
             ->orderByDesc('created_at')
             ->paginate(10);

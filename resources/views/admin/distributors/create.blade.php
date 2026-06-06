@@ -17,12 +17,25 @@
         <form action="{{ route('admin.distributors.store') }}" method="POST" class="space-y-6">
             @csrf
 
+            <div>
+                <label for="nama" class="block text-xs font-bold text-slate-400 uppercase mb-2">Nama Distributor</label>
+                <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required 
+                       placeholder="Contoh: CV. Bento Lestari Abadi" 
+                       class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="nama" class="block text-xs font-bold text-slate-400 uppercase mb-2">Nama Distributor</label>
-                    <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required 
-                           placeholder="Contoh: CV. Bento Lestari Abadi" 
-                           class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
+                    <label for="provinsi_id" class="block text-xs font-bold text-slate-400 uppercase mb-2">Provinsi Wilayah</label>
+                    <select name="provinsi_id" id="provinsi_id" required 
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
+                        <option value="">-- Pilih Provinsi --</option>
+                        @foreach($provinces as $province)
+                            <option value="{{ $province->id }}" {{ old('provinsi_id') == $province->id ? 'selected' : '' }}>
+                                {{ $province->nama }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div>
@@ -92,4 +105,36 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('provinsi_id').addEventListener('change', function() {
+            const provinceId = this.value;
+            const citySelect = document.getElementById('kota_id');
+            citySelect.innerHTML = '<option value="">-- Loading Kota --</option>';
+            if (!provinceId) {
+                citySelect.innerHTML = '<option value="">-- Pilih Kota --</option>';
+                return;
+            }
+            
+            fetch(`/api/cities-by-province/${provinceId}?admin=1`)
+                .then(res => res.json())
+                .then(data => {
+                    citySelect.innerHTML = '<option value="">-- Pilih Kota --</option>';
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.textContent = city.nama;
+                        citySelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    citySelect.innerHTML = '<option value="">-- Gagal memuat kota --</option>';
+                });
+        });
+    });
+</script>
 @endsection

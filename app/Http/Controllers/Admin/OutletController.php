@@ -22,7 +22,6 @@ class OutletController extends Controller
         if (!is_array($cityIds)) {
             $cityIds = $cityIds ? [$cityIds] : [];
         }
-        
         $status = $request->input('status');
         $isHidden = $request->input('is_hidden');
         $featured = $request->input('featured');
@@ -32,14 +31,15 @@ class OutletController extends Controller
         
         $outlets = Outlet::with(['distributor', 'city'])
             ->when($search, function ($query, $search) {
-                $query->where(function($q) use ($search) {
-                    $q->where('nama_outlet', 'like', "%{$search}%")
-                      ->orWhere('nama_pic', 'like', "%{$search}%")
-                      ->orWhereHas('city', function ($c) use ($search) {
-                          $c->where('nama', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->where(function($q) use ($lowered) {
+                    $q->whereRaw('LOWER(nama_outlet) LIKE ?', [$lowered])
+                      ->orWhereRaw('LOWER(nama_pic) LIKE ?', [$lowered])
+                      ->orWhereHas('city', function ($c) use ($lowered) {
+                          $c->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
                       })
-                      ->orWhereHas('distributor', function ($d) use ($search) {
-                          $d->where('nama', 'like', "%{$search}%");
+                      ->orWhereHas('distributor', function ($d) use ($lowered) {
+                          $d->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
                       });
                 });
             })
@@ -89,9 +89,11 @@ class OutletController extends Controller
     public function create()
     {
         $distributors = Distributor::where('status', 'ACTIVE')->orderBy('nama')->get();
-        $cities = City::orderBy('nama')->get();
+        $provinces = Province::orderBy('nama')->get();
+        $oldProvinceId = old('provinsi_id');
+        $cities = $oldProvinceId ? City::where('provinsi_id', $oldProvinceId)->orderBy('nama')->get() : [];
         $shippingContacts = ShippingContact::where('aktif', true)->orderBy('nama')->get();
-        return view('admin.outlets.create', compact('distributors', 'cities', 'shippingContacts'));
+        return view('admin.outlets.create', compact('distributors', 'provinces', 'cities', 'shippingContacts'));
     }
 
     public function store(Request $request)
@@ -137,10 +139,12 @@ class OutletController extends Controller
     public function edit(Outlet $outlet)
     {
         $distributors = Distributor::where('status', 'ACTIVE')->orderBy('nama')->get();
-        $cities = City::orderBy('nama')->get();
+        $provinces = Province::orderBy('nama')->get();
+        $currentProvinceId = old('provinsi_id', $outlet->city ? $outlet->city->provinsi_id : null);
+        $cities = $currentProvinceId ? City::where('provinsi_id', $currentProvinceId)->orderBy('nama')->get() : [];
         $shippingContacts = ShippingContact::where('aktif', true)->orderBy('nama')->get();
         $selectedContacts = $outlet->shippingContacts->pluck('id')->toArray();
-        return view('admin.outlets.edit', compact('outlet', 'distributors', 'cities', 'shippingContacts', 'selectedContacts'));
+        return view('admin.outlets.edit', compact('outlet', 'distributors', 'provinces', 'cities', 'shippingContacts', 'selectedContacts'));
     }
 
     public function update(Request $request, Outlet $outlet)
@@ -339,6 +343,11 @@ class OutletController extends Controller
         $allShippingContacts = ShippingContact::all()->keyBy('whatsapp');
 
         $cityProvinceMap = [
+            'Demak' => 'Jawa Tengah',
+            'Pemalang' => 'Jawa Tengah',
+            'Situbondo' => 'Jawa Timur',
+            'Kuningan' => 'Jawa Barat',
+            'Banjarmasin' => 'Kalimantan Selatan',
             'Madiun' => 'Jawa Timur',
             'Sukoharjo' => 'Jawa Tengah',
             'Ponorogo' => 'Jawa Timur',

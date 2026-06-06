@@ -24,9 +24,10 @@ class LeadController extends Controller
         $leads = LeadRequest::with(['customer', 'product', 'city', 'outlet', 'distributor'])
             ->withCount('actions')
             ->when($search, function ($query, $search) {
-                $query->whereHas('customer', function ($q) use ($search) {
-                    $q->where('nama', 'like', "%{$search}%")
-                        ->orWhere('whatsapp', 'like', "%{$search}%");
+                $lowered = '%' . strtolower($search) . '%';
+                $query->whereHas('customer', function ($q) use ($lowered) {
+                    $q->whereRaw('LOWER(nama) LIKE ?', [$lowered])
+                        ->orWhereRaw('LOWER(whatsapp) LIKE ?', [$lowered]);
                 });
             })
             ->when($cityId, function ($query, $cityId) {
