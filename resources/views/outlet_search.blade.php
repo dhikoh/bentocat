@@ -49,45 +49,32 @@
                     </h3>
                     <p class="text-xs text-slate-550 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
                 </div>
-
-                @if($outlet->is_mitra || $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH')
-                    <!-- Delivery modes grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <span>🏠</span>
-                            <div>
-                                <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
-                                <span class="block text-[10px] text-slate-450">
-                                    @if(!$outlet->is_mitra)
-                                        Tidak Tersedia
-                                    @else
-                                        {{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-200 pt-2 sm:pt-0 sm:px-3">
-                            <span>🚚</span>
-                            <div>
-                                <span class="block font-semibold">Rekomendasi Kurir Lokal</span>
-                                <span class="block text-[10px] text-slate-450">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 border-t sm:border-t-0 pt-2 sm:pt-0">
-                            <span>🏪</span>
-                            <div>
-                                <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
-                                <span class="block text-[10px] text-slate-450">
-                                    @if(!$outlet->is_mitra)
-                                        Tidak Tersedia
-                                    @else
-                                        Selalu Tersedia
-                                    @endif
-                                </span>
-                            </div>
+                <!-- Delivery modes grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span>🏠</span>
+                        <div>
+                            <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
+                            <span class="block text-[10px] text-slate-450">
+                                {{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}
+                            </span>
                         </div>
                     </div>
-                @endif
+                    <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-200 pt-2 sm:pt-0 sm:px-3">
+                        <span>🚚</span>
+                        <div>
+                            <span class="block font-semibold">Rekomendasi Kurir Lokal</span>
+                            <span class="block text-[10px] text-slate-450">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 border-t sm:border-t-0 pt-2 sm:pt-0">
+                        <span>🏪</span>
+                        <div>
+                            <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
+                            <span class="block text-[10px] text-slate-450">Selalu Tersedia</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 pt-2">
                     <!-- Action WA Redirect Button -->

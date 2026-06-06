@@ -72,10 +72,6 @@
                                 <span>Mode Kirim: 
                                     @if($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT')
                                         <span class="text-indigo-700 font-bold">Kurir Eksternal 🛵</span>
-                                    @elseif($outlet->delivery_mode === 'BOTH')
-                                        <span class="text-slate-700 font-bold">Semua Mode</span>
-                                    @elseif(!$outlet->is_mitra)
-                                        <span class="text-slate-500 font-bold">Belum Menyediakan BentoCat</span>
                                     @elseif($outlet->delivery_mode === 'SELF_DELIVERY')
                                         <span class="text-amber-700 font-bold">Pengantaran Toko 🚚</span>
                                     @elseif($outlet->delivery_mode === 'PICKUP_ONLY')
