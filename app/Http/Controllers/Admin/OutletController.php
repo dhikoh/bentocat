@@ -32,8 +32,9 @@ class OutletController extends Controller
         $outlets = Outlet::with(['distributor', 'city'])
             ->when($search, function ($query, $search) {
                 $lowered = '%' . strtolower($search) . '%';
-                $query->where(function($q) use ($lowered) {
+                $query->where(function($q) use ($lowered, $search) {
                     $q->whereRaw('LOWER(nama_outlet) LIKE ?', [$lowered])
+                      ->orWhere('whatsapp', 'LIKE', '%' . $search . '%')
                       ->orWhereHas('city', function ($c) use ($lowered) {
                           $c->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
                       });

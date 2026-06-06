@@ -250,4 +250,28 @@ class AdminOutletTest extends TestCase
         $response2->assertStatus(200);
         $response2->assertSee('Mutiara Petshop Unique Search');
     }
+
+    public function test_outlet_search_matches_whatsapp()
+    {
+        $outlet = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Kucing Imut Petshop',
+            'nama_pic' => 'Budi',
+            'whatsapp' => '6287779998881',
+            'alamat_lengkap' => 'Jl. Kebagusan No. 20',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        // Search for full WhatsApp number
+        $response = $this->actingAs($this->admin)->get('/admin/outlets?search=6287779998881');
+        $response->assertStatus(200);
+        $response->assertSee('Kucing Imut Petshop');
+
+        // Search for partial WhatsApp number
+        $response2 = $this->actingAs($this->admin)->get('/admin/outlets?search=999888');
+        $response2->assertStatus(200);
+        $response2->assertSee('Kucing Imut Petshop');
+    }
 }
