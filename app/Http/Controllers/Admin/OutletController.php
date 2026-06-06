@@ -733,4 +733,55 @@ class OutletController extends Controller
 
         return redirect()->route('admin.outlets.index')->with('success', $msg);
     }
+
+    /**
+     * Batch update status and attributes (featured, is_mitra, is_hidden, status) for outlets.
+     */
+    public function batchUpdateStatus(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['superadmin', 'editor'])) {
+            return back()->with('error', 'Anda tidak memiliki wewenang untuk mengubah status outlet secara massal.');
+        }
+
+        $validated = $request->validate([
+            'outlet_ids' => 'required|array',
+            'outlet_ids.*' => 'exists:outlets,id',
+            'update_featured' => 'nullable|boolean',
+            'featured' => 'nullable|boolean',
+            'update_is_mitra' => 'nullable|boolean',
+            'is_mitra' => 'nullable|boolean',
+            'update_is_hidden' => 'nullable|boolean',
+            'is_hidden' => 'nullable|boolean',
+            'update_status' => 'nullable|boolean',
+            'status' => 'nullable|in:AKTIF,STOK_KOSONG,TUTUP,NONAKTIF',
+        ]);
+
+        $ids = $validated['outlet_ids'];
+        $updateData = [];
+
+        if ($request->has('update_featured')) {
+            $updateData['featured'] = $request->boolean('featured');
+        }
+        if ($request->has('update_is_mitra')) {
+            $updateData['is_mitra'] = $request->boolean('is_mitra');
+        }
+        if ($request->has('update_is_hidden')) {
+            $updateData['is_hidden'] = $request->boolean('is_hidden');
+        }
+        if ($request->has('update_status')) {
+            $updateData['status'] = $request->input('status');
+        }
+
+        if (empty($updateData)) {
+            return back()->with('warning', 'Tidak ada atribut status yang dipilih untuk diubah.');
+        }
+
+        try {
+            $count = Outlet::whereIn('id', $ids)->update($updateData);
+            return redirect()->route('admin.outlets.index')->with('success', "Berhasil memperbarui status {$count} outlet secara massal.");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui status outlet: ' . $e->getMessage());
+        }
+    }
 }

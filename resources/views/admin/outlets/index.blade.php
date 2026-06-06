@@ -279,6 +279,11 @@
         <div id="delete-ids-container"></div>
     </form>
 
+    <form id="bulk-update-status-form" action="{{ route('admin.outlets.batch-update-status') }}" method="POST" class="hidden">
+        @csrf
+        <div id="status-ids-container"></div>
+    </form>
+
     <!-- Floating Bulk Action Bar -->
     <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-slate-800 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col md:flex-row items-center gap-4 z-50 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none max-w-4xl w-[90%] md:w-auto">
         <div class="text-xs font-semibold text-slate-300 whitespace-nowrap">
@@ -299,12 +304,100 @@
                 </button>
             </div>
 
+            <!-- Ubah Status Massal (restricted to superadmin & editor) -->
+            @if(Auth::user() && in_array(Auth::user()->role, ['superadmin', 'editor']))
+                <button type="button" onclick="openBulkStatusModal()" class="bg-slate-800 hover:bg-slate-700 text-amber-500 hover:text-amber-400 text-xs font-bold px-4 py-2 rounded-xl border border-slate-700 transition-all w-full md:w-auto whitespace-nowrap">
+                    Ubah Status ⚙️
+                </button>
+            @endif
+
             <!-- Batch Delete (restricted to superadmin) -->
             @if(Auth::user() && Auth::user()->role === 'superadmin')
                 <button type="button" onclick="submitBulkDelete()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-rose-500/10 transition-all w-full md:w-auto whitespace-nowrap">
                     Hapus Terpilih 🗑️
                 </button>
             @endif
+        </div>
+    </div>
+
+    <!-- Bulk Status Update Modal -->
+    <div id="bulk-status-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-lg w-[90%] shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Ubah Atribut Massal (<span id="modal-selected-count" class="text-amber-500">0</span> Outlet)</h3>
+                <button type="button" onclick="closeBulkStatusModal()" class="text-slate-400 hover:text-white text-lg font-bold transition-colors">&times;</button>
+            </div>
+            
+            <p class="text-xs text-slate-450 leading-relaxed">Pilih atribut yang ingin diubah. Hanya atribut yang dicentang yang akan diperbarui pada seluruh outlet terpilih.</p>
+            
+            <div class="space-y-4">
+                <!-- Featured / Toko Rekomendasi -->
+                <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
+                    <input type="checkbox" id="check-update-featured" onchange="toggleModalField('featured')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
+                    <div class="flex-1 space-y-1.5">
+                        <label for="check-update-featured" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Rekomendasi (Featured)</label>
+                        <div id="field-container-featured" class="hidden pl-1 flex items-center gap-2">
+                            <label class="inline-flex items-center gap-2 text-xs text-slate-450 cursor-pointer">
+                                <input type="checkbox" id="input-featured" class="rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0">
+                                <span class="text-xs font-semibold text-slate-350">Aktifkan sebagai Rekomendasi</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mitra Resmi BentoCat -->
+                <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
+                    <input type="checkbox" id="check-update-is-mitra" onchange="toggleModalField('is-mitra')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
+                    <div class="flex-1 space-y-1.5">
+                        <label for="check-update-is-mitra" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Kemitraan (Mitra Resmi)</label>
+                        <div id="field-container-is-mitra" class="hidden pl-1 flex items-center gap-2">
+                            <label class="inline-flex items-center gap-2 text-xs text-slate-450 cursor-pointer">
+                                <input type="checkbox" id="input-is-mitra" class="rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0">
+                                <span class="text-xs font-semibold text-slate-350">Jadikan Mitra Resmi BentoCat</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sembunyikan dari Pencarian -->
+                <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
+                    <input type="checkbox" id="check-update-is-hidden" onchange="toggleModalField('is-hidden')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
+                    <div class="flex-1 space-y-1.5">
+                        <label for="check-update-is-hidden" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Pencarian (Sembunyikan)</label>
+                        <div id="field-container-is-hidden" class="hidden pl-1 flex items-center gap-2">
+                            <label class="inline-flex items-center gap-2 text-xs text-slate-450 cursor-pointer">
+                                <input type="checkbox" id="input-is-hidden" class="rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0">
+                                <span class="text-xs font-semibold text-slate-355">Sembunyikan outlet dari alat pencarian</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Operasional -->
+                <div class="flex items-start gap-3 p-3 bg-slate-950/40 rounded-xl border border-slate-850/60">
+                    <input type="checkbox" id="check-update-status" onchange="toggleModalField('status')" class="mt-1 rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-0">
+                    <div class="flex-1 space-y-2">
+                        <label for="check-update-status" class="text-xs font-bold text-slate-200 cursor-pointer select-none">Ubah Status Operasional</label>
+                        <div id="field-container-status" class="hidden pl-1">
+                            <select id="input-status" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none transition-all">
+                                <option value="AKTIF">AKTIF</option>
+                                <option value="STOK_KOSONG">STOK HABIS</option>
+                                <option value="TUTUP">TUTUP</option>
+                                <option value="NONAKTIF">NONAKTIF / SEMBUNYI</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800/80">
+                <button type="button" onclick="closeBulkStatusModal()" class="bg-slate-950 border border-slate-850 hover:bg-slate-850 text-slate-400 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all">
+                    Batal
+                </button>
+                <button type="button" onclick="submitBulkUpdateStatus()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-5 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/10 transition-all">
+                    Simpan Perubahan
+                </button>
+            </div>
         </div>
     </div>
 
@@ -551,6 +644,145 @@ function closeClearModal() {
     const modal = document.getElementById('clear-data-modal');
     if (modal) {
         modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+}
+
+function openBulkStatusModal() {
+    const ids = getCheckedOutletIds();
+    if (ids.length === 0) {
+        alert('Tidak ada outlet yang dipilih.');
+        return;
+    }
+    
+    document.getElementById('modal-selected-count').innerText = ids.length;
+    
+    // Reset checkboxes
+    document.getElementById('check-update-featured').checked = false;
+    document.getElementById('check-update-is-mitra').checked = false;
+    document.getElementById('check-update-is-hidden').checked = false;
+    document.getElementById('check-update-status').checked = false;
+    
+    // Hide all input containers
+    toggleModalField('featured');
+    toggleModalField('is-mitra');
+    toggleModalField('is-hidden');
+    toggleModalField('status');
+
+    const modal = document.getElementById('bulk-status-modal');
+    if (modal) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+}
+
+function closeBulkStatusModal() {
+    const modal = document.getElementById('bulk-status-modal');
+    if (modal) {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+}
+
+function toggleModalField(field) {
+    const isChecked = document.getElementById(`check-update-${field}`).checked;
+    const container = document.getElementById(`field-container-${field}`);
+    if (container) {
+        if (isChecked) {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+    }
+}
+
+function submitBulkUpdateStatus() {
+    const ids = getCheckedOutletIds();
+    if (ids.length === 0) {
+        alert('Tidak ada outlet yang dipilih.');
+        return;
+    }
+
+    const checkFeatured = document.getElementById('check-update-featured').checked;
+    const checkMitra = document.getElementById('check-update-is-mitra').checked;
+    const checkHidden = document.getElementById('check-update-is-hidden').checked;
+    const checkStatus = document.getElementById('check-update-status').checked;
+
+    if (!checkFeatured && !checkMitra && !checkHidden && !checkStatus) {
+        alert('Silakan centang setidaknya satu atribut yang ingin diubah.');
+        return;
+    }
+
+    if (confirm(`Apakah Anda yakin ingin memperbarui status untuk ${ids.length} outlet terpilih?`)) {
+        const form = document.getElementById('bulk-update-status-form');
+        const container = document.getElementById('status-ids-container');
+        
+        container.innerHTML = '';
+        
+        // Append outlet IDs
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'outlet_ids[]';
+            input.value = id;
+            container.appendChild(input);
+        });
+
+        // Append selective update fields
+        if (checkFeatured) {
+            const upFeatured = document.createElement('input');
+            upFeatured.type = 'hidden';
+            upFeatured.name = 'update_featured';
+            upFeatured.value = '1';
+            container.appendChild(upFeatured);
+
+            const valFeatured = document.createElement('input');
+            valFeatured.type = 'hidden';
+            valFeatured.name = 'featured';
+            valFeatured.value = document.getElementById('input-featured').checked ? '1' : '0';
+            container.appendChild(valFeatured);
+        }
+
+        if (checkMitra) {
+            const upMitra = document.createElement('input');
+            upMitra.type = 'hidden';
+            upMitra.name = 'update_is_mitra';
+            upMitra.value = '1';
+            container.appendChild(upMitra);
+
+            const valMitra = document.createElement('input');
+            valMitra.type = 'hidden';
+            valMitra.name = 'is_mitra';
+            valMitra.value = document.getElementById('input-is-mitra').checked ? '1' : '0';
+            container.appendChild(valMitra);
+        }
+
+        if (checkHidden) {
+            const upHidden = document.createElement('input');
+            upHidden.type = 'hidden';
+            upHidden.name = 'update_is_hidden';
+            upHidden.value = '1';
+            container.appendChild(upHidden);
+
+            const valHidden = document.createElement('input');
+            valHidden.type = 'hidden';
+            valHidden.name = 'is_hidden';
+            valHidden.value = document.getElementById('input-is-hidden').checked ? '1' : '0';
+            container.appendChild(valHidden);
+        }
+
+        if (checkStatus) {
+            const upStatus = document.createElement('input');
+            upStatus.type = 'hidden';
+            upStatus.name = 'update_status';
+            upStatus.value = '1';
+            container.appendChild(upStatus);
+
+            const valStatus = document.createElement('input');
+            valStatus.type = 'hidden';
+            valStatus.name = 'status';
+            valStatus.value = document.getElementById('input-status').value;
+            container.appendChild(valStatus);
+        }
+
+        form.submit();
     }
 }
 </script>
