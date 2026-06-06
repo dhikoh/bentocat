@@ -73,6 +73,17 @@
 
     <!-- Filter & Search -->
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800/60 pb-3">
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <span>Filter & Pencarian</span>
+            </h2>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold font-mono">
+                    {{ $outlets->total() }} Outlet Ditemukan
+                </span>
+            </div>
+        </div>
         <form action="{{ route('admin.outlets.index') }}" method="GET" class="space-y-4">
             <!-- Row 1: Search & Base Filters -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
@@ -240,7 +251,7 @@
                     @forelse($outlets as $outlet)
                         <tr class="hover:bg-slate-900/20">
                             <td class="px-6 py-4 w-10">
-                                <input type="checkbox" name="outlet_ids[]" value="{{ $outlet->id }}" class="outlet-checkbox rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-amber-500">
+                                <input type="checkbox" name="outlet_ids[]" value="{{ $outlet->id }}" data-nama="{{ $outlet->nama_outlet }}" data-kota="{{ $outlet->city->nama }}" class="outlet-checkbox rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-amber-500">
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-1.5">
@@ -413,6 +424,14 @@
             </div>
             
             <p class="text-xs text-slate-450 leading-relaxed">Pilih atribut yang ingin diubah. Hanya atribut yang dicentang yang akan diperbarui pada seluruh outlet terpilih.</p>
+            
+            <!-- Selected Outlets Checklist -->
+            <div class="space-y-2 pb-1 border-b border-slate-800/50">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Daftar Outlet Terpilih & Kota (Hilangkan centang untuk mengecualikan):</label>
+                <div id="modal-outlets-checklist" class="max-h-36 overflow-y-auto p-3 bg-slate-950/60 border border-slate-850 rounded-xl space-y-2">
+                    <!-- Dynamic Checklist -->
+                </div>
+            </div>
             
             <div class="space-y-4">
                 <!-- Featured / Toko Rekomendasi -->
@@ -633,6 +652,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    if (cityCheckboxesContainer) {
+        cityCheckboxesContainer.addEventListener('change', function(e) {
+            if (e.target && e.target.classList.contains('city-checkbox')) {
+                if (!e.target.checked && checkAllCities) {
+                    checkAllCities.checked = false;
+                }
+            }
+        });
+    }
+
     if (cityLocalSearch) {
         cityLocalSearch.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
@@ -767,13 +796,50 @@ function closeClearModal() {
 }
 
 function openBulkStatusModal() {
-    const ids = getCheckedOutletIds();
-    if (ids.length === 0) {
+    const checkedBoxes = document.querySelectorAll('.outlet-checkbox:checked');
+    if (checkedBoxes.length === 0) {
         alert('Tidak ada outlet yang dipilih.');
         return;
     }
 
-    document.getElementById('modal-selected-count').innerText = ids.length;
+    const container = document.getElementById('modal-outlets-checklist');
+    if (container) {
+        container.innerHTML = '';
+        checkedBoxes.forEach(cb => {
+            const id = cb.value;
+            const nama = cb.getAttribute('data-nama') || 'Outlet';
+            const kota = cb.getAttribute('data-kota') || 'Kota';
+
+            const label = document.createElement('label');
+            label.className = 'flex items-center gap-2 text-xs text-slate-350 cursor-pointer hover:text-white transition-colors py-1';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = id;
+            checkbox.checked = true;
+            checkbox.className = 'modal-outlet-checkbox rounded border-slate-850 bg-slate-950 text-amber-500 focus:ring-0';
+            
+            // Sync unchecked status back to the main table checklist
+            checkbox.addEventListener('change', function() {
+                const mainCheckbox = document.querySelector(`.outlet-checkbox[value="${id}"]`);
+                if (mainCheckbox) {
+                    mainCheckbox.checked = this.checked;
+                    mainCheckbox.dispatchEvent(new Event('change'));
+                }
+                updateModalSelectedCount();
+            });
+
+            const span = document.createElement('span');
+            span.className = 'select-none truncate';
+            span.innerHTML = `<span class="font-semibold text-slate-200">${nama}</span> <span class="text-amber-500 font-medium">(${kota})</span>`;
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            container.appendChild(label);
+        });
+    }
+
+    updateModalSelectedCount();
     
     // Reset checkboxes
     document.getElementById('check-update-featured').checked = false;
@@ -796,6 +862,15 @@ function openBulkStatusModal() {
     const modal = document.getElementById('bulk-status-modal');
     if (modal) {
         modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+}
+
+function updateModalSelectedCount() {
+    const checkedModalBoxes = document.querySelectorAll('.modal-outlet-checkbox:checked');
+    const count = checkedModalBoxes.length;
+    const countSpan = document.getElementById('modal-selected-count');
+    if (countSpan) {
+        countSpan.innerText = count;
     }
 }
 
@@ -824,9 +899,11 @@ function toggleModalField(field) {
 }
 
 function submitBulkUpdateStatus() {
-    const ids = getCheckedOutletIds();
+    const checkedModalBoxes = document.querySelectorAll('.modal-outlet-checkbox:checked');
+    const ids = Array.from(checkedModalBoxes).map(cb => cb.value);
+
     if (ids.length === 0) {
-        alert('Tidak ada outlet yang dipilih.');
+        alert('Tidak ada outlet yang dipilih untuk diperbarui.');
         return;
     }
 
