@@ -41,7 +41,17 @@ class DistributorController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kota_id' => 'required|exists:cities,id',
+            'provinsi_id' => 'required|exists:provinces,id',
+            'kota_id' => [
+                'required',
+                'exists:cities,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    $city = City::find($value);
+                    if ($city && $city->provinsi_id != $request->input('provinsi_id')) {
+                        $fail('Kota yang dipilih tidak berada di dalam Provinsi yang dipilih.');
+                    }
+                }
+            ],
             'nama' => 'required|string|max:255',
             'pic' => 'required|string|max:255',
             'whatsapp' => 'required|string|max:25',
@@ -52,6 +62,7 @@ class DistributorController extends Controller
 
         $validated['tampil_ke_publik'] = $request->has('tampil_ke_publik');
 
+        unset($validated['provinsi_id']);
         Distributor::create($validated);
 
         return redirect()->route('admin.distributors.index')->with('success', 'Distributor berhasil ditambahkan.');
@@ -68,7 +79,17 @@ class DistributorController extends Controller
     public function update(Request $request, Distributor $distributor)
     {
         $validated = $request->validate([
-            'kota_id' => 'required|exists:cities,id',
+            'provinsi_id' => 'required|exists:provinces,id',
+            'kota_id' => [
+                'required',
+                'exists:cities,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    $city = City::find($value);
+                    if ($city && $city->provinsi_id != $request->input('provinsi_id')) {
+                        $fail('Kota yang dipilih tidak berada di dalam Provinsi yang dipilih.');
+                    }
+                }
+            ],
             'nama' => 'required|string|max:255',
             'pic' => 'required|string|max:255',
             'whatsapp' => 'required|string|max:25',
@@ -79,6 +100,7 @@ class DistributorController extends Controller
 
         $validated['tampil_ke_publik'] = $request->has('tampil_ke_publik');
 
+        unset($validated['provinsi_id']);
         $distributor->update($validated);
 
         return redirect()->route('admin.distributors.index')->with('success', 'Distributor berhasil diperbarui.');

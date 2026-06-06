@@ -124,4 +124,53 @@ class AdminOutletTest extends TestCase
         $this->assertEquals(-7.151234, floatval($outlet->latitude));
         $this->assertEquals(111.881234, floatval($outlet->longitude));
     }
+
+    public function test_outlet_store_validation_requires_matching_province_and_city()
+    {
+        $otherProvince = \App\Models\Province::create([
+            'nama' => 'Jawa Barat'
+        ]);
+
+        $otherCity = City::create([
+            'provinsi_id' => $otherProvince->id,
+            'nama' => 'Bandung',
+            'slug' => 'bandung'
+        ]);
+
+        // Submit form with province 'Jawa Timur' (id of $this->city->provinsi_id) but city 'Bandung' ($otherCity->id)
+        $response = $this->actingAs($this->admin)->post('/admin/outlets', [
+            'distributor_id' => $this->distributor->id,
+            'provinsi_id' => $this->city->provinsi_id,
+            'kota_id' => $otherCity->id,
+            'nama_outlet' => 'Mutiara Petshop Store Validation',
+            'nama_pic' => 'Andi',
+            'whatsapp' => '628123456780',
+            'alamat_lengkap' => 'Jl. Pemuda No. 15',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        $response->assertSessionHasErrors(['kota_id']);
+    }
+
+    public function test_outlet_store_validation_passes_when_province_and_city_match()
+    {
+        $response = $this->actingAs($this->admin)->post('/admin/outlets', [
+            'distributor_id' => $this->distributor->id,
+            'provinsi_id' => $this->city->provinsi_id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Mutiara Petshop Store Passes',
+            'nama_pic' => 'Andi',
+            'whatsapp' => '628123456780',
+            'alamat_lengkap' => 'Jl. Pemuda No. 15',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        $response->assertRedirect(route('admin.outlets.index'));
+        $this->assertDatabaseHas('outlets', [
+            'nama_outlet' => 'Mutiara Petshop Store Passes',
+            'kota_id' => $this->city->id
+        ]);
+    }
 }

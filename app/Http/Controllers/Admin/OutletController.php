@@ -100,7 +100,17 @@ class OutletController extends Controller
     {
         $validated = $request->validate([
             'distributor_id' => 'required|exists:distributors,id',
-            'kota_id' => 'required|exists:cities,id',
+            'provinsi_id' => 'required|exists:provinces,id',
+            'kota_id' => [
+                'required',
+                'exists:cities,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    $city = City::find($value);
+                    if ($city && $city->provinsi_id != $request->input('provinsi_id')) {
+                        $fail('Kota yang dipilih tidak berada di dalam Provinsi yang dipilih.');
+                    }
+                }
+            ],
             'nama_outlet' => 'required|string|max:255',
             'nama_pic' => 'required|string|max:255',
             'whatsapp' => 'required|string|max:25',
@@ -121,6 +131,7 @@ class OutletController extends Controller
         $validated['is_mitra'] = $request->has('is_mitra');
         $validated['is_hidden'] = $request->has('is_hidden');
 
+        unset($validated['provinsi_id']);
         $outlet = Outlet::create($validated);
 
         if ($request->filled('shipping_contacts') && $validated['delivery_mode'] === 'RECOMMENDED_SHIPPING_CONTACT') {
@@ -151,7 +162,17 @@ class OutletController extends Controller
     {
         $validated = $request->validate([
             'distributor_id' => 'required|exists:distributors,id',
-            'kota_id' => 'required|exists:cities,id',
+            'provinsi_id' => 'required|exists:provinces,id',
+            'kota_id' => [
+                'required',
+                'exists:cities,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    $city = City::find($value);
+                    if ($city && $city->provinsi_id != $request->input('provinsi_id')) {
+                        $fail('Kota yang dipilih tidak berada di dalam Provinsi yang dipilih.');
+                    }
+                }
+            ],
             'nama_outlet' => 'required|string|max:255',
             'nama_pic' => 'required|string|max:255',
             'whatsapp' => 'required|string|max:25',
@@ -172,6 +193,7 @@ class OutletController extends Controller
         $validated['is_mitra'] = $request->has('is_mitra');
         $validated['is_hidden'] = $request->has('is_hidden');
 
+        unset($validated['provinsi_id']);
         $outlet->update($validated);
 
         if ($request->filled('shipping_contacts') && $validated['delivery_mode'] === 'RECOMMENDED_SHIPPING_CONTACT') {
