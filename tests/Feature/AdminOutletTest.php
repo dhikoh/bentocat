@@ -214,6 +214,8 @@ class AdminOutletTest extends TestCase
         $response->assertRedirect(route('admin.outlets.index'));
         $this->assertTrue($outlet1->fresh()->shippingContacts->contains($shippingContact->id));
         $this->assertTrue($outlet2->fresh()->shippingContacts->contains($shippingContact->id));
+        $this->assertEquals('RECOMMENDED_SHIPPING_CONTACT', $outlet1->fresh()->delivery_mode);
+        $this->assertEquals('RECOMMENDED_SHIPPING_CONTACT', $outlet2->fresh()->delivery_mode);
 
         // Clear all contacts test
         $responseClear = $this->actingAs($this->admin)
@@ -226,6 +228,8 @@ class AdminOutletTest extends TestCase
         $responseClear->assertRedirect(route('admin.outlets.index'));
         $this->assertCount(0, $outlet1->fresh()->shippingContacts);
         $this->assertCount(0, $outlet2->fresh()->shippingContacts);
+        $this->assertEquals('SELF_DELIVERY', $outlet1->fresh()->delivery_mode);
+        $this->assertEquals('SELF_DELIVERY', $outlet2->fresh()->delivery_mode);
     }
 
     public function test_outlet_search_does_not_match_distributor_name()

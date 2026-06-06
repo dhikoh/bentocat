@@ -830,8 +830,10 @@ class OutletController extends Controller
         foreach ($outlets as $outlet) {
             if ($shippingContactId) {
                 $outlet->shippingContacts()->sync([$shippingContactId => ['urutan' => 1]]);
+                $outlet->update(['delivery_mode' => 'RECOMMENDED_SHIPPING_CONTACT']);
             } else {
                 $outlet->shippingContacts()->detach();
+                $outlet->update(['delivery_mode' => 'SELF_DELIVERY']);
             }
         }
 
