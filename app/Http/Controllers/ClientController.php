@@ -77,8 +77,8 @@ class ClientController extends Controller
             'longitude' => 'nullable|numeric',
         ]);
 
-        // 3. Turnstile anti-spam check (if configured in .env and is POST form submission)
-        $turnstileSecret = env('TURNSTILE_SECRET_KEY');
+        // 3. Turnstile anti-spam check (if configured in config and is POST form submission)
+        $turnstileSecret = config('services.cloudflare.turnstile.secret');
         if ($turnstileSecret && $turnstileSecret !== '1x00000000000000000000000000000000' && $request->isMethod('post')) {
             $token = $request->input('cf-turnstile-response');
             if (!$token) {

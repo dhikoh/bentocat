@@ -13,23 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Leaflet Map CSS (For optional outlet location displays) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-
-    <!-- Tailwind CSS v4 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        outfit: ['Outfit', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS v4 Compiled via Vite -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- HSL Ambient Background Effect & Scrollbar Styling -->
     <style>
@@ -57,6 +42,7 @@
         }
     </style>
     @yield('head')
+    @stack('styles')
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-amber-100 selection:text-amber-900">
 
@@ -151,5 +137,6 @@
         });
     </script>
     @yield('scripts')
+    @stack('scripts')
 </body>
 </html>

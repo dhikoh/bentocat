@@ -15,6 +15,10 @@ class AuditController extends Controller
 {
     public function index()
     {
+        if (!auth()->user() || !in_array(auth()->user()->role, ['superadmin', 'editor'])) {
+            abort(403, 'Unauthorized action. Hanya Superadmin dan Editor yang dapat mengakses audit database.');
+        }
+
         // 1. Data Duplication Audit - Petshops
         // Group by WhatsApp
         $petshopDupesByWa = Outlet::select('whatsapp', DB::raw('count(id) as count'))
@@ -147,6 +151,10 @@ class AuditController extends Controller
 
     public function merge(Request $request)
     {
+        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
+            abort(403, 'Unauthorized action. Hanya Superadmin yang dapat melakukan penyatuan data.');
+        }
+
         $request->validate([
             'type' => 'required|in:petshop,distributor,kurir',
             'target_id' => 'required|integer',

@@ -106,6 +106,10 @@ class ArticleController extends Controller
 
     public function destroy(Article $article)
     {
+        if (!auth()->user() || !in_array(auth()->user()->role, ['superadmin', 'editor'])) {
+            abort(403, 'Unauthorized action. Hanya Superadmin dan Editor yang dapat menghapus artikel.');
+        }
+
         $article->delete();
         return redirect()->route('admin.articles.index')->with('success', 'Artikel berhasil dihapus.');
     }
@@ -158,8 +162,8 @@ class ArticleController extends Controller
         $seoTitle = '';
         $seoDesc = '';
 
-        // Call Gemini API if key is present
-        $apiKey = env('GEMINI_API_KEY');
+        // Call Gemini API if key is present in configuration
+        $apiKey = config('services.gemini.key');
         $apiSuccess = false;
 
         if ($apiKey) {

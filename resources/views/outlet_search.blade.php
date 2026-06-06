@@ -2,6 +2,11 @@
 
 @section('title', 'Hasil Pencarian Petshop BentoCat Resmi - Kota ' . $city->nama)
 
+@push('styles')
+<!-- Leaflet Map CSS (For optional outlet location displays) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
 

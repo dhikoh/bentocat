@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'cloudflare' => [
+        'turnstile' => [
+            'secret' => env('TURNSTILE_SECRET_KEY'),
+        ],
+    ],
+
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];
