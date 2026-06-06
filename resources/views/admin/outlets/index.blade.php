@@ -115,7 +115,7 @@
                     <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl text-sm transition-all text-center">
                         Cari
                     </button>
-                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds) || $perPage != 10 || $status !== null || $isHidden !== null || $featured !== null)
+                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds) || $perPage != 10 || $status !== null || $isHidden !== null || $featured !== null || ($distributorId ?? null) !== null || ($sortBy ?? 'nama_outlet') !== 'nama_outlet' || ($sortDir ?? 'asc') !== 'asc')
                         <a href="{{ route('admin.outlets.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 p-2.5 rounded-xl text-sm flex items-center justify-center transition-all" title="Reset Filter">
                             ✕
                         </a>
@@ -151,6 +151,38 @@
                         <option value="">Semua Rekomendasi</option>
                         <option value="1" {{ $featured === '1' ? 'selected' : '' }}>Featured / Toko Rekomendasi</option>
                         <option value="0" {{ $featured === '0' ? 'selected' : '' }}>Toko Biasa</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 3: Distributor & Sorting Filters -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 border-t border-slate-800/40 pt-3">
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Filter Distributor</label>
+                    <select name="distributor_id" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Distributor</option>
+                        @foreach($distributorsList as $dist)
+                            <option value="{{ $dist->id }}" {{ ($distributorId ?? '') == $dist->id ? 'selected' : '' }}>{{ $dist->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Urutkan Berdasarkan</label>
+                    <select name="sort_by" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="nama_outlet" {{ ($sortBy ?? '') === 'nama_outlet' ? 'selected' : '' }}>Nama Outlet</option>
+                        <option value="created_at" {{ ($sortBy ?? '') === 'created_at' ? 'selected' : '' }}>Tanggal Ditambahkan</option>
+                        <option value="is_mitra" {{ ($sortBy ?? '') === 'is_mitra' ? 'selected' : '' }}>Status Kemitraan (Mitra Resmi)</option>
+                        <option value="status" {{ ($sortBy ?? '') === 'status' ? 'selected' : '' }}>Status Operasional</option>
+                        <option value="featured" {{ ($sortBy ?? '') === 'featured' ? 'selected' : '' }}>Toko Rekomendasi (Featured)</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Arah Urutan</label>
+                    <select name="sort_dir" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="asc" {{ ($sortDir ?? '') === 'asc' ? 'selected' : '' }}>Meningkat (Ascending)</option>
+                        <option value="desc" {{ ($sortDir ?? '') === 'desc' ? 'selected' : '' }}>Menurun (Descending)</option>
                     </select>
                 </div>
             </div>

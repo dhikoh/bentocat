@@ -25,6 +25,17 @@ class OutletController extends Controller
         $status = $request->input('status');
         $isHidden = $request->input('is_hidden');
         $featured = $request->input('featured');
+        $distributorId = $request->input('distributor_id');
+        $sortBy = $request->input('sort_by', 'nama_outlet');
+        $sortDir = $request->input('sort_dir', 'asc');
+
+        // Whitelist sorting fields
+        if (!in_array($sortBy, ['nama_outlet', 'created_at', 'is_mitra', 'status', 'featured'])) {
+            $sortBy = 'nama_outlet';
+        }
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'asc';
+        }
 
         $perPage = $request->input('per_page', 10);
         $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
@@ -64,7 +75,10 @@ class OutletController extends Controller
             ->when($featured !== null && $featured !== '', function ($query) use ($featured) {
                 $query->where('featured', $featured);
             })
-            ->orderBy('nama_outlet')
+            ->when($distributorId, function ($query, $distributorId) {
+                $query->where('distributor_id', $distributorId);
+            })
+            ->orderBy($sortBy, $sortDir)
             ->paginate($perPageLimit);
 
         // Fetch counts for summary cards
@@ -80,7 +94,7 @@ class OutletController extends Controller
             'outlets', 'search', 'isMitra', 'provinceId', 'cityIds', 'perPage',
             'countDistributors', 'countMitra', 'countNonMitra',
             'distributorsList', 'provincesList', 'citiesList', 'shippingContactsList',
-            'status', 'isHidden', 'featured'
+            'status', 'isHidden', 'featured', 'distributorId', 'sortBy', 'sortDir'
         ));
     }
 

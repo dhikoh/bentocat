@@ -282,4 +282,91 @@ class AdminOutletTest extends TestCase
         $response2->assertStatus(200);
         $response2->assertSee('Kucing Imut Petshop');
     }
+
+    public function test_outlet_list_can_be_filtered_by_distributor()
+    {
+        // Create another distributor
+        $distributor2 = Distributor::create([
+            'kota_id' => $this->city->id,
+            'nama' => 'Distributor Surabaya',
+            'pic' => 'PIC Sby',
+            'whatsapp' => '628999999999',
+            'alamat' => 'Jl. Surabaya',
+            'tampil_ke_publik' => true,
+            'status' => 'ACTIVE'
+        ]);
+
+        $outlet1 = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Petshop Pertama',
+            'nama_pic' => 'Andi',
+            'whatsapp' => '628123456781',
+            'alamat_lengkap' => 'Jl. Pemuda No. 15',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        $outlet2 = Outlet::create([
+            'distributor_id' => $distributor2->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Petshop Kedua',
+            'nama_pic' => 'Budi',
+            'whatsapp' => '628123456782',
+            'alamat_lengkap' => 'Jl. Merdeka No. 10',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        // Filter by first distributor
+        $response = $this->actingAs($this->admin)->get('/admin/outlets?distributor_id=' . $this->distributor->id);
+        $response->assertStatus(200);
+        $response->assertSee('Petshop Pertama');
+        $response->assertDontSee('Petshop Kedua');
+
+        // Filter by second distributor
+        $response2 = $this->actingAs($this->admin)->get('/admin/outlets?distributor_id=' . $distributor2->id);
+        $response2->assertStatus(200);
+        $response2->assertSee('Petshop Kedua');
+        $response2->assertDontSee('Petshop Pertama');
+    }
+
+    public function test_outlet_list_can_be_sorted()
+    {
+        $outletA = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Alpha Petshop',
+            'nama_pic' => 'PIC A',
+            'whatsapp' => '628123456788',
+            'alamat_lengkap' => 'Jl. Alpha No. 1',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        $outletZ = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Zulu Petshop',
+            'nama_pic' => 'PIC Z',
+            'whatsapp' => '628123456789',
+            'alamat_lengkap' => 'Jl. Zulu No. 9',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        // Sort by nama_outlet asc
+        $responseAsc = $this->actingAs($this->admin)->get('/admin/outlets?sort_by=nama_outlet&sort_dir=asc');
+        $responseAsc->assertStatus(200);
+        // Alpha Petshop should appear before Zulu Petshop in HTML
+        $htmlAsc = $responseAsc->getContent();
+        $this->assertLessThan(strpos($htmlAsc, 'Zulu Petshop'), strpos($htmlAsc, 'Alpha Petshop'));
+
+        // Sort by nama_outlet desc
+        $responseDesc = $this->actingAs($this->admin)->get('/admin/outlets?sort_by=nama_outlet&sort_dir=desc');
+        $responseDesc->assertStatus(200);
+        // Zulu Petshop should appear before Alpha Petshop in HTML
+        $htmlDesc = $responseDesc->getContent();
+        $this->assertLessThan(strpos($htmlDesc, 'Alpha Petshop'), strpos($htmlDesc, 'Zulu Petshop'));
+    }
 }
