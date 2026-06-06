@@ -229,6 +229,18 @@
         </form>
     </div>
 
+    <!-- Selected Cities Tags Container -->
+    <div id="selected-cities-container" class="hidden bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl mb-4">
+        <div class="flex items-center flex-wrap gap-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1.5">
+                <span>📍 Kota Terpilih:</span>
+            </span>
+            <div id="selected-cities-list" class="flex flex-wrap gap-2">
+                <!-- Dynamically populated tags -->
+            </div>
+        </div>
+    </div>
+
     <!-- Grid / Table -->
     <div class="bg-slate-900/20 border border-slate-800/80 rounded-3xl overflow-hidden">
         <div class="overflow-x-auto">
@@ -552,16 +564,68 @@ document.addEventListener('DOMContentLoaded', function() {
     const bulkBar = document.getElementById('bulk-action-bar');
     const selectedCountSpan = document.getElementById('selected-count');
 
+    const selectedCitiesContainer = document.getElementById('selected-cities-container');
+    const selectedCitiesList = document.getElementById('selected-cities-list');
+
     function updateBulkBar() {
         const checkedBoxes = document.querySelectorAll('.outlet-checkbox:checked');
         const count = checkedBoxes.length;
-        selectedCountSpan.textContent = count;
+        if (selectedCountSpan) selectedCountSpan.textContent = count;
 
         if (count > 0) {
-            bulkBar.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            if (bulkBar) bulkBar.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            
+            // Extract unique cities and their checked checkboxes count
+            const citiesMap = {};
+            checkedBoxes.forEach(cb => {
+                const kota = cb.getAttribute('data-kota');
+                if (kota) {
+                    if (!citiesMap[kota]) {
+                        citiesMap[kota] = [];
+                    }
+                    citiesMap[kota].push(cb);
+                }
+            });
+
+            // Populate tags
+            if (selectedCitiesList) {
+                selectedCitiesList.innerHTML = '';
+                Object.keys(citiesMap).forEach(kota => {
+                    const tag = document.createElement('span');
+                    tag.className = 'inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/35 text-amber-400 text-xs px-2.5 py-1 rounded-xl shadow-sm transition-all hover:bg-amber-500/20';
+                    
+                    const spanText = document.createElement('span');
+                    spanText.className = 'font-semibold';
+                    spanText.textContent = `${kota} (${citiesMap[kota].length})`;
+
+                    const closeBtn = document.createElement('button');
+                    closeBtn.type = 'button';
+                    closeBtn.className = 'text-amber-500 hover:text-rose-400 font-extrabold text-sm focus:outline-none transition-colors ml-1';
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.title = `Hapus semua pilihan di kota ${kota}`;
+                    
+                    // Click handler for close button
+                    closeBtn.addEventListener('click', function() {
+                        citiesMap[kota].forEach(cb => {
+                            cb.checked = false;
+                            cb.dispatchEvent(new Event('change'));
+                        });
+                    });
+
+                    tag.appendChild(spanText);
+                    tag.appendChild(closeBtn);
+                    selectedCitiesList.appendChild(tag);
+                });
+            }
+
+            if (selectedCitiesContainer) selectedCitiesContainer.classList.remove('hidden');
         } else {
-            bulkBar.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            if (bulkBar) {
+                bulkBar.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            }
             if (selectAllCheckbox) selectAllCheckbox.checked = false;
+            if (selectedCitiesContainer) selectedCitiesContainer.classList.add('hidden');
+            if (selectedCitiesList) selectedCitiesList.innerHTML = '';
         }
     }
 
