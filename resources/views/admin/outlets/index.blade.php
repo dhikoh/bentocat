@@ -306,6 +306,12 @@
         <div id="reassign-ids-container"></div>
     </form>
 
+    <form id="bulk-reassign-shipping-form" action="{{ route('admin.outlets.batch-reassign-shipping') }}" method="POST" class="hidden">
+        @csrf
+        <input type="hidden" name="shipping_contact_id" id="reassign-shipping-contact-id">
+        <div id="reassign-shipping-ids-container"></div>
+    </form>
+
     <form id="bulk-delete-form" action="{{ route('admin.outlets.batch-delete') }}" method="POST" class="hidden">
         @csrf
         <div id="delete-ids-container"></div>
@@ -317,12 +323,12 @@
     </form>
 
     <!-- Floating Bulk Action Bar -->
-    <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-slate-800 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col md:flex-row items-center gap-4 z-50 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none max-w-4xl w-[90%] md:w-auto">
+    <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-slate-800 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col lg:flex-row items-center gap-4 z-50 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none max-w-5xl w-[95%] lg:w-auto">
         <div class="text-xs font-semibold text-slate-300 whitespace-nowrap">
             <span id="selected-count" class="text-amber-500 font-extrabold text-sm">0</span> outlet dipilih
         </div>
-        <div class="h-6 w-px bg-slate-800 hidden md:block"></div>
-        <div class="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+        <div class="h-6 w-px bg-slate-800 hidden lg:block"></div>
+        <div class="flex flex-col md:flex-row flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:w-auto">
             <!-- Reassign Distributor -->
             <div class="flex items-center gap-2 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/85 w-full md:w-auto">
                 <select id="bulk-distributor-select" class="bg-transparent border-none focus:ring-0 text-xs text-slate-350 py-1 pl-2 pr-8 focus:outline-none">
@@ -333,6 +339,20 @@
                 </select>
                 <button type="button" onclick="submitBulkReassign()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
                     Pindahkan 🚚
+                </button>
+            </div>
+
+            <!-- Reassign Shipping Contact (Ojek Online Lokal) -->
+            <div class="flex items-center gap-2 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/85 w-full md:w-auto">
+                <select id="bulk-shipping-select" class="bg-transparent border-none focus:ring-0 text-xs text-slate-350 py-1 pl-2 pr-8 focus:outline-none">
+                    <option value="" class="bg-slate-900 text-slate-400">Hubungkan ke Ojek Online...</option>
+                    @foreach($shippingContactsList as $contact)
+                        <option value="{{ $contact->id }}" class="bg-slate-900 text-slate-200">{{ $contact->nama }}</option>
+                    @endforeach
+                    <option value="clear" class="bg-slate-900 text-rose-450 font-semibold">❌ Hapus Semua Kontak</option>
+                </select>
+                <button type="button" onclick="submitBulkReassignShipping()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition-all whitespace-nowrap">
+                    Hubungkan 🛵
                 </button>
             </div>
 
@@ -629,6 +649,47 @@ function submitBulkReassign() {
         document.getElementById('reassign-distributor-id').value = distributorId;
         
         const container = document.getElementById('reassign-ids-container');
+        container.innerHTML = '';
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'outlet_ids[]';
+            input.value = id;
+            container.appendChild(input);
+        });
+
+        form.submit();
+    }
+}
+
+function submitBulkReassignShipping() {
+    const ids = getCheckedOutletIds();
+    const shippingSelect = document.getElementById('bulk-shipping-select');
+    const shippingContactId = shippingSelect.value;
+
+    if (!shippingContactId) {
+        alert('Silakan pilih kontak pengiriman terlebih dahulu.');
+        return;
+    }
+
+    if (ids.length === 0) {
+        alert('Tidak ada outlet yang dipilih.');
+        return;
+    }
+
+    let confirmMsg = '';
+    if (shippingContactId === 'clear') {
+        confirmMsg = `Apakah Anda yakin ingin menghapus semua kontak pengiriman dari ${ids.length} outlet terpilih?`;
+    } else {
+        const contactName = shippingSelect.options[shippingSelect.selectedIndex].text;
+        confirmMsg = `Apakah Anda yakin ingin menghubungkan ${ids.length} outlet terpilih ke kontak pengiriman "${contactName}"?`;
+    }
+
+    if (confirm(confirmMsg)) {
+        const form = document.getElementById('bulk-reassign-shipping-form');
+        document.getElementById('reassign-shipping-contact-id').value = (shippingContactId === 'clear') ? '' : shippingContactId;
+        
+        const container = document.getElementById('reassign-shipping-ids-container');
         container.innerHTML = '';
         ids.forEach(id => {
             const input = document.createElement('input');

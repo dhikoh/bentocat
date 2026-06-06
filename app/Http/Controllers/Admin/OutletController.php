@@ -34,12 +34,8 @@ class OutletController extends Controller
                 $lowered = '%' . strtolower($search) . '%';
                 $query->where(function($q) use ($lowered) {
                     $q->whereRaw('LOWER(nama_outlet) LIKE ?', [$lowered])
-                      ->orWhereRaw('LOWER(nama_pic) LIKE ?', [$lowered])
                       ->orWhereHas('city', function ($c) use ($lowered) {
                           $c->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
-                      })
-                      ->orWhereHas('distributor', function ($d) use ($lowered) {
-                          $d->whereRaw('LOWER(nama) LIKE ?', [$lowered]);
                       });
                 });
             })
@@ -77,11 +73,12 @@ class OutletController extends Controller
         $distributorsList = Distributor::orderBy('nama')->get();
         $provincesList = Province::orderBy('nama')->get();
         $citiesList = $provinceId ? City::where('provinsi_id', $provinceId)->orderBy('nama')->get() : [];
+        $shippingContactsList = ShippingContact::orderBy('nama')->get();
 
         return view('admin.outlets.index', compact(
             'outlets', 'search', 'isMitra', 'provinceId', 'cityIds', 'perPage',
             'countDistributors', 'countMitra', 'countNonMitra',
-            'distributorsList', 'provincesList', 'citiesList',
+            'distributorsList', 'provincesList', 'citiesList', 'shippingContactsList',
             'status', 'isHidden', 'featured'
         ));
     }
@@ -792,6 +789,39 @@ class OutletController extends Controller
         $distributor = Distributor::find($distributorId);
 
         return redirect()->route('admin.outlets.index')->with('success', "Berhasil memindahkan {$count} outlet ke distributor: {$distributor->nama}.");
+    }
+
+    public function batchReassignShipping(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['superadmin', 'editor'])) {
+            return back()->with('error', 'Anda tidak memiliki wewenang untuk mengubah kontak pengiriman outlet.');
+        }
+
+        $validated = $request->validate([
+            'outlet_ids' => 'required|array',
+            'outlet_ids.*' => 'exists:outlets,id',
+            'shipping_contact_id' => 'nullable|exists:shipping_contacts,id',
+        ]);
+
+        $ids = $validated['outlet_ids'];
+        $shippingContactId = $validated['shipping_contact_id'];
+
+        $outlets = Outlet::whereIn('id', $ids)->get();
+        foreach ($outlets as $outlet) {
+            if ($shippingContactId) {
+                $outlet->shippingContacts()->sync([$shippingContactId => ['urutan' => 1]]);
+            } else {
+                $outlet->shippingContacts()->detach();
+            }
+        }
+
+        if ($shippingContactId) {
+            $contact = ShippingContact::find($shippingContactId);
+            return redirect()->route('admin.outlets.index')->with('success', "Berhasil menghubungkan " . count($ids) . " outlet ke kontak pengiriman: {$contact->nama}.");
+        }
+
+        return redirect()->route('admin.outlets.index')->with('success', "Berhasil menghapus kontak pengiriman dari " . count($ids) . " outlet.");
     }
 
     public function clearOutlets(Request $request)

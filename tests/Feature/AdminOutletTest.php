@@ -173,4 +173,81 @@ class AdminOutletTest extends TestCase
             'kota_id' => $this->city->id
         ]);
     }
+
+    public function test_outlet_batch_reassign_shipping_contact()
+    {
+        $outlet1 = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Petshop A',
+            'nama_pic' => 'Andi',
+            'whatsapp' => '628123456780',
+            'alamat_lengkap' => 'Jl. Pemuda No. 15',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        $outlet2 = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Petshop B',
+            'nama_pic' => 'Budi',
+            'whatsapp' => '628123456781',
+            'alamat_lengkap' => 'Jl. Pemuda No. 16',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        $shippingContact = \App\Models\ShippingContact::create([
+            'nama' => 'Ojek Online Surabaya',
+            'whatsapp' => '628123456700',
+            'tampil_ke_publik' => true
+        ]);
+
+        $response = $this->actingAs($this->admin)->post('/admin/outlets/batch-reassign-shipping', [
+            'outlet_ids' => [$outlet1->id, $outlet2->id],
+            'shipping_contact_id' => $shippingContact->id
+        ]);
+
+        $response->assertRedirect(route('admin.outlets.index'));
+        $this->assertTrue($outlet1->fresh()->shippingContacts->contains($shippingContact->id));
+        $this->assertTrue($outlet2->fresh()->shippingContacts->contains($shippingContact->id));
+
+        // Clear all contacts test
+        $responseClear = $this->actingAs($this->admin)->post('/admin/outlets/batch-reassign-shipping', [
+            'outlet_ids' => [$outlet1->id, $outlet2->id],
+            'shipping_contact_id' => null
+        ]);
+
+        $responseClear->assertRedirect(route('admin.outlets.index'));
+        $this->assertCount(0, $outlet1->fresh()->shippingContacts);
+        $this->assertCount(0, $outlet2->fresh()->shippingContacts);
+    }
+
+    public function test_outlet_search_does_not_match_distributor_name()
+    {
+        // $this->distributor->nama is 'Distributor Bojonegoro' which contains 'ibu'
+        $outlet = Outlet::create([
+            'distributor_id' => $this->distributor->id,
+            'kota_id' => $this->city->id,
+            'nama_outlet' => 'Mutiara Petshop Unique Search',
+            'nama_pic' => 'Andi',
+            'whatsapp' => '628123456780',
+            'alamat_lengkap' => 'Jl. Pemuda No. 15',
+            'status' => 'AKTIF',
+            'delivery_mode' => 'SELF_DELIVERY'
+        ]);
+
+        // Search for 'ibu'. Since the distributor name has 'Distributor' (containing 'ibu'),
+        // if search matches distributor, it would find it. If it doesn't, it won't find it.
+        $response = $this->actingAs($this->admin)->get('/admin/outlets?search=ibu');
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Mutiara Petshop Unique Search');
+
+        // Search for 'Mutiara' which is in the outlet name. It should see it.
+        $response2 = $this->actingAs($this->admin)->get('/admin/outlets?search=Mutiara');
+        $response2->assertStatus(200);
+        $response2->assertSee('Mutiara Petshop Unique Search');
+    }
 }
