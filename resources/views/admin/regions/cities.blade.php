@@ -42,6 +42,7 @@
                     <tr>
                         <th class="px-6 py-4">Nama Kota</th>
                         <th class="px-6 py-4">Slug SEO</th>
+                        <th class="px-6 py-4 text-center">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -50,9 +51,16 @@
                         <tr class="hover:bg-slate-900/20">
                             <td class="px-6 py-4 font-semibold text-white">{{ $city->nama }}</td>
                             <td class="px-6 py-4 text-slate-400 font-mono text-xs">/kota/{{ $city->slug }}</td>
+                            <td class="px-6 py-4 text-center">
+                                @if($city->is_hidden)
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 border border-rose-500/20 text-rose-400 uppercase">Hidden</span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase">Active</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <button onclick="editCity({{ $city->id }}, '{{ $city->nama }}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                                    <button onclick="editCity({{ $city->id }}, '{{ $city->nama }}', {{ $city->is_hidden ? 'true' : 'false' }})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </button>
                                     @if(Auth::user() && Auth::user()->role === 'superadmin')
@@ -69,7 +77,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan kota di provinsi ini.</td>
+                            <td colspan="4" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan kota di provinsi ini.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -95,6 +103,12 @@
                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nama Kota</label>
                 <input type="text" name="nama" required class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all" placeholder="Contoh: Surabaya">
             </div>
+            <div>
+                <label class="flex items-center gap-2 text-sm text-slate-350 select-none cursor-pointer">
+                    <input type="checkbox" name="is_hidden" value="1" class="rounded border-slate-800 bg-slate-950 text-amber-500 focus:ring-0">
+                    Sembunyikan Kota ini dari pencarian
+                </label>
+            </div>
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="toggleModal('add-city-modal')" class="bg-slate-850 hover:bg-slate-800 text-slate-400 px-4 py-2 rounded-xl text-sm font-semibold transition-all">
                     Batal
@@ -117,6 +131,12 @@
             <div>
                 <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nama Kota</label>
                 <input type="text" name="nama" id="edit-city-nama" required class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none transition-all">
+            </div>
+            <div>
+                <label class="flex items-center gap-2 text-sm text-slate-350 select-none cursor-pointer">
+                    <input type="checkbox" name="is_hidden" id="edit-city-hidden" value="1" class="rounded border-slate-800 bg-slate-950 text-amber-500 focus:ring-0">
+                    Sembunyikan Kota ini dari pencarian
+                </label>
             </div>
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="toggleModal('edit-city-modal')" class="bg-slate-850 hover:bg-slate-800 text-slate-400 px-4 py-2 rounded-xl text-sm font-semibold transition-all">
@@ -144,8 +164,9 @@
         }
     }
 
-    function editCity(id, name) {
+    function editCity(id, name, isHidden) {
         document.getElementById('edit-city-nama').value = name;
+        document.getElementById('edit-city-hidden').checked = isHidden;
         document.getElementById('edit-city-form').action = `/admin/regions/city/${id}`;
         toggleModal('edit-city-modal');
     }

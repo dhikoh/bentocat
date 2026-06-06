@@ -11,7 +11,11 @@ class City extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['provinsi_id', 'nama', 'slug'];
+    protected $fillable = ['provinsi_id', 'nama', 'slug', 'is_hidden'];
+
+    protected $casts = [
+        'is_hidden' => 'boolean',
+    ];
 
     public function province(): BelongsTo
     {

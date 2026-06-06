@@ -22,7 +22,7 @@ class ClientController extends Controller
     public function index()
     {
         $products = Product::where('status', 'ACTIVE')->with('variants')->get();
-        $provinces = Province::orderBy('nama')->get();
+        $provinces = Province::where('is_hidden', false)->orderBy('nama')->get();
         $articles = Article::where('status', 'PUBLISHED')
             ->orderBy('published_at', 'desc')
             ->take(3)
@@ -34,7 +34,7 @@ class ClientController extends Controller
     // Get cities under a province for AJAX select
     public function getCities($province_id)
     {
-        $cities = City::where('provinsi_id', $province_id)->orderBy('nama')->get();
+        $cities = City::where('provinsi_id', $province_id)->where('is_hidden', false)->orderBy('nama')->get();
         return response()->json($cities);
     }
 
@@ -43,6 +43,13 @@ class ClientController extends Controller
     {
         $outlets = Outlet::where('kota_id', $city_id)
             ->where('status', 'AKTIF')
+            ->where('is_hidden', false)
+            ->whereHas('city', function($q) {
+                $q->where('is_hidden', false)
+                  ->whereHas('province', function($qp) {
+                      $qp->where('is_hidden', false);
+                  });
+            })
             ->orderBy('featured', 'desc')
             ->get(['id', 'nama_outlet', 'alamat_lengkap', 'featured', 'is_mitra']);
             
@@ -119,6 +126,13 @@ class ClientController extends Controller
         // 6. Fetch active outlets in the chosen city
         $outletsQuery = Outlet::where('kota_id', $request->kota_id)
             ->where('status', 'AKTIF')
+            ->where('is_hidden', false)
+            ->whereHas('city', function($q) {
+                $q->where('is_hidden', false)
+                  ->whereHas('province', function($qp) {
+                      $qp->where('is_hidden', false);
+                  });
+            })
             ->with(['shippingContacts' => function($q) {
                 $q->orderBy('pivot_urutan', 'asc');
             }]);
@@ -272,11 +286,12 @@ class ClientController extends Controller
     // Dynamic SEO City routing (/kota/{slug})
     public function cityLanding($slug)
     {
-        $city = City::where('slug', $slug)->firstOrFail();
-        $province = Province::find($city->provinsi_id);
+        $city = City::where('slug', $slug)->where('is_hidden', false)->firstOrFail();
+        $province = Province::where('id', $city->provinsi_id)->where('is_hidden', false)->firstOrFail();
 
         $outlets = Outlet::where('kota_id', $city->id)
             ->where('status', 'AKTIF')
+            ->where('is_hidden', false)
             ->orderBy('featured', 'desc')
             ->get();
 
@@ -290,7 +305,7 @@ class ClientController extends Controller
         }
 
         $products = Product::where('status', 'ACTIVE')->get();
-        $provinces = Province::orderBy('nama')->get();
+        $provinces = Province::where('is_hidden', false)->orderBy('nama')->get();
 
         return view('city_routing', compact('city', 'province', 'outlets', 'distributor', 'products', 'provinces'));
     }

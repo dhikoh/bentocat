@@ -217,15 +217,21 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
-                                @if($outlet->status === 'AKTIF')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase">Aktif</span>
-                                @elseif($outlet->status === 'STOK_KOSONG')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-400 uppercase">Stok Habis</span>
-                                @elseif($outlet->status === 'TUTUP')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 border border-slate-700 text-slate-500 uppercase">Tutup</span>
-                                @else
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 border border-rose-500/20 text-rose-400 uppercase">Nonaktif</span>
-                                @endif
+                                <div class="flex flex-col items-center gap-1 justify-center">
+                                    @if($outlet->status === 'AKTIF')
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase">Aktif</span>
+                                    @elseif($outlet->status === 'STOK_KOSONG')
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-400 uppercase">Stok Habis</span>
+                                    @elseif($outlet->status === 'TUTUP')
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 border border-slate-700 text-slate-500 uppercase">Tutup</span>
+                                    @else
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 border border-rose-500/20 text-rose-400 uppercase">Nonaktif</span>
+                                    @endif
+
+                                    @if($outlet->is_hidden)
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 border border-rose-500/20 text-rose-400 uppercase" title="Sembunyi dari hasil pencarian">Sembunyi</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">

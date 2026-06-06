@@ -98,10 +98,12 @@ class OutletController extends Controller
             'delivery_mode' => 'required|in:SELF_DELIVERY,RECOMMENDED_SHIPPING_CONTACT,PICKUP_ONLY',
             'shipping_contacts' => 'nullable|array',
             'shipping_contacts.*' => 'exists:shipping_contacts,id',
+            'is_hidden' => 'boolean',
         ]);
 
         $validated['featured'] = $request->has('featured');
         $validated['is_mitra'] = $request->has('is_mitra');
+        $validated['is_hidden'] = $request->has('is_hidden');
 
         $outlet = Outlet::create($validated);
 
@@ -145,10 +147,12 @@ class OutletController extends Controller
             'delivery_mode' => 'required|in:SELF_DELIVERY,RECOMMENDED_SHIPPING_CONTACT,PICKUP_ONLY',
             'shipping_contacts' => 'nullable|array',
             'shipping_contacts.*' => 'exists:shipping_contacts,id',
+            'is_hidden' => 'boolean',
         ]);
 
         $validated['featured'] = $request->has('featured');
         $validated['is_mitra'] = $request->has('is_mitra');
+        $validated['is_hidden'] = $request->has('is_hidden');
 
         $outlet->update($validated);
 

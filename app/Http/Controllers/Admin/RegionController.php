@@ -29,7 +29,10 @@ class RegionController extends Controller
             'nama' => 'required|string|max:255|unique:provinces,nama',
         ]);
 
-        Province::create($validated);
+        Province::create([
+            'nama' => $validated['nama'],
+            'is_hidden' => $request->has('is_hidden'),
+        ]);
 
         return redirect()->route('admin.regions.index')->with('success', 'Provinsi berhasil ditambahkan.');
     }
@@ -40,7 +43,10 @@ class RegionController extends Controller
             'nama' => 'required|string|max:255|unique:provinces,nama,' . $province->id,
         ]);
 
-        $province->update($validated);
+        $province->update([
+            'nama' => $validated['nama'],
+            'is_hidden' => $request->has('is_hidden'),
+        ]);
 
         return redirect()->route('admin.regions.index')->with('success', 'Provinsi berhasil diubah.');
     }
@@ -89,6 +95,7 @@ class RegionController extends Controller
         $province->cities()->create([
             'nama' => $validated['nama'],
             'slug' => $slug,
+            'is_hidden' => $request->has('is_hidden'),
         ]);
 
         return redirect()->route('admin.regions.cities', $province->id)->with('success', 'Kota berhasil ditambahkan.');
@@ -103,12 +110,13 @@ class RegionController extends Controller
         $slug = Str::slug($validated['nama']);
         $count = City::where('slug', 'like', $slug . '%')->where('id', '!=', $city->id)->count();
         if ($count > 0) {
-            $slug = $slug . '-' . ($count + 1);
+            $slug = $count > 0 ? $slug . '-' . ($count + 1) : $slug;
         }
 
         $city->update([
             'nama' => $validated['nama'],
             'slug' => $slug,
+            'is_hidden' => $request->has('is_hidden'),
         ]);
 
         return redirect()->route('admin.regions.cities', $city->provinsi_id)->with('success', 'Kota berhasil diubah.');

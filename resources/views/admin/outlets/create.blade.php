@@ -143,6 +143,11 @@
                     </label>
 
                     <label class="flex items-center gap-2 text-sm text-slate-300 select-none cursor-pointer">
+                        <input type="checkbox" name="is_hidden" value="1" class="rounded border-slate-850 text-amber-500 bg-slate-950">
+                        Sembunyikan dari Pencarian
+                    </label>
+
+                    <label class="flex items-center gap-2 text-sm text-slate-300 select-none cursor-pointer">
                         <span class="text-xs font-bold text-slate-400 uppercase mr-1">Status:</span>
                         <select name="status" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200">
                             <option value="AKTIF" selected>AKTIF</option>
