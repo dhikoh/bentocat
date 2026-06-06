@@ -81,15 +81,6 @@
                     <input type="text" name="search" value="{{ $search }}" placeholder="Nama outlet, PIC, kota, distributor..." class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-200 placeholder:text-slate-605 focus:outline-none transition-all">
                 </div>
                 
-                <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hubungan</label>
-                    <select name="is_mitra" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
-                        <option value="">Semua Hubungan</option>
-                        <option value="1" {{ $isMitra === '1' ? 'selected' : '' }}>Mitra Resmi BentoCat</option>
-                        <option value="0" {{ $isMitra === '0' ? 'selected' : '' }}>Toko Terdaftar (Non-Mitra)</option>
-                    </select>
-                </div>
-
                 <div class="md:col-span-3">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Provinsi</label>
                     <select name="provinsi_id" id="filter-province" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
@@ -97,6 +88,15 @@
                         @foreach($provincesList as $prov)
                             <option value="{{ $prov->id }}" {{ $provinceId == $prov->id ? 'selected' : '' }}>{{ $prov->nama }}</option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hubungan</label>
+                    <select name="is_mitra" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Hubungan</option>
+                        <option value="1" {{ $isMitra === '1' ? 'selected' : '' }}>Mitra Resmi BentoCat</option>
+                        <option value="0" {{ $isMitra === '0' ? 'selected' : '' }}>Toko Terdaftar (Non-Mitra)</option>
                     </select>
                 </div>
 
@@ -115,11 +115,43 @@
                     <button type="submit" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl text-sm transition-all text-center">
                         Cari
                     </button>
-                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds) || $perPage != 10)
+                    @if($search || $isMitra !== null || $provinceId || !empty($cityIds) || $perPage != 10 || $status !== null || $isHidden !== null || $featured !== null)
                         <a href="{{ route('admin.outlets.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 p-2.5 rounded-xl text-sm flex items-center justify-center transition-all" title="Reset Filter">
                             ✕
                         </a>
                     @endif
+                </div>
+            </div>
+
+            <!-- Row 2: Status, Visibilitas, & Rekomendasi Filters -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 border-t border-slate-800/40 pt-3">
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status Operasional</label>
+                    <select name="status" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Status</option>
+                        <option value="AKTIF" {{ $status === 'AKTIF' ? 'selected' : '' }}>AKTIF</option>
+                        <option value="STOK_KOSONG" {{ $status === 'STOK_KOSONG' ? 'selected' : '' }}>STOK HABIS</option>
+                        <option value="TUTUP" {{ $status === 'TUTUP' ? 'selected' : '' }}>TUTUP</option>
+                        <option value="NONAKTIF" {{ $status === 'NONAKTIF' ? 'selected' : '' }}>NONAKTIF</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status Tampilan (Visibilitas)</label>
+                    <select name="is_hidden" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Tampilan</option>
+                        <option value="0" {{ $isHidden === '0' ? 'selected' : '' }}>Ditampilkan di Pencarian</option>
+                        <option value="1" {{ $isHidden === '1' ? 'selected' : '' }}>Disembunyikan dari Pencarian</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-4">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Toko Rekomendasi (Featured)</label>
+                    <select name="featured" onchange="this.form.submit()" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-sm text-slate-300 focus:outline-none transition-all">
+                        <option value="">Semua Rekomendasi</option>
+                        <option value="1" {{ $featured === '1' ? 'selected' : '' }}>Featured / Toko Rekomendasi</option>
+                        <option value="0" {{ $featured === '0' ? 'selected' : '' }}>Toko Biasa</option>
+                    </select>
                 </div>
             </div>
 

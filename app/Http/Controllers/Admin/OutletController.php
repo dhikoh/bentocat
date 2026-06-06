@@ -23,6 +23,10 @@ class OutletController extends Controller
             $cityIds = $cityIds ? [$cityIds] : [];
         }
         
+        $status = $request->input('status');
+        $isHidden = $request->input('is_hidden');
+        $featured = $request->input('featured');
+
         $perPage = $request->input('per_page', 10);
         $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
         
@@ -54,6 +58,15 @@ class OutletController extends Controller
             ->when(!$provinceId && !empty($cityIds), function ($query) use ($cityIds) {
                 $query->whereIn('kota_id', $cityIds);
             })
+            ->when($status !== null && $status !== '', function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when($isHidden !== null && $isHidden !== '', function ($query) use ($isHidden) {
+                $query->where('is_hidden', $isHidden);
+            })
+            ->when($featured !== null && $featured !== '', function ($query) use ($featured) {
+                $query->where('featured', $featured);
+            })
             ->orderBy('nama_outlet')
             ->paginate($perPageLimit);
 
@@ -68,7 +81,8 @@ class OutletController extends Controller
         return view('admin.outlets.index', compact(
             'outlets', 'search', 'isMitra', 'provinceId', 'cityIds', 'perPage',
             'countDistributors', 'countMitra', 'countNonMitra',
-            'distributorsList', 'provincesList', 'citiesList'
+            'distributorsList', 'provincesList', 'citiesList',
+            'status', 'isHidden', 'featured'
         ));
     }
 
@@ -204,7 +218,10 @@ class OutletController extends Controller
                 'Mitra',
                 'Kota',
                 'Distributor',
-                'Kurir'
+                'Kurir',
+                'Featured',
+                'Sembunyikan',
+                'Status'
             ]);
 
             foreach ($outlets as $outlet) {
@@ -220,7 +237,10 @@ class OutletController extends Controller
                     $outlet->is_mitra ? 'Ya' : 'Tidak',
                     $outlet->city->nama,
                     $outlet->distributor->nama,
-                    $couriers
+                    $couriers,
+                    $outlet->featured ? 'Ya' : 'Tidak',
+                    $outlet->is_hidden ? 'Ya' : 'Tidak',
+                    $outlet->status
                 ]);
             }
 
@@ -278,7 +298,10 @@ class OutletController extends Controller
             'latitude' => ['latitude', 'lat'],
             'longitude' => ['longitude', 'lng', 'long'],
             'distributor' => ['distributor', 'nama distributor', 'distributor_id'],
-            'kurir' => ['kurir', 'courier', 'shipping_contact']
+            'kurir' => ['kurir', 'courier', 'shipping_contact'],
+            'featured' => ['featured', 'rekomendasi', 'toko rekomendasi'],
+            'is_hidden' => ['sembunyikan', 'is hidden', 'is_hidden', 'hidden'],
+            'status' => ['status', 'status operasional', 'operational status']
         ];
 
         foreach ($headerKeywords as $key => $keywords) {
@@ -443,6 +466,10 @@ class OutletController extends Controller
                 $latitude = $colMap['latitude'] !== -1 && trim($row[$colMap['latitude']] ?? '') !== '' ? floatval($row[$colMap['latitude']]) : null;
                 $longitude = $colMap['longitude'] !== -1 && trim($row[$colMap['longitude']] ?? '') !== '' ? floatval($row[$colMap['longitude']]) : null;
 
+                $featuredRaw = $colMap['featured'] !== -1 ? strtolower(trim($row[$colMap['featured']] ?? '')) : null;
+                $isHiddenRaw = $colMap['is_hidden'] !== -1 ? strtolower(trim($row[$colMap['is_hidden']] ?? '')) : null;
+                $statusRaw = $colMap['status'] !== -1 ? strtoupper(trim($row[$colMap['status']] ?? '')) : null;
+
                 if (empty($namaOutlet) || empty($whatsapp)) {
                     $failed[] = "Baris {$rowNum}: Nama Petshop dan No WA wajib diisi.";
                     continue;
@@ -457,6 +484,32 @@ class OutletController extends Controller
 
                 // Determine is_mitra
                 $isMitra = in_array($mitraRaw, ['ya', 'yes', 'mitra', '1', 'true', 'aktif']);
+
+                // Parse featured
+                $isFeatured = null;
+                if ($featuredRaw !== null && $featuredRaw !== '') {
+                    $isFeatured = in_array($featuredRaw, ['ya', 'yes', '1', 'true', 'aktif']);
+                }
+
+                // Parse is_hidden
+                $isHidden = null;
+                if ($isHiddenRaw !== null && $isHiddenRaw !== '') {
+                    $isHidden = in_array($isHiddenRaw, ['ya', 'yes', '1', 'true', 'sembunyikan', 'hidden']);
+                }
+
+                // Parse status
+                $status = null;
+                if ($statusRaw !== null && $statusRaw !== '') {
+                    if (in_array($statusRaw, ['AKTIF', 'ACTIVE', 'ON'])) {
+                        $status = 'AKTIF';
+                    } elseif (in_array($statusRaw, ['STOK HABIS', 'STOK HABIS / KOSONG', 'STOK_KOSONG', 'EMPTY', 'OUT OF STOCK'])) {
+                        $status = 'STOK_KOSONG';
+                    } elseif (in_array($statusRaw, ['TUTUP', 'CLOSED'])) {
+                        $status = 'TUTUP';
+                    } elseif (in_array($statusRaw, ['NONAKTIF', 'INACTIVE', 'OFF', 'SEMBUNYI'])) {
+                        $status = 'NONAKTIF';
+                    }
+                }
 
                 // Find or create city dynamically in-memory
                 $city = null;
@@ -529,7 +582,7 @@ class OutletController extends Controller
 
                 $outlet = null;
                 if ($existing) {
-                    $existing->fill([
+                    $fillData = [
                         'distributor_id' => $distributor->id,
                         'nama_outlet' => $namaOutlet,
                         'alamat_lengkap' => $alamat,
@@ -537,8 +590,18 @@ class OutletController extends Controller
                         'google_maps_url' => $googleMapsUrl ?: $existing->google_maps_url,
                         'latitude' => $latitude ?: $existing->latitude,
                         'longitude' => $longitude ?: $existing->longitude,
-                        'status' => 'AKTIF'
-                    ]);
+                    ];
+                    if ($status !== null) {
+                        $fillData['status'] = $status;
+                    }
+                    if ($isFeatured !== null) {
+                        $fillData['featured'] = $isFeatured;
+                    }
+                    if ($isHidden !== null) {
+                        $fillData['is_hidden'] = $isHidden;
+                    }
+
+                    $existing->fill($fillData);
                     if ($existing->isDirty()) {
                         // Use saveQuietly() to bypass geocoding observer that triggers Nominatim HTTP requests & sleep
                         $existing->saveQuietly();
@@ -557,7 +620,9 @@ class OutletController extends Controller
                         'google_maps_url' => $googleMapsUrl,
                         'latitude' => $latitude,
                         'longitude' => $longitude,
-                        'status' => 'AKTIF',
+                        'status' => $status ?? 'AKTIF',
+                        'featured' => $isFeatured ?? false,
+                        'is_hidden' => $isHidden ?? false,
                         'delivery_mode' => 'SELF_DELIVERY'
                     ]);
                     // Use saveQuietly() to bypass geocoding observer that triggers Nominatim HTTP requests & sleep
