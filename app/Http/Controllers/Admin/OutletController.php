@@ -743,6 +743,12 @@ class OutletController extends Controller
             return back()->with('error', 'Hanya Superadmin yang diperbolehkan menghapus outlet.');
         }
 
+        if (is_string($request->input('outlet_ids'))) {
+            $request->merge([
+                'outlet_ids' => explode(',', $request->input('outlet_ids'))
+            ]);
+        }
+
         $ids = $request->input('outlet_ids', []);
         if (empty($ids)) {
             return back()->with('error', 'Tidak ada outlet yang dipilih.');
@@ -776,6 +782,12 @@ class OutletController extends Controller
             return back()->with('error', 'Anda tidak memiliki wewenang untuk memindahkan distributor outlet.');
         }
 
+        if (is_string($request->input('outlet_ids'))) {
+            $request->merge([
+                'outlet_ids' => explode(',', $request->input('outlet_ids'))
+            ]);
+        }
+
         $validated = $request->validate([
             'outlet_ids' => 'required|array',
             'outlet_ids.*' => 'exists:outlets,id',
@@ -797,6 +809,12 @@ class OutletController extends Controller
         $user = auth()->user();
         if (!$user || !in_array($user->role, ['superadmin', 'editor'])) {
             return back()->with('error', 'Anda tidak memiliki wewenang untuk mengubah kontak pengiriman outlet.');
+        }
+
+        if (is_string($request->input('outlet_ids'))) {
+            $request->merge([
+                'outlet_ids' => explode(',', $request->input('outlet_ids'))
+            ]);
         }
 
         $validated = $request->validate([
@@ -869,6 +887,12 @@ class OutletController extends Controller
         $user = auth()->user();
         if (!$user || !in_array($user->role, ['superadmin', 'editor'])) {
             return back()->with('error', 'Anda tidak memiliki wewenang untuk mengubah status outlet secara massal.');
+        }
+
+        if (is_string($request->input('outlet_ids'))) {
+            $request->merge([
+                'outlet_ids' => explode(',', $request->input('outlet_ids'))
+            ]);
         }
 
         $validated = $request->validate([

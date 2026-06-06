@@ -650,13 +650,11 @@ function submitBulkReassign() {
         
         const container = document.getElementById('reassign-ids-container');
         container.innerHTML = '';
-        ids.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'outlet_ids[]';
-            input.value = id;
-            container.appendChild(input);
-        });
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'outlet_ids';
+        input.value = ids.join(',');
+        container.appendChild(input);
 
         form.submit();
     }
@@ -691,13 +689,11 @@ function submitBulkReassignShipping() {
         
         const container = document.getElementById('reassign-shipping-ids-container');
         container.innerHTML = '';
-        ids.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'outlet_ids[]';
-            input.value = id;
-            container.appendChild(input);
-        });
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'outlet_ids';
+        input.value = ids.join(',');
+        container.appendChild(input);
 
         form.submit();
     }
@@ -714,13 +710,11 @@ function submitBulkDelete() {
         const form = document.getElementById('bulk-delete-form');
         const container = document.getElementById('delete-ids-container');
         container.innerHTML = '';
-        ids.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'outlet_ids[]';
-            input.value = id;
-            container.appendChild(input);
-        });
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'outlet_ids';
+        input.value = ids.join(',');
+        container.appendChild(input);
 
         form.submit();
     }
@@ -780,6 +774,11 @@ function toggleModalField(field) {
     if (container) {
         if (isChecked) {
             container.classList.remove('hidden');
+            // Auto-check value if it's a checkbox
+            const innerInput = document.getElementById(`input-${field}`);
+            if (innerInput && innerInput.type === 'checkbox') {
+                innerInput.checked = true;
+            }
         } else {
             container.classList.add('hidden');
         }
@@ -810,13 +809,11 @@ function submitBulkUpdateStatus() {
         container.innerHTML = '';
         
         // Append outlet IDs
-        ids.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'outlet_ids[]';
-            input.value = id;
-            container.appendChild(input);
-        });
+        const inputIds = document.createElement('input');
+        inputIds.type = 'hidden';
+        inputIds.name = 'outlet_ids';
+        inputIds.value = ids.join(',');
+        container.appendChild(inputIds);
 
         // Append selective update fields
         if (checkFeatured) {
