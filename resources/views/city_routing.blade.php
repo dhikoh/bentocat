@@ -50,10 +50,6 @@
                                         ✓ Mitra Aktif
                                     </span>
                                 @endif
-                            @else
-                                <span class="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                                    Mitra Non-Aktif
-                                </span>
                             @endif
                         </div>
 
@@ -74,12 +70,14 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10c0 .6.4 1 1 1h1m-6 0a2 2 0 002 2h10a2 2 0 002-2m-1-1h1a1 1 0 001-1v-4a1 1 0 00-.29-.707l-2-2A1 1 0 0016 7h-3" />
                                 </svg>
                                 <span>Mode Kirim: 
-                                    @if(!$outlet->is_mitra)
+                                    @if($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT')
+                                        <span class="text-indigo-700 font-bold">Kurir Eksternal 🛵</span>
+                                    @elseif($outlet->delivery_mode === 'BOTH')
+                                        <span class="text-slate-700 font-bold">Semua Mode</span>
+                                    @elseif(!$outlet->is_mitra)
                                         <span class="text-slate-500 font-bold">Belum Menyediakan BentoCat</span>
                                     @elseif($outlet->delivery_mode === 'SELF_DELIVERY')
                                         <span class="text-amber-700 font-bold">Pengantaran Toko 🚚</span>
-                                    @elseif($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT')
-                                        <span class="text-indigo-700 font-bold">Kurir Eksternal 🛵</span>
                                     @elseif($outlet->delivery_mode === 'PICKUP_ONLY')
                                         <span class="text-emerald-700 font-bold">Ambil Sendiri 🏪</span>
                                     @else

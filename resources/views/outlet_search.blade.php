@@ -36,10 +36,6 @@
                             ★ Rekomendasi Utama
                         </span>
                     @endif
-                @else
-                    <span class="absolute top-6 right-6 bg-slate-100 border border-slate-200 text-slate-550 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                        ⚠️ Mitra Non-Aktif / Belum Menyediakan Produk
-                    </span>
                 @endif
 
                 <div class="space-y-3">
@@ -54,14 +50,20 @@
                     <p class="text-xs text-slate-550 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
                 </div>
 
-                @if($outlet->is_mitra)
+                @if($outlet->is_mitra || $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH')
                     <!-- Delivery modes grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div class="flex items-center gap-2">
                             <span>🏠</span>
                             <div>
                                 <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
-                                <span class="block text-[10px] text-slate-450">{{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                                <span class="block text-[10px] text-slate-450">
+                                    @if(!$outlet->is_mitra)
+                                        Tidak Tersedia
+                                    @else
+                                        {{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}
+                                    @endif
+                                </span>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-200 pt-2 sm:pt-0 sm:px-3">
@@ -75,7 +77,13 @@
                             <span>🏪</span>
                             <div>
                                 <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
-                                <span class="block text-[10px] text-slate-450">Selalu Tersedia</span>
+                                <span class="block text-[10px] text-slate-450">
+                                    @if(!$outlet->is_mitra)
+                                        Tidak Tersedia
+                                    @else
+                                        Selalu Tersedia
+                                    @endif
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -94,7 +102,7 @@
                 </div>
 
                 <!-- Shipping couriers section -->
-                @if($outlet->is_mitra && ($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH') && $outlet->shippingContacts->count() > 0)
+                @if(($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH') && $outlet->shippingContacts->count() > 0)
                     <div class="border-t border-slate-100 pt-6 space-y-4">
                         <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                             <span>🚚 Kurir Lokal Terdekat Direkomendasikan Petshop:</span>
