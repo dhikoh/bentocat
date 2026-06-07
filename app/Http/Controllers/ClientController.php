@@ -378,6 +378,37 @@ class ClientController extends Controller
         return view('blog.show', compact('article', 'blocks'));
     }
 
+    // List Petshops Directory
+    public function listPetshops()
+    {
+        $provinces = Province::where('is_hidden', false)
+            ->whereHas('cities', function ($query) {
+                $query->where('is_hidden', false)
+                    ->whereHas('outlets', function ($q) {
+                        $q->where('status', 'AKTIF')
+                          ->where('is_hidden', false);
+                    });
+            })
+            ->with(['cities' => function ($query) {
+                $query->where('is_hidden', false)
+                    ->whereHas('outlets', function ($q) {
+                        $q->where('status', 'AKTIF')
+                          ->where('is_hidden', false);
+                    })
+                    ->with(['outlets' => function ($q) {
+                        $q->where('status', 'AKTIF')
+                          ->where('is_hidden', false)
+                          ->orderBy('featured', 'desc')
+                          ->orderBy('nama_outlet', 'asc');
+                    }])
+                    ->orderBy('nama', 'asc');
+            }])
+            ->orderBy('nama', 'asc')
+            ->get();
+
+        return view('list_petshop', compact('provinces'));
+    }
+
     // Haversine Distance Calculation Helper (Returns in km)
     private function haversine($lat1, $lon1, $lat2, $lon2)
     {

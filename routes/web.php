@@ -19,6 +19,7 @@ Route::get('/', [ClientController::class, 'index'])->name('home');
 Route::get('/api/cities-by-province/{province_id}', [ClientController::class, 'getCities']);
 Route::get('/api/outlets-by-city/{city_id}', [ClientController::class, 'getOutletsByCity']);
 Route::match(['get', 'post'], '/search-outlet', [ClientController::class, 'searchOutlets'])->name('search-outlet');
+Route::get('/list-petshop', [ClientController::class, 'listPetshops'])->name('petshop.list');
 Route::post('/api/leads/create-and-log', [ClientController::class, 'createLeadAndAction'])->name('leads.create-and-log');
 Route::post('/api/leads/action', [ClientController::class, 'logAction'])->name('leads.log-action');
 

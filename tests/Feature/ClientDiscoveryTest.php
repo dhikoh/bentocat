@@ -332,4 +332,55 @@ class ClientDiscoveryTest extends TestCase
             'nama' => 'Kota Distributor Only'
         ]);
     }
+
+    public function test_list_petshop_page_renders_successfully(): void
+    {
+        // 1. Setup Data
+        $province = Province::create(['nama' => 'Jawa Tengah', 'slug' => 'jawa-tengah', 'is_hidden' => false]);
+        $city = City::create(['provinsi_id' => $province->id, 'nama' => 'Surakarta', 'slug' => 'surakarta', 'is_hidden' => false]);
+        
+        $activeOutlet = Outlet::create([
+            'kota_id' => $city->id,
+            'distributor_id' => $this->distributor->id,
+            'nama_outlet' => 'Solo Petshop Aktif',
+            'nama_pic' => 'Budi',
+            'whatsapp' => '081234567890',
+            'alamat_lengkap' => 'Jl. Slamet Riyadi No. 12',
+            'status' => 'AKTIF',
+            'is_hidden' => false
+        ]);
+
+        $inactiveOutlet = Outlet::create([
+            'kota_id' => $city->id,
+            'distributor_id' => $this->distributor->id,
+            'nama_outlet' => 'Solo Petshop Inaktif',
+            'nama_pic' => 'Andi',
+            'whatsapp' => '081234567891',
+            'alamat_lengkap' => 'Jl. Slamet Riyadi No. 13',
+            'status' => 'NONAKTIF',
+            'is_hidden' => false
+        ]);
+
+        $hiddenOutlet = Outlet::create([
+            'kota_id' => $city->id,
+            'distributor_id' => $this->distributor->id,
+            'nama_outlet' => 'Solo Petshop Tersembunyi',
+            'nama_pic' => 'Candra',
+            'whatsapp' => '081234567892',
+            'alamat_lengkap' => 'Jl. Slamet Riyadi No. 14',
+            'status' => 'AKTIF',
+            'is_hidden' => true
+        ]);
+
+        // 2. Request list petshop page
+        $response = $this->get(route('petshop.list'));
+        $response->assertStatus(200);
+
+        // 3. Assertions
+        $response->assertSee('Jawa Tengah');
+        $response->assertSee('Surakarta');
+        $response->assertSee('Solo Petshop Aktif');
+        $response->assertDontSee('Solo Petshop Inaktif');
+        $response->assertDontSee('Solo Petshop Tersembunyi');
+    }
 }

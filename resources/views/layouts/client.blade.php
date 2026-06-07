@@ -57,6 +57,7 @@
             <nav class="hidden md:flex items-center gap-8">
                 <a href="{{ route('home') }}#katalog" class="text-sm font-semibold text-slate-600 hover:text-amber-600 transition-all">Katalog Pasir</a>
                 <a href="{{ route('home') }}#cari-outlet" class="text-sm font-semibold text-slate-600 hover:text-amber-600 transition-all">Cari Petshop</a>
+                <a href="{{ route('petshop.list') }}" class="text-sm font-semibold text-slate-600 hover:text-amber-600 transition-all">List Petshop</a>
                 <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-slate-600 hover:text-amber-600 transition-all">Tips & Edukasi</a>
                 <a href="{{ route('admin.dashboard') }}" class="text-xs font-bold bg-slate-50 border border-slate-200 text-slate-500 px-4 py-2 rounded-xl hover:border-amber-500/50 hover:text-amber-600 transition-all">
                     Dashboard Admin
@@ -76,6 +77,7 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-100 px-4 py-4 space-y-3 shadow-md">
             <a href="{{ route('home') }}#katalog" class="block text-sm font-semibold text-slate-600 hover:text-amber-600 py-2">Katalog Pasir</a>
             <a href="{{ route('home') }}#cari-outlet" class="block text-sm font-semibold text-slate-600 hover:text-amber-600 py-2">Cari Petshop</a>
+            <a href="{{ route('petshop.list') }}" class="block text-sm font-semibold text-slate-600 hover:text-amber-600 py-2">List Petshop</a>
             <a href="{{ route('blog.index') }}" class="block text-sm font-semibold text-slate-600 hover:text-amber-600 py-2">Tips & Edukasi</a>
             <a href="{{ route('admin.dashboard') }}" class="block text-xs font-bold text-center bg-slate-50 border border-slate-200 text-slate-500 py-2.5 rounded-xl">
                 Dashboard Admin
