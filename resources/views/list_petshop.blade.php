@@ -143,7 +143,13 @@
                                                 </a>
                                             @endif
 
-                                            <a href="{{ $waUrl }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm shadow-emerald-500/10 transition-all select-none whitespace-nowrap">
+                                            <a href="{{ $waUrl }}" target="_blank" rel="noopener noreferrer" 
+                                               class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm shadow-emerald-500/10 transition-all select-none whitespace-nowrap btn-chat-wa"
+                                               data-outlet-id="{{ $outlet->id }}"
+                                               data-distributor-id="{{ $outlet->distributor_id }}"
+                                               data-provinsi-id="{{ $province->id }}"
+                                               data-kota-id="{{ $city->id }}"
+                                               data-wa-url="{{ $waUrl }}">
                                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                                                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.688 2.008 14.195.979 11.999.979c-5.441 0-9.87 4.372-9.874 9.802-.001 1.785.47 3.524 1.364 5.086l-.994 3.633 3.737-.968c1.524.832 3.084 1.25 4.525 1.25zm8.932-6.843c-.274-.136-1.62-.8-1.87-.893-.249-.093-.43-.139-.61.139-.18.27-.7.893-.857 1.076-.159.182-.317.205-.591.069-.275-.136-1.16-.427-2.21-1.366-.817-.729-1.37-1.628-1.53-1.9-.16-.272-.016-.42.12-.557.123-.122.274-.32.412-.478.136-.159.182-.272.274-.453.092-.18.046-.341-.022-.478-.068-.137-.61-1.472-.836-2.018-.22-.53-.443-.458-.61-.466-.157-.008-.339-.009-.521-.009-.18 0-.476.068-.724.341-.249.272-.952.931-.952 2.271s.975 2.634 1.112 2.816c.137.182 1.92 2.925 4.65 4.103.65.28 1.157.446 1.553.571.654.207 1.25.178 1.72.108.523-.078 1.62-.663 1.847-1.302.228-.638.228-1.185.16-1.302-.069-.118-.249-.185-.523-.321z" />
                                                 </svg>
@@ -185,6 +191,57 @@
     </svg>
 </button>
 
+<!-- Lead Capture WhatsApp Modal Popup -->
+<div id="lead-capture-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 relative border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="lead-modal-box">
+        
+        <!-- Close Button -->
+        <button type="button" id="close-lead-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-2xl focus:outline-none transition-colors">
+            &times;
+        </button>
+        
+        <!-- Modal Icon & Header -->
+        <div class="text-center space-y-2.5">
+            <span class="text-4xl block">💬</span>
+            <h3 class="font-outfit font-black text-xl text-slate-900 leading-tight">Hubungi Petshop</h3>
+            <p class="text-xs text-slate-500 leading-relaxed px-2">
+                Gunakan nomor WhatsApp aktif Anda untuk mendapatkan kesempatan klaim promo atau e-coupon BentoCat di petshop mitra resmi kami apabila program promo sedang berjalan.
+            </p>
+        </div>
+
+        <!-- Capture Form -->
+        <form id="lead-capture-form" class="space-y-4">
+            <!-- Name Input -->
+            <div class="space-y-1">
+                <label for="customer-name" class="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Nama Lengkap</label>
+                <input type="text" id="customer-name" required placeholder="Masukkan nama Anda..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white rounded-xl text-sm transition-all focus:outline-none focus:ring-4 focus:ring-amber-500/10 text-slate-700 placeholder-slate-400">
+            </div>
+
+            <!-- WhatsApp Input -->
+            <div class="space-y-1">
+                <label for="customer-whatsapp" class="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Nomor WhatsApp</label>
+                <input type="tel" id="customer-whatsapp" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white rounded-xl text-sm transition-all focus:outline-none focus:ring-4 focus:ring-amber-500/10 text-slate-700 placeholder-slate-400">
+                <p id="whatsapp-error-msg" class="hidden text-[10px] text-red-500 font-semibold mt-1"></p>
+            </div>
+
+            <!-- Hidden context fields -->
+            <input type="hidden" id="modal-outlet-id" value="">
+            <input type="hidden" id="modal-distributor-id" value="">
+            <input type="hidden" id="modal-provinsi-id" value="">
+            <input type="hidden" id="modal-kota-id" value="">
+            <input type="hidden" id="modal-wa-url" value="">
+
+            <!-- Submit button -->
+            <button type="submit" id="submit-lead-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-xl text-sm shadow-md shadow-emerald-500/10 transition-all flex items-center justify-center gap-2 select-none">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.688 2.008 14.195.979 11.999.979c-5.441 0-9.87 4.372-9.874 9.802-.001 1.785.47 3.524 1.364 5.086l-.994 3.633 3.737-.968c1.524.832 3.084 1.25 4.525 1.25zm8.932-6.843c-.274-.136-1.62-.8-1.87-.893-.249-.093-.43-.139-.61.139-.18.27-.7.893-.857 1.076-.159.182-.317.205-.591.069-.275-.136-1.16-.427-2.21-1.366-.817-.729-1.37-1.628-1.53-1.9-.16-.272-.016-.42.12-.557.123-.122.274-.32.412-.478.136-.159.182-.272.274-.453.092-.18.046-.341-.022-.478-.068-.137-.61-1.472-.836-2.018-.22-.53-.443-.458-.61-.466-.157-.008-.339-.009-.521-.009-.18 0-.476.068-.724.341-.249.272-.952.931-.952 2.271s.975 2.634 1.112 2.816c.137.182 1.92 2.925 4.65 4.103.65.28 1.157.446 1.553.571.654.207 1.25.178 1.72.108.523-.078 1.62-.663 1.847-1.302.228-.638.228-1.185.16-1.302-.069-.118-.249-.185-.523-.321z" />
+                </svg>
+                <span id="btn-text">Lanjutkan ke WhatsApp</span>
+            </button>
+        </form>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('directory-search');
@@ -192,6 +249,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const emptyState = document.getElementById('empty-state');
     const provinceWrappers = document.querySelectorAll('.province-wrapper');
     const backToTopBtn = document.getElementById('btn-back-to-top');
+
+    // Lead Modal Elements
+    const leadModal = document.getElementById('lead-capture-modal');
+    const leadModalBox = document.getElementById('lead-modal-box');
+    const closeLeadBtn = document.getElementById('close-lead-modal');
+    const leadForm = document.getElementById('lead-capture-form');
+    const submitBtn = document.getElementById('submit-lead-btn');
+    const submitBtnText = document.getElementById('btn-text');
+    
+    const inputName = document.getElementById('customer-name');
+    const inputWhatsapp = document.getElementById('customer-whatsapp');
+    const whatsappErrorMsg = document.getElementById('whatsapp-error-msg');
+
+    const modalOutletId = document.getElementById('modal-outlet-id');
+    const modalDistributorId = document.getElementById('modal-distributor-id');
+    const modalProvinsiId = document.getElementById('modal-provinsi-id');
+    const modalKotaId = document.getElementById('modal-kota-id');
+    const modalWaUrl = document.getElementById('modal-wa-url');
 
     // 1. Accordion Toggle Handlers
     document.querySelectorAll('.province-toggle').forEach(btn => {
@@ -347,6 +422,159 @@ document.addEventListener('DOMContentLoaded', function() {
                 behavior: 'smooth'
             });
         });
+    }
+
+    // 4. Lead Capture Modal Event Handlers
+    document.querySelectorAll('.btn-chat-wa').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Set hidden data values
+            modalOutletId.value = this.getAttribute('data-outlet-id') || '';
+            modalDistributorId.value = this.getAttribute('data-distributor-id') || '';
+            modalProvinsiId.value = this.getAttribute('data-provinsi-id') || '';
+            modalKotaId.value = this.getAttribute('data-kota-id') || '';
+            modalWaUrl.value = this.getAttribute('data-wa-url') || '';
+
+            // Auto-fill from LocalStorage if user previously filled their profile
+            const savedName = localStorage.getItem('customer_name');
+            const savedWhatsapp = localStorage.getItem('customer_whatsapp');
+            if (savedName) inputName.value = savedName;
+            if (savedWhatsapp) inputWhatsapp.value = savedWhatsapp;
+
+            // Show Modal with Animation
+            leadModal.classList.remove('hidden');
+            setTimeout(() => {
+                leadModalBox.classList.remove('scale-95', 'opacity-0');
+                leadModalBox.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        });
+    });
+
+    function closeModal() {
+        leadModalBox.classList.remove('scale-100', 'opacity-100');
+        leadModalBox.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            leadModal.classList.add('hidden');
+            whatsappErrorMsg.classList.add('hidden');
+            whatsappErrorMsg.textContent = '';
+        }, 200);
+    }
+
+    closeLeadBtn.addEventListener('click', closeModal);
+
+    leadModal.addEventListener('click', function(e) {
+        if (e.target === leadModal) {
+            closeModal();
+        }
+    });
+
+    // 5. Form Validation & AJAX Submission
+    leadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nameVal = inputName.value.trim();
+        const rawWhatsappVal = inputWhatsapp.value.trim();
+        const cleanWhatsappVal = rawWhatsappVal.replace(/[^0-9]/g, '');
+
+        // Validation 1: Name length
+        if (nameVal.length < 3) {
+            showError("Nama Lengkap minimal 3 karakter.");
+            return;
+        }
+
+        // Validation 2: WhatsApp length & prefix
+        if (cleanWhatsappVal.length < 9 || cleanWhatsappVal.length > 14) {
+            showError("Nomor WhatsApp harus berukuran 9-14 digit.");
+            return;
+        }
+        if (!cleanWhatsappVal.startsWith('08') && !cleanWhatsappVal.startsWith('628')) {
+            showError("Nomor WhatsApp harus diawali dengan 08 atau 628.");
+            return;
+        }
+
+        // Validation 3: Anti-spam repeating pattern (e.g. 1111111)
+        const repeatingPattern = /(.)\1{5,}/;
+        if (repeatingPattern.test(cleanWhatsappVal)) {
+            showError("Nomor WhatsApp tidak valid (terdeteksi pola berulang).");
+            return;
+        }
+
+        // Validation 4: Anti-spam sequential pattern (e.g. 123456789)
+        const sequentialPattern = /12345678|23456789|0812345678/;
+        if (sequentialPattern.test(cleanWhatsappVal)) {
+            showError("Nomor WhatsApp tidak valid (terdeteksi pola berurutan).");
+            return;
+        }
+
+        whatsappErrorMsg.classList.add('hidden');
+
+        // Save valid profile details locally to browser storage for future visits
+        localStorage.setItem('customer_name', nameVal);
+        localStorage.setItem('customer_whatsapp', cleanWhatsappVal);
+
+        // Prepare request body
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        // Disable button & show spinner/loading state
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+        submitBtn.classList.add('bg-slate-400', 'cursor-not-allowed');
+        submitBtnText.textContent = "Mengirim...";
+
+        const payload = {
+            nama: nameVal,
+            whatsapp: cleanWhatsappVal,
+            provinsi_id: modalProvinsiId.value,
+            kota_id: modalKotaId.value,
+            produk_id: "{{ $product ? $product->id : '' }}",
+            outlet_id: modalOutletId.value,
+            distributor_id: modalDistributorId.value,
+            action_type: 'CLICK_WA_OUTLET'
+        };
+
+        fetch('/api/leads/create-and-log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Re-enable submit button
+            resetSubmitButton();
+            closeModal();
+            // Open WA link
+            window.open(modalWaUrl.value, '_blank');
+        })
+        .catch(error => {
+            console.error('AJAX logging error:', error);
+            // Fallback: Proceed to WhatsApp anyway so user journey is never blocked on connection timeout
+            resetSubmitButton();
+            closeModal();
+            window.open(modalWaUrl.value, '_blank');
+        });
+    });
+
+    function showError(msg) {
+        whatsappErrorMsg.textContent = msg;
+        whatsappErrorMsg.classList.remove('hidden');
+    }
+
+    function resetSubmitButton() {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('bg-slate-400', 'cursor-not-allowed');
+        submitBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+        submitBtnText.textContent = "Lanjutkan ke WhatsApp";
     }
 });
 </script>

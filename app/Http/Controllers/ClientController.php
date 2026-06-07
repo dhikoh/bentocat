@@ -406,7 +406,9 @@ class ClientController extends Controller
             ->orderBy('nama', 'asc')
             ->get();
 
-        return view('list_petshop', compact('provinces'));
+        $product = Product::where('status', 'ACTIVE')->first();
+
+        return view('list_petshop', compact('provinces', 'product'));
     }
 
     // Haversine Distance Calculation Helper (Returns in km)
