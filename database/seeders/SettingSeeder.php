@@ -14,7 +14,7 @@ class SettingSeeder extends Seeder
             'site_logo' => 'bentocat.png',
             'site_favicon' => 'favicon.ico',
             'site_description' => 'Platform pencarian distributor & petshop resmi BentoCat seluruh Indonesia. Temukan pasir kucing bentonite premium terdekat.',
-            'contact_whatsapp' => '6281234567890',
+            'contact_whatsapp' => '6287777717300',
             'social_instagram' => 'https://instagram.com/bentocat',
             'social_facebook' => 'https://facebook.com/bentocat',
         ];
