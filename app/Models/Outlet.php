@@ -58,7 +58,7 @@ class Outlet extends Model
         return $this->belongsToMany(ShippingContact::class, 'petshop_shipping_contacts', 'petshop_id', 'shipping_contact_id')
                     ->withPivot('urutan')
                     ->withTimestamps()
-                    ->orderBy('pivot_urutan');
+                    ->orderBy('petshop_shipping_contacts.urutan');
     }
 
     public function leadRequests(): HasMany

@@ -23,7 +23,7 @@ class AuditController extends Controller
         // Group by WhatsApp
         $petshopDupesByWa = Outlet::select('whatsapp', DB::raw('count(id) as count'))
             ->groupBy('whatsapp')
-            ->having('count', '>', 1)
+            ->havingRaw('count(id) > 1')
             ->get();
 
         $petshopWaGroups = [];
@@ -37,7 +37,7 @@ class AuditController extends Controller
         // Group by Name + City
         $petshopDupesByNameCity = Outlet::select('nama_outlet', 'kota_id', DB::raw('count(id) as count'))
             ->groupBy('nama_outlet', 'kota_id')
-            ->having('count', '>', 1)
+            ->havingRaw('count(id) > 1')
             ->get();
 
         $petshopNameCityGroups = [];
@@ -54,7 +54,7 @@ class AuditController extends Controller
         // Group by WhatsApp
         $distributorDupesByWa = Distributor::select('whatsapp', DB::raw('count(id) as count'))
             ->groupBy('whatsapp')
-            ->having('count', '>', 1)
+            ->havingRaw('count(id) > 1')
             ->get();
 
         $distributorWaGroups = [];
@@ -68,7 +68,7 @@ class AuditController extends Controller
         // Group by Name + City
         $distributorDupesByNameCity = Distributor::select('nama', 'kota_id', DB::raw('count(id) as count'))
             ->groupBy('nama', 'kota_id')
-            ->having('count', '>', 1)
+            ->havingRaw('count(id) > 1')
             ->get();
 
         $distributorNameCityGroups = [];
@@ -85,7 +85,7 @@ class AuditController extends Controller
         // Group by WhatsApp
         $courierDupesByWa = ShippingContact::select('whatsapp', DB::raw('count(id) as count'))
             ->groupBy('whatsapp')
-            ->having('count', '>', 1)
+            ->havingRaw('count(id) > 1')
             ->get();
 
         $courierWaGroups = [];
@@ -98,7 +98,7 @@ class AuditController extends Controller
         // Group by Name
         $courierDupesByName = ShippingContact::select('nama', DB::raw('count(id) as count'))
             ->groupBy('nama')
-            ->having('count', '>', 1)
+            ->havingRaw('count(id) > 1')
             ->get();
 
         $courierNameGroups = [];
