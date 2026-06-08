@@ -15,5 +15,8 @@ if [ ! -L /var/www/html/public/uploads ]; then
 fi
 chown -h www-data:www-data /var/www/html/public/uploads
 
+# Run database migrations
+php artisan migrate --force
+
 # Start supervisord to launch Nginx and PHP-FPM
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
