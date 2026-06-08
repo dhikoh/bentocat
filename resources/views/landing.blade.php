@@ -376,7 +376,19 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 w-7 h-7"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.29-2.29 3.21S3 10.79 3 11.95c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.5c1.37 0 2.5-1.14 2.5-2.53 0-.72-.35-1.41-1.07-2S17.18 12.53 17 11.62c-.18.91-.71 1.77-1.43 2.35s-1.07 1.12-1.07 1.84c0 1.39 1.13 2.53 2.5 2.53z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 w-7 h-7">
+                                    <path d="M12 2L21 7V17L12 22L3 17V7Z" />
+                                    <path d="M12 22V12" />
+                                    <path d="M12 12L21 7" />
+                                    <path d="M12 12L3 7" />
+                                    <circle cx="12" cy="12" r="2" fill="currentColor" />
+                                    <circle cx="12" cy="2" r="1.5" fill="currentColor" />
+                                    <circle cx="21" cy="7" r="1.5" fill="currentColor" />
+                                    <circle cx="21" cy="17" r="1.5" fill="currentColor" />
+                                    <circle cx="12" cy="22" r="1.5" fill="currentColor" />
+                                    <circle cx="3" cy="17" r="1.5" fill="currentColor" />
+                                    <circle cx="3" cy="7" r="1.5" fill="currentColor" />
+                                </svg>
                             </div>
                             <span class="text-[10px] font-mono uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-bold">Instan & Padat</span>
                         </div>
