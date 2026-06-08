@@ -744,7 +744,7 @@
             <div class="max-w-4xl mx-auto bg-white border border-[#e5e0d8]/80 rounded-[2.5rem] overflow-hidden group hover:border-amber-500/50 hover:shadow-xl transition-premium p-6 md:p-8">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <!-- Left: Large Image Container -->
-                    <div class="md:col-span-5 aspect-square bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex items-center justify-center p-6 relative">
+                    <div class="md:col-span-5 aspect-square bg-white rounded-3xl overflow-hidden border border-slate-100 flex items-center justify-center p-6 relative">
                         @if($product->thumbnail)
                             <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-[1.03] transition-premium">
                         @else
@@ -791,7 +791,7 @@
                 @forelse($products as $product)
                     <div class="bg-white border border-[#e5e0d8]/80 rounded-[2rem] overflow-hidden group hover:border-amber-500/50 hover:shadow-lg transition-premium flex flex-col justify-between">
                         <div class="p-6 space-y-4">
-                            <div class="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center p-4">
+                            <div class="aspect-square bg-white rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center p-4">
                                 @if($product->thumbnail)
                                     <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-103 transition-premium">
                                 @else

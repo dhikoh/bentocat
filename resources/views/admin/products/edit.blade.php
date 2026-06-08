@@ -52,7 +52,7 @@
                             
                             <!-- Live Preview Container -->
                             <div id="thumbnail-preview-container" class="{{ $product->thumbnail ? '' : 'hidden' }} border border-slate-800/80 p-3 rounded-2xl bg-slate-900/60 flex gap-3 items-center max-w-sm">
-                                <img id="thumbnail-preview" src="{{ $product->thumbnail ? (str_starts_with($product->thumbnail, 'http') ? $product->thumbnail : asset($product->thumbnail)) : '#' }}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">
+                                <img id="thumbnail-preview" src="{{ $product->thumbnail ? (str_starts_with($product->thumbnail, 'http') ? $product->thumbnail : asset($product->thumbnail)) : '#' }}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850 bg-white">
                                 <div class="overflow-hidden">
                                     <span class="block text-[10px] font-bold text-emerald-400 uppercase">Preview Aktif</span>
                                     <span class="block text-[10px] text-slate-400 truncate" id="preview-path">{{ $product->thumbnail }}</span>
@@ -139,8 +139,8 @@
             <h3 class="text-lg font-bold text-white">Sesuaikan Potongan Gambar (1:1)</h3>
             <button type="button" onclick="closeCropperModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
         </div>
-        <div class="overflow-hidden rounded-2xl bg-slate-950 max-h-[300px] flex justify-center items-center">
-            <img id="cropper-image" src="" alt="Source Image" class="max-w-full block">
+        <div class="overflow-hidden rounded-2xl bg-white max-h-[300px] flex justify-center items-center">
+            <img id="cropper-image" src="" alt="Source Image" class="max-w-full block bg-white">
         </div>
         <div class="flex justify-end gap-3 pt-2">
             <button type="button" onclick="closeCropperModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all">Batal</button>
@@ -200,7 +200,7 @@ function previewImage(input) {
                 if (file.type.startsWith('video/')) {
                     mediaHtml = `<video id="thumbnail-preview" src="${e.target.result}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
                 } else {
-                    mediaHtml = `<img id="thumbnail-preview" src="${e.target.result}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+                    mediaHtml = `<img id="thumbnail-preview" src="${e.target.result}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850 bg-white">`;
                 }
                 mediaHtml += `
                     <div class="overflow-hidden">
@@ -241,14 +241,27 @@ function cropAndSave() {
         imageSmoothingQuality: 'high'
     });
 
-    const dataUrl = canvas.toDataURL('image/png');
+    // Create a new canvas to draw a white background under the cropped transparent image
+    const whiteCanvas = document.createElement('canvas');
+    whiteCanvas.width = 800;
+    whiteCanvas.height = 800;
+    const ctx = whiteCanvas.getContext('2d');
+    
+    // Fill background with solid white
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 800, 800);
+    
+    // Draw the cropped image on top of the white background
+    ctx.drawImage(canvas, 0, 0, 800, 800);
+
+    const dataUrl = whiteCanvas.toDataURL('image/png');
     document.getElementById('cropped_image_data').value = dataUrl;
 
     const previewContainer = document.getElementById('thumbnail-preview-container');
     const urlInput = document.getElementById('thumbnail');
 
     previewContainer.innerHTML = `
-        <img id="thumbnail-preview" src="${dataUrl}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">
+        <img id="thumbnail-preview" src="${dataUrl}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850 bg-white">
         <div class="overflow-hidden">
             <span class="block text-[10px] font-bold text-emerald-450 uppercase">Preview Terpotong (1:1)</span>
             <span class="block text-[10px] text-slate-450 truncate" id="preview-path">Gambar berhasil dipotong</span>
@@ -275,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isVideo) {
             mediaHtml = `<video id="thumbnail-preview" src="${resolvedUrl}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
         } else {
-            mediaHtml = `<img id="thumbnail-preview" src="${resolvedUrl}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+            mediaHtml = `<img id="thumbnail-preview" src="${resolvedUrl}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850 bg-white">`;
         }
         mediaHtml += `
             <div class="overflow-hidden">
@@ -296,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isVideo) {
                 mediaHtml = `<video id="thumbnail-preview" src="${val}" class="w-14 h-14 object-cover rounded-lg border border-slate-850" muted autoplay loop></video>`;
             } else {
-                mediaHtml = `<img id="thumbnail-preview" src="${val}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850">`;
+                mediaHtml = `<img id="thumbnail-preview" src="${val}" alt="Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-850 bg-white">`;
             }
             mediaHtml += `
                 <div class="overflow-hidden">
