@@ -36,12 +36,12 @@
         <div class="max-w-md mx-auto relative pt-4">
             <div class="relative">
                 <input type="text" id="directory-search" placeholder="Cari wilayah, kota, atau nama petshop..." class="w-full pl-12 pr-10 py-4 bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-2xl text-xs sm:text-sm shadow-sm transition-premium focus:outline-none text-slate-700 placeholder-slate-400">
-                <span class="absolute left-4 top-4.5 text-slate-400">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </span>
-                <button id="clear-search" class="hidden absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors font-bold text-lg border-none bg-transparent cursor-pointer">
+                <button id="clear-search" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors font-bold text-lg border-none bg-transparent cursor-pointer">
                     &times;
                 </button>
             </div>
