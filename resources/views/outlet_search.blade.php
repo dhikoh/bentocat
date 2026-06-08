@@ -8,26 +8,26 @@
 @endpush
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
 
     <!-- Search overview header -->
-    <div class="space-y-3">
+    <div class="space-y-4">
         <div class="flex items-center gap-2">
-            <a href="{{ route('home') }}#cari-outlet" class="text-xs font-bold text-amber-650 hover:text-amber-750 hover:underline">← Ulangi Pencarian</a>
+            <a href="{{ route('home') }}#cari-outlet" class="text-xs font-bold text-amber-600 hover:text-amber-700 transition-premium">← Ulangi Pencarian Baru</a>
         </div>
-        <h1 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Petshop Resmi di Kota {{ $city->nama }}</h1>
-        <p class="text-sm text-slate-600">Menemukan {{ $outlets->count() }} outlet aktif yang menjual produk {{ $product->nama }}.</p>
+        <h1 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900 leading-tight">Petshop Resmi di Kota {{ $city->nama }}</h1>
+        <p class="text-slate-500 text-sm font-medium">Menemukan {{ $outlets->count() }} outlet aktif yang menyediakan produk {{ $product->nama }}.</p>
     </div>
 
-    <!-- Map Container (Optional, rendered if coordinates exist) -->
-    <div class="bg-white border border-slate-100 rounded-3xl p-4 shadow-md shadow-amber-900/5 overflow-hidden">
+    <!-- Map Container -->
+    <div class="bg-white border border-[#e5e0d8] rounded-[2rem] p-4 shadow-sm overflow-hidden">
         <div id="results-map" class="h-64 sm:h-80 w-full rounded-2xl border border-slate-150 bg-slate-50"></div>
     </div>
 
     <!-- Outlets Grid list -->
     <div class="space-y-6">
         @forelse($outlets as $outlet)
-            <div class="bg-white border {{ !$outlet->is_mitra ? 'border-slate-200/80 opacity-90' : ($outlet->featured ? 'border-amber-500 bg-amber-50/20 shadow-md' : 'border-slate-100 shadow-md') }} p-6 sm:p-8 rounded-3xl space-y-6 relative hover:shadow-lg transition-all">
+            <div class="bg-white border {{ !$outlet->is_mitra ? 'border-[#e5e0d8]/80 opacity-90' : ($outlet->featured ? 'border-amber-500 bg-amber-50/5 shadow-md' : 'border-[#e5e0d8]/80 shadow-sm') }} p-6 sm:p-8 rounded-[2rem] space-y-6 relative hover:shadow-md transition-premium">
                 
                 <!-- Recommendation badge or Non-Mitra status -->
                 @if($outlet->is_mitra)
@@ -42,47 +42,48 @@
                     <h3 class="font-outfit font-black text-xl text-slate-900 flex items-center gap-2">
                         <span>🏪 {{ $outlet->nama_outlet }}</span>
                         @if(isset($outlet->distance) && $outlet->distance < 99999)
-                            <span class="text-xs text-amber-750 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-lg">
+                            <span class="text-xs text-amber-700 bg-amber-50 border border-amber-100/50 px-2.5 py-0.5 rounded-xl font-bold">
                                 {{ number_format($outlet->distance, 2) }} km dari Anda
                             </span>
                         @endif
                     </h3>
-                    <p class="text-xs text-slate-550 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
+                    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">{{ $outlet->alamat }}</p>
                 </div>
+                
                 <!-- Delivery modes grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-600 bg-[#FAF8F5]/60 p-5 rounded-2xl border border-[#e5e0d8]/40">
                     <div class="flex items-center gap-2">
-                        <span>🏠</span>
+                        <span class="text-lg">🏠</span>
                         <div>
-                            <span class="block font-semibold">Toko Mandiri (Self-delivery)</span>
-                            <span class="block text-[10px] text-slate-450">
+                            <span class="block font-bold text-slate-700">Toko Mandiri (Self-delivery)</span>
+                            <span class="block text-[10px] text-slate-450 mt-0.5">
                                 {{ $outlet->delivery_mode === 'SELF_DELIVERY' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}
                             </span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-slate-200 pt-2 sm:pt-0 sm:px-3">
-                        <span>🚚</span>
+                    <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-x border-[#e5e0d8]/50 pt-2 sm:pt-0 sm:px-3">
+                        <span class="text-lg">🚚</span>
                         <div>
-                            <span class="block font-semibold">Rekomendasi Kurir Lokal</span>
-                            <span class="block text-[10px] text-slate-450">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
+                            <span class="block font-bold text-slate-700">Rekomendasi Kurir Lokal</span>
+                            <span class="block text-[10px] text-slate-450 mt-0.5">{{ $outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH' ? 'Tersedia' : 'Tidak Tersedia' }}</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 border-t sm:border-t-0 pt-2 sm:pt-0">
-                        <span>🏪</span>
+                        <span class="text-lg">🏪</span>
                         <div>
-                            <span class="block font-semibold">Ambil Sendiri (Pickup)</span>
-                            <span class="block text-[10px] text-slate-450">Selalu Tersedia</span>
+                            <span class="block font-bold text-slate-700">Ambil Sendiri (Pickup)</span>
+                            <span class="block text-[10px] text-slate-450 mt-0.5">Selalu Tersedia</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 pt-2">
                     <!-- Action WA Redirect Button -->
-                    <button type="button" onclick="contactOutlet({{ $outlet->id }}, '{{ $outlet->whatsapp }}', '{{ $outlet->nama_outlet }}', {{ $outlet->is_mitra ? 'true' : 'false' }})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                    <button type="button" onclick="contactOutlet({{ $outlet->id }}, '{{ $outlet->whatsapp }}', '{{ $outlet->nama_outlet }}', {{ $outlet->is_mitra ? 'true' : 'false' }})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 px-6 rounded-2xl transition-premium flex items-center justify-center gap-2 text-xs uppercase tracking-wider border-none cursor-pointer">
                         <span>Hubungi Petshop via WhatsApp</span> 💬
                     </button>
                     @if($outlet->maps_url)
-                        <a href="{{ $outlet->maps_url }}" target="_blank" class="bg-white border border-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-xl hover:bg-slate-50 transition-all text-xs flex items-center justify-center gap-1.5 shadow-sm font-sans">
+                        <a href="{{ $outlet->maps_url }}" target="_blank" class="bg-white border border-[#e5e0d8] text-slate-700 font-bold px-6 py-3.5 rounded-2xl hover:bg-[#FAF8F5] transition-premium text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm text-center">
                             <span>Petunjuk Arah</span> 🗺️
                         </a>
                     @endif
@@ -91,18 +92,18 @@
                 <!-- Shipping couriers section -->
                 @if(($outlet->delivery_mode === 'RECOMMENDED_SHIPPING_CONTACT' || $outlet->delivery_mode === 'BOTH') && $outlet->shippingContacts->count() > 0)
                     <div class="border-t border-slate-100 pt-6 space-y-4">
-                        <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                             <span>🚚 Kurir Lokal Terdekat Direkomendasikan Petshop:</span>
                         </h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach($outlet->shippingContacts as $courier)
-                                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between gap-3 shadow-sm">
+                                <div class="bg-[#FAF8F5]/40 border border-[#e5e0d8]/40 p-5 rounded-2xl flex flex-col justify-between gap-3 shadow-sm">
                                     <div class="space-y-1">
                                         <span class="block font-bold text-xs text-slate-900">{{ $courier->nama }}</span>
-                                        <p class="text-[11px] text-slate-550 leading-relaxed">{{ $courier->keterangan ?: 'Melayani area jangkauan toko.' }}</p>
+                                        <p class="text-[11px] text-slate-500 leading-relaxed">{{ $courier->keterangan ?: 'Melayani area jangkauan toko.' }}</p>
                                     </div>
-                                    <button type="button" onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-white border border-slate-200 hover:border-amber-500/30 hover:text-amber-650 text-slate-650 text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm font-sans">
+                                    <button type="button" onclick="contactCourier({{ $outlet->id }}, '{{ $courier->whatsapp }}', '{{ $courier->nama }}')" class="w-full bg-white border border-[#e5e0d8] hover:border-amber-500/50 hover:text-amber-700 text-slate-600 text-xs font-bold py-2.5 rounded-xl transition-premium flex items-center justify-center gap-1.5 shadow-sm border-none cursor-pointer">
                                         <span>Chat Kurir {{ $courier->nama }}</span> 💬
                                     </button>
                                 </div>
@@ -114,24 +115,24 @@
             </div>
         @empty
             <!-- Fallback distributor view when no outlets are active in city -->
-            <div class="bg-white border border-amber-200/60 p-8 rounded-3xl text-center shadow-md space-y-6">
+            <div class="bg-white border border-[#e5e0d8] p-12 rounded-[2.5rem] text-center shadow-md space-y-6">
                 <span class="text-4xl block">😿</span>
                 <div class="space-y-2">
                     <h3 class="font-outfit font-black text-xl text-slate-900">Belum Ada Petshop Terdaftar di Kota {{ $city->nama }}</h3>
-                    <p class="text-xs text-slate-600 max-w-xl mx-auto leading-relaxed">
+                    <p class="text-xs text-slate-500 max-w-xl mx-auto leading-relaxed">
                         Kami sedang memperluas jangkauan ke petshop di daerah Anda. Untuk saat ini, Anda dapat memesan langsung melalui distributor utama wilayah kami dengan opsi kirim kurir gudang.
                     </p>
                 </div>
 
                 @if($allocatedDistributor)
-                    <div class="bg-slate-50 max-w-md mx-auto p-5 rounded-2xl border border-slate-100 space-y-4 text-left shadow-sm">
-                        <span class="block text-[10px] font-bold text-slate-400 uppercase">Distributor Resmi Wilayah:</span>
-                        <div class="space-y-1 text-xs">
-                            <strong class="block text-slate-900 text-sm">{{ $allocatedDistributor->nama }}</strong>
-                            <span class="block text-slate-650">WhatsApp PIC: {{ $allocatedDistributor->whatsapp }} ({{ $allocatedDistributor->pic }})</span>
-                            <span class="block text-slate-650">Gudang Alamat: {{ $allocatedDistributor->alamat }}</span>
+                    <div class="bg-[#FAF8F5]/80 max-w-md mx-auto p-6 rounded-3xl border border-[#e5e0d8] space-y-4 text-left shadow-inner">
+                        <span class="block text-[10px] font-bold text-slate-450 uppercase tracking-widest">Distributor Resmi Wilayah:</span>
+                        <div class="space-y-1.5 text-xs text-slate-600">
+                            <strong class="block text-slate-900 text-sm font-bold">{{ $allocatedDistributor->nama }}</strong>
+                            <span class="block">WhatsApp PIC: {{ $allocatedDistributor->whatsapp }} ({{ $allocatedDistributor->pic }})</span>
+                            <span class="block">Gudang Alamat: {{ $allocatedDistributor->alamat }}</span>
                         </div>
-                        <button type="button" onclick="contactDistributor('{{ $allocatedDistributor->whatsapp }}', '{{ $allocatedDistributor->nama }}')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs">
+                        <button type="button" onclick="contactDistributor('{{ $allocatedDistributor->whatsapp }}', '{{ $allocatedDistributor->nama }}')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-xl transition-premium flex items-center justify-center gap-2 text-xs uppercase tracking-wider border-none cursor-pointer">
                             <span>Hubungi Distributor Resmi</span> 💬
                         </button>
                     </div>
@@ -147,13 +148,13 @@
 <!-- Premium Lead Capture Modal Overlay -->
 <div id="lead-capture-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto" role="dialog" aria-modal="true">
     <!-- Backdrop blur -->
-    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeLeadModal()"></div>
+    <div class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity" onclick="closeLeadModal()"></div>
 
     <!-- Modal Centerer -->
     <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="relative w-full max-w-md transform overflow-hidden rounded-3xl bg-white border border-slate-100 p-6 sm:p-8 text-left shadow-2xl transition-all space-y-6">
+        <div class="relative w-full max-w-md transform overflow-hidden rounded-[2rem] bg-[#FAF8F5] border border-[#e5e0d8] p-6 sm:p-8 text-left shadow-2xl transition-premium space-y-6">
             <!-- Close Button -->
-            <button type="button" onclick="closeLeadModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition-all text-lg">
+            <button type="button" onclick="closeLeadModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 font-bold text-2xl border-none bg-transparent cursor-pointer">
                 ✕
             </button>
 
@@ -168,21 +169,21 @@
             <!-- Lead Capture Form -->
             <form id="lead-capture-form" class="space-y-4" onsubmit="handleLeadSubmit(event)">
                 <div>
-                    <label for="lead_name" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                    <input type="text" id="lead_name" required placeholder="Nama panggilan Anda..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                    <label for="lead_name" class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider mb-1">Nama Lengkap</label>
+                    <input type="text" id="lead_name" required placeholder="Nama panggilan Anda..." class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none transition-premium">
                 </div>
 
                 <div>
-                    <label for="lead_whatsapp" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nomor WhatsApp Aktif</label>
-                    <input type="text" id="lead_whatsapp" required placeholder="Contoh: 08123456789..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                    <label for="lead_whatsapp" class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider mb-1">Nomor WhatsApp Aktif</label>
+                    <input type="text" id="lead_whatsapp" required placeholder="Contoh: 08123456789..." class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none transition-premium">
                 </div>
 
                 <div>
-                    <label for="lead_address" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Alamat Lengkap (Opsional)</label>
-                    <textarea id="lead_address" rows="2" placeholder="Untuk mempermudah perhitungan ongkir kurir lokal..." class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none transition-all"></textarea>
+                    <label for="lead_address" class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider mb-1">Alamat Lengkap (Opsional)</label>
+                    <textarea id="lead_address" rows="2" placeholder="Untuk mempermudah perhitungan ongkir kurir lokal..." class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none transition-premium"></textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg transition-all text-xs uppercase tracking-wide">
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg transition-premium text-xs uppercase tracking-wider border-none cursor-pointer">
                     Hubungi via WhatsApp 💬
                 </button>
             </form>

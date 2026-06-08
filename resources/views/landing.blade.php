@@ -1,51 +1,114 @@
 @extends('layouts.client')
 
-@section('title', 'BentoCat - Premium Cat Litter Discovery & Lead Intelligence')
+@section('title', \App\Models\Setting::get('site_name', 'BentoCat') . ' - Pasir Kucing Bentonit Premium')
 
 @section('content')
-<div class="space-y-24">
+<div class="space-y-32 pb-20">
 
-    <!-- 1. Hero Section -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 md:pt-24 flex flex-col items-center text-center space-y-6">
-        <span class="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider select-none">
-            🐾 BentoCat Premium Bentonite Cat Litter
-        </span>
-        <h1 class="font-outfit font-black text-4xl sm:text-6xl lg:text-7xl tracking-tight text-slate-900 max-w-4xl leading-[1.1]">
-            Hemat Ongkir, Beli Pasir Kucing di <span class="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Petshop Terdekat</span> Anda!
-        </h1>
-        <p class="text-slate-600 text-sm sm:text-lg max-w-2xl leading-relaxed">
-            Hindari potongan besar marketplace yang membuat harga jadi mahal. Temukan outlet resmi penjual BentoCat di kota Anda dan nikmati harga wajar petshop lokal.
-        </p>
-        <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md">
-            <button onclick="openSearchModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all text-sm sm:text-base">
-                Cari Toko Terdekat 📍
-            </button>
-            <a href="#katalog" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold px-8 py-3.5 rounded-xl shadow-sm transition-all text-sm sm:text-base">
-                Lihat Katalog Produk
-            </a>
+    <!-- 1. Hero Section: Double-Column Layout -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 md:pt-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            <!-- Left Column: Content & Call to Action -->
+            <div class="lg:col-span-7 space-y-8 text-left">
+                <!-- Tagline Badge -->
+                <span class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-700 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider select-none font-outfit">
+                    {{ \App\Models\Setting::get('hero_badge_text', '🐾 BentoCat Premium Bentonite Cat Litter') }}
+                </span>
+                
+                <!-- Main Heading -->
+                <h1 class="font-outfit font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight text-slate-900 leading-[1.15]">
+                    {!! str_replace('Petshop Terdekat', '<span class="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Petshop Terdekat</span>', \App\Models\Setting::get('hero_title', 'Pasir Kucing Premium, Sahabat Terbaik Kucing Anda!')) !!}
+                </h1>
+                
+                <!-- Subtitle / Description -->
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-xl">
+                    {{ \App\Models\Setting::get('hero_subtitle', 'Hemat Ongkir! Cari petshop resmi terdekat di kota Anda dengan harga lokal wajar tanpa markup tinggi marketplace.') }}
+                </p>
+                
+                <!-- CTA Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+                    <button onclick="openSearchModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-8 py-4 rounded-2xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35 transition-premium text-sm uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2">
+                        <span>{{ \App\Models\Setting::get('cta_primary_text', 'Cari Toko Terdekat 📍') }}</span>
+                    </button>
+                    <a href="#katalog" class="bg-white hover:bg-slate-50 border border-[#e5e0d8] text-slate-700 font-bold px-8 py-4 rounded-2xl transition-premium text-sm uppercase tracking-wide text-center">
+                        {{ \App\Models\Setting::get('cta_secondary_text', 'Lihat Katalog Produk') }}
+                    </a>
+                </div>
+
+                <!-- Floating Product Box -->
+                <div class="bg-white/85 backdrop-blur-md border border-[#e5e0d8]/80 p-5 rounded-3xl shadow-lg flex items-center gap-4 max-w-md transition-premium hover:-translate-y-1 hover:shadow-xl">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-500/5 border border-amber-500/10 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                        <img src="{{ asset(\App\Models\Setting::get('hero_product_image', 'images/product_default.png')) }}" alt="Product Image" class="w-full h-full object-contain">
+                    </div>
+                    <div class="space-y-1">
+                        <span class="block font-outfit font-black text-sm text-slate-900">{{ \App\Models\Setting::get('hero_product_title', 'BentoCat Premium') }}</span>
+                        <p class="text-[11px] text-slate-500 leading-tight">{{ \App\Models\Setting::get('hero_product_desc', 'Odor Control • Instant Clumping • 99% Dust Free') }}</p>
+                        <a href="#katalog" class="text-[10px] font-bold text-amber-650 hover:text-amber-700 transition-premium">Detail Varian &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Media & Floating Badges -->
+            <div class="lg:col-span-5 relative mt-10 lg:mt-0 flex justify-center">
+                <!-- Outer Glow Backdrop -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-amber-500/10 to-teal-500/5 rounded-full blur-3xl opacity-60"></div>
+                
+                <!-- Media Frame Wrapper -->
+                <div class="relative w-full max-w-[360px] aspect-[4/5] bg-white border-4 border-white rounded-[2.8rem] shadow-2xl overflow-hidden z-10 group">
+                    @if(\App\Models\Setting::get('hero_media_type', 'image') === 'video')
+                        <video src="{{ asset(\App\Models\Setting::get('hero_media_path', 'images/hero_default.png')) }}" autoplay muted loop playsinline class="w-full h-full object-cover rounded-[2.5rem] group-hover:scale-102 transition-premium"></video>
+                    @else
+                        <img src="{{ asset(\App\Models\Setting::get('hero_media_path', 'images/hero_default.png')) }}" alt="BentoCat Mascot" class="w-full h-full object-cover rounded-[2.5rem] group-hover:scale-102 transition-premium">
+                    @endif
+                </div>
+
+                <!-- Floating Badge 1 (Top Left) -->
+                <div class="absolute -top-4 -left-4 bg-white border border-[#e5e0d8] px-4 py-2.5 rounded-full shadow-md flex items-center gap-2 text-xs font-black text-slate-800 z-20 animate-blob">
+                    <span class="text-amber-500">⭐</span>
+                    <span>{{ \App\Models\Setting::get('hero_badge_1_text', 'Vet Approved') }}</span>
+                </div>
+
+                <!-- Floating Badge 2 (Right Middle) -->
+                <div class="absolute top-1/3 -right-6 bg-white border border-[#e5e0d8] px-4 py-2.5 rounded-full shadow-md flex items-center gap-2 text-xs font-black text-slate-800 z-20 animate-blob" style="animation-delay: 3s;">
+                    <span class="text-emerald-500">🍃</span>
+                    <span>{{ \App\Models\Setting::get('hero_badge_2_text', 'Healthy & Natural') }}</span>
+                </div>
+
+                <!-- Floating Info Badge 3 (Bottom Right Card) -->
+                <div class="absolute -bottom-6 -right-2 bg-slate-900 border border-slate-850 p-4 rounded-3xl shadow-lg max-w-[210px] text-left z-20 transition-premium hover:scale-105">
+                    <span class="block text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">
+                        {{ \App\Models\Setting::get('hero_badge_3_title', 'Complete Care for Every Stage') }}
+                    </span>
+                    <p class="text-[10px] text-slate-400 leading-normal">
+                        {{ \App\Models\Setting::get('hero_badge_3_desc', 'Dari kitten hingga senior, menjaga kebersihan litter box tetap steril.') }}
+                    </p>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <!-- 2. Keunggulan Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white border border-amber-100/50 p-8 rounded-3xl shadow-md shadow-amber-900/5 space-y-4">
-                <span class="text-3xl">⚡</span>
-                <h3 class="font-outfit font-bold text-lg text-slate-800">Gumpalan Instan & Kuat</h3>
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-premium space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-xl">⚡</div>
+                <h3 class="font-outfit font-bold text-lg text-slate-900">Gumpalan Instan & Kuat</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Menyerap cairan dalam hitungan detik untuk mengunci urin seketika. Gumpalan padat tidak mudah pecah saat diserok, menjaga pasir bersih tetap higienis.
                 </p>
             </div>
-            <div class="bg-white border border-amber-100/50 p-8 rounded-3xl shadow-md shadow-amber-900/5 space-y-4">
-                <span class="text-3xl">🌸</span>
-                <h3 class="font-outfit font-bold text-lg text-slate-800">Kontrol Bau Ekstra (Scented)</h3>
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-premium space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl">🌸</div>
+                <h3 class="font-outfit font-bold text-lg text-slate-900">Kontrol Bau Ekstra (Scented)</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Dilengkapi dengan aroma wangi premium (Lavender, Coffee, Apple) yang menyebarkan kesegaran alami dan menetralkan bau amonia kotoran secara maksimal.
                 </p>
             </div>
-            <div class="bg-white border border-amber-100/50 p-8 rounded-3xl shadow-md shadow-amber-900/5 space-y-4">
-                <span class="text-3xl">🍃</span>
-                <h3 class="font-outfit font-bold text-lg text-slate-800">Minim Debu (Dust-Free)</h3>
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-premium space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center text-xl">🍃</div>
+                <h3 class="font-outfit font-bold text-lg text-slate-900">Minim Debu (Dust-Free)</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Diproses melalui penyaringan ganda sehingga aman bagi pernapasan kucing peliharaan maupun pemilik rumah. Mencegah noda jejak kaki kucing di lantai.
                 </p>
@@ -54,7 +117,7 @@
     </section>
 
     <!-- 3. Katalog Section -->
-    <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24 space-y-12">
+    <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-28 space-y-12">
         <div class="text-center space-y-3">
             <h2 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Katalog BentoCat Premium</h2>
             <p class="text-sm text-slate-500 max-w-xl mx-auto">Varian pasir kucing bentonit premium dengan penawaran kualitas gumpalan tinggi.</p>
@@ -62,12 +125,12 @@
 
         @if($products->count() === 1)
             @php $product = $products->first(); @endphp
-            <div class="max-w-4xl mx-auto bg-white border border-amber-100/50 rounded-3xl overflow-hidden group hover:border-amber-500 hover:shadow-xl transition-all p-6 md:p-8">
+            <div class="max-w-4xl mx-auto bg-white border border-[#e5e0d8]/80 rounded-[2.5rem] overflow-hidden group hover:border-amber-500/50 hover:shadow-xl transition-premium p-6 md:p-8">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <!-- Left: Large Image Container -->
-                    <div class="md:col-span-5 aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center p-4 relative">
+                    <div class="md:col-span-5 aspect-square bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 flex items-center justify-center p-6 relative">
                         @if($product->thumbnail)
-                            <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300">
+                            <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-[1.03] transition-premium">
                         @else
                             <span class="text-6xl">🐈</span>
                         @endif
@@ -76,23 +139,23 @@
                     <!-- Right: Product Information & CTAs -->
                     <div class="md:col-span-7 space-y-5 flex flex-col justify-between h-full py-2">
                         <div class="space-y-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider">
                                 Produk Unggulan
                             </span>
-                            <h3 class="font-outfit font-black text-2xl md:text-3xl text-slate-900 group-hover:text-amber-600 transition-all">
+                            <h3 class="font-outfit font-black text-2xl md:text-3xl text-slate-900 group-hover:text-amber-600 transition-premium">
                                 {{ $product->nama }}
                             </h3>
                             <span class="inline-block text-xs text-slate-400 font-mono">ID: PROD-00{{ $product->id }}</span>
-                            <p class="text-sm text-slate-650 leading-relaxed pt-2">
+                            <p class="text-xs text-slate-500 leading-relaxed pt-2">
                                 {{ $product->deskripsi ? strip_tags($product->deskripsi) : 'Pasir bentonit wangi gumpal kualitas premium.' }}
                             </p>
                         </div>
                         
                         <div class="pt-4 border-t border-slate-100">
-                            <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Varian Tersedia:</span>
+                            <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Varian Tersedia:</span>
                             <div class="flex flex-wrap gap-2">
                                 @forelse($product->variants->whereNull('parent_id') as $v1)
-                                    <span class="bg-slate-50 hover:bg-amber-50 hover:text-amber-700 text-slate-650 text-xs font-medium px-3 py-1 rounded-lg border border-slate-200 transition-colors cursor-default">{{ $v1->nama }}</span>
+                                    <span class="bg-[#FAF8F5] hover:bg-amber-50 hover:text-amber-700 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-200/50 transition-premium cursor-default">{{ $v1->nama }}</span>
                                 @empty
                                     <span class="text-xs text-slate-400 italic">Varian standar saja.</span>
                                 @endforelse
@@ -100,7 +163,7 @@
                         </div>
 
                         <div class="pt-4">
-                            <button onclick="openSearchModal()" class="inline-flex items-center gap-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 hover:scale-[1.02] text-slate-950 font-black py-3.5 px-6 rounded-xl shadow-lg shadow-amber-500/10 transition-all text-xs uppercase tracking-wider">
+                            <button onclick="openSearchModal()" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-md shadow-amber-500/10 transition-premium text-xs uppercase tracking-wider cursor-pointer">
                                 <span>📍</span> Cari Toko Terdekat
                             </button>
                         </div>
@@ -110,28 +173,28 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($products as $product)
-                    <div class="bg-white border border-amber-100/50 rounded-3xl overflow-hidden group hover:border-amber-500 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="bg-white border border-[#e5e0d8]/80 rounded-[2rem] overflow-hidden group hover:border-amber-500/50 hover:shadow-lg transition-premium flex flex-col justify-between">
                         <div class="p-6 space-y-4">
-                            <div class="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-5xl">
+                            <div class="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center p-4">
                                 @if($product->thumbnail)
-                                    <img src="{{ $product->thumbnail }}" alt="{{ $product->nama }}" class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300">
+                                    <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-103 transition-premium">
                                 @else
-                                    🐈
+                                    <span class="text-5xl">🐈</span>
                                 @endif
                             </div>
                             <div>
-                                <h3 class="font-outfit font-bold text-lg text-slate-900 group-hover:text-amber-600 transition-all">{{ $product->nama }}</h3>
+                                <h3 class="font-outfit font-bold text-lg text-slate-900 group-hover:text-amber-600 transition-premium">{{ $product->nama }}</h3>
                                 <span class="block text-[10px] text-slate-400 font-mono mt-0.5">ID: PROD-00{{ $product->id }}</span>
                             </div>
-                            <p class="text-xs text-slate-550 leading-relaxed">
+                            <p class="text-xs text-slate-500 leading-relaxed">
                                 {{ $product->deskripsi ? strip_tags($product->deskripsi) : 'Pasir bentonit wangi gumpal kualitas premium.' }}
                             </p>
                         </div>
-                        <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-                            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Varian Tersedia:</span>
+                        <div class="p-6 border-t border-slate-100 bg-[#FAF8F5]/50">
+                            <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Varian Tersedia:</span>
                             <div class="flex flex-wrap gap-1">
                                 @forelse($product->variants->whereNull('parent_id') as $v1)
-                                    <span class="bg-white text-slate-650 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-200">{{ $v1->nama }}</span>
+                                    <span class="bg-white text-slate-600 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-200/60">{{ $v1->nama }}</span>
                                 @empty
                                     <span class="text-xs text-slate-400 italic">Varian standar saja.</span>
                                 @endforelse
@@ -149,7 +212,7 @@
 
     <!-- 4. Discovery Search Modal & FAB -->
     <!-- Floating Action Button (FAB) -->
-    <button onclick="openSearchModal()" class="fixed bottom-6 right-6 z-40 bg-amber-500 hover:bg-amber-600 active:scale-95 hover:scale-105 text-slate-950 font-black py-4 px-6 rounded-full shadow-2xl shadow-amber-500/20 transition-all duration-300 flex items-center gap-2.5 group">
+    <button onclick="openSearchModal()" class="fixed bottom-6 right-6 z-40 bg-amber-500 hover:bg-amber-600 active:scale-95 hover:scale-105 text-slate-950 font-black py-4 px-6 rounded-full shadow-2xl shadow-amber-500/20 transition-premium flex items-center gap-2.5 group cursor-pointer border-none">
         <span class="text-lg">📍</span>
         <span class="text-xs uppercase tracking-wider font-bold">Cari Toko BentoCat</span>
         <span class="inline-block animate-ping absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
@@ -158,14 +221,14 @@
     <!-- Search Modal Overlay -->
     <div id="search-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
         <!-- Backdrop blur -->
-        <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeSearchModal()"></div>
+        <div class="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity" onclick="closeSearchModal()"></div>
 
         <!-- Modal Centerer -->
         <div class="flex min-h-screen items-center justify-center p-4 sm:p-6 md:p-8">
-            <div class="relative w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white border border-slate-100 p-6 sm:p-10 text-left shadow-2xl transition-all space-y-6">
+            <div class="relative w-full max-w-2xl transform overflow-hidden rounded-[2.5rem] bg-[#FAF8F5] border border-[#e5e0d8] p-6 sm:p-10 text-left shadow-2xl transition-premium space-y-6">
                 
                 <!-- Close Button -->
-                <button type="button" onclick="closeSearchModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition-all text-xl">
+                <button type="button" onclick="closeSearchModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition-premium text-xl border-none bg-transparent cursor-pointer">
                     ✕
                 </button>
 
@@ -201,12 +264,12 @@
                     <input type="hidden" name="longitude" id="longitude_input">
 
                     <!-- Geolocation trigger (GPS Browser) -->
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-[#e5e0d8] flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="space-y-1 text-center sm:text-left">
-                            <span class="block text-xs font-bold text-slate-800">Izinkan Geolocation (GPS Browser)</span>
-                            <span class="block text-[10px] text-slate-500">Membantu sistem menyortir petshop dari jarak terdekat secara akurat.</span>
+                            <span class="block text-xs font-bold text-slate-850">Bagikan Lokasi Akurat (GPS)</span>
+                            <span class="block text-[10px] text-slate-500">Membantu mengurutkan petshop resmi terdekat di layar hasil secara real-time.</span>
                         </div>
-                        <button type="button" id="gps-btn" onclick="requestGPS()" class="bg-white border border-slate-200 hover:border-amber-500/50 hover:text-amber-600 text-slate-650 font-bold px-4 py-2 rounded-xl text-[10px] flex items-center gap-1.5 transition-all shadow-sm shrink-0">
+                        <button type="button" id="gps-btn" onclick="requestGPS()" class="bg-[#FAF8F5] border border-[#e5e0d8] hover:border-amber-500/50 hover:text-amber-600 text-slate-650 font-bold px-4 py-2.5 rounded-xl text-[10px] flex items-center gap-1.5 transition-premium shadow-sm shrink-0 cursor-pointer">
                             <span>Bagikan Koordinat</span> 📍
                         </button>
                     </div>
@@ -216,7 +279,7 @@
                         <!-- Province Select -->
                         <div>
                             <label for="provinsi_id" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Provinsi Tujuan</label>
-                            <select name="provinsi_id" id="provinsi_id" required onchange="loadCities(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none transition-all">
+                            <select name="provinsi_id" id="provinsi_id" required onchange="loadCities(this.value)" class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-3 py-3 text-xs text-slate-800 focus:outline-none transition-premium">
                                 <option value="">Pilih Provinsi...</option>
                                 @foreach($provinces as $prov)
                                     <option value="{{ $prov->id }}">{{ $prov->nama }}</option>
@@ -227,35 +290,35 @@
                         <!-- City Select -->
                         <div>
                             <label for="kota_id" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kota / Kabupaten</label>
-                            <select name="kota_id" id="kota_id" required disabled onchange="onCityChange(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none transition-all disabled:opacity-45">
+                            <select name="kota_id" id="kota_id" required disabled onchange="onCityChange(this.value)" class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-3 py-3 text-xs text-slate-800 focus:outline-none transition-premium disabled:opacity-45">
                                 <option value="">Pilih Kota...</option>
                             </select>
                         </div>
                     </div>
 
                     <!-- Dynamic Petshop List Preview (Shown after choosing city) -->
-                    <div id="petshop-preview-wrapper" class="hidden bg-slate-50 p-4 rounded-2xl border border-slate-150 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
-                            <span class="block text-[10px] font-bold text-slate-650 uppercase tracking-wider">🏪 Petshop Resmi Tersedia:</span>
-                            <span id="petshop-preview-count" class="text-[10px] font-black text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">0 Mitra</span>
+                    <div id="petshop-preview-wrapper" class="hidden bg-white p-4 rounded-2xl border border-[#e5e0d8] space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
+                            <span class="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">🏪 Petshop Terdaftar di Wilayah Ini:</span>
+                            <span id="petshop-preview-count" class="text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded">0 Mitra</span>
                         </div>
                         <div id="petshop-preview-list" class="space-y-2 max-h-36 overflow-y-auto pr-1 text-xs text-slate-700">
                             <!-- Populated via AJAX -->
                         </div>
-                        <div id="petshop-direct-link-container" class="pt-2 border-t border-slate-200 text-[10px] text-slate-500 leading-relaxed">
+                        <div id="petshop-direct-link-container" class="pt-2 border-t border-slate-100 text-[10px] text-slate-500 leading-relaxed">
                             <!-- Link to city landing page direct browse -->
                         </div>
                     </div>
 
                     <!-- Product Selection & Variant cascades -->
-                    <div class="bg-amber-50/20 p-4 rounded-2xl border border-amber-100/50 space-y-3">
-                        <h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider border-b border-amber-100/50 pb-1.5">Produk Yang Dicari</h4>
+                    <div class="bg-amber-500/5 p-5 rounded-2xl border border-amber-500/10 space-y-4">
+                        <h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider border-b border-amber-500/10 pb-1.5">Produk Yang Dicari</h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                             <!-- Product Selection -->
                             <div class="col-span-12 md:col-span-6" id="wrapper_produk_id">
-                                <label for="produk_id" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Pilih Produk</label>
-                                <select name="produk_id" id="produk_id" required onchange="onProductChange(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none">
+                                <label for="produk_id" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Pilih Produk</label>
+                                <select name="produk_id" id="produk_id" required onchange="onProductChange(this.value)" class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none">
                                     <option value="">Pilih Produk...</option>
                                     @foreach($products as $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->nama }}</option>
@@ -265,24 +328,24 @@
 
                             <!-- Variant Lvl 1 -->
                             <div class="col-span-12 md:col-span-6 hidden" id="wrapper_varian_level_1">
-                                <label for="varian_level_1" id="label_varian_level_1" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Kategori / Seri</label>
-                                <select name="varian_level_1" id="varian_level_1" disabled onchange="onLevel1Change(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none disabled:opacity-40">
+                                <label for="varian_level_1" id="label_varian_level_1" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Kategori / Seri</label>
+                                <select name="varian_level_1" id="varian_level_1" disabled onchange="onLevel1Change(this.value)" class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none disabled:opacity-40">
                                     <option value="" id="placeholder_varian_level_1">Pilih Kategori...</option>
                                 </select>
                             </div>
 
                             <!-- Variant Lvl 2 -->
                             <div class="col-span-12 md:col-span-6 hidden" id="wrapper_varian_level_2">
-                                <label for="varian_level_2" id="label_varian_level_2" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Aroma / Scent</label>
-                                <select name="varian_level_2" id="varian_level_2" disabled onchange="onLevel2Change(this.value)" class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none disabled:opacity-40">
+                                <label for="varian_level_2" id="label_varian_level_2" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Aroma / Scent</label>
+                                <select name="varian_level_2" id="varian_level_2" disabled onchange="onLevel2Change(this.value)" class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none disabled:opacity-40">
                                     <option value="" id="placeholder_varian_level_2">Pilih Aroma...</option>
                                 </select>
                             </div>
 
                             <!-- Variant Lvl 3 -->
                             <div class="col-span-12 md:col-span-6 hidden" id="wrapper_varian_level_3">
-                                <label for="varian_level_3" id="label_varian_level_3" class="block text-[9px] font-bold text-slate-650 uppercase mb-1">Ukuran / Kemasan</label>
-                                <select name="varian_level_3" id="varian_level_3" disabled class="w-full bg-white border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-855 focus:outline-none disabled:opacity-40">
+                                <label for="varian_level_3" id="label_varian_level_3" class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Ukuran / Kemasan</label>
+                                <select name="varian_level_3" id="varian_level_3" disabled class="w-full bg-white border border-[#e5e0d8] focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none disabled:opacity-40">
                                     <option value="" id="placeholder_varian_level_3">Pilih Ukuran...</option>
                                 </select>
                             </div>
@@ -298,7 +361,7 @@
 
                     <!-- Submit -->
                     <div class="pt-2">
-                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all text-xs uppercase tracking-wide">
+                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-4 rounded-xl shadow-lg shadow-amber-500/10 hover:shadow-amber-500/25 transition-premium text-xs uppercase tracking-wider cursor-pointer">
                             Temukan Toko Terdekat 🔍
                         </button>
                     </div>
@@ -320,14 +383,14 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @forelse($articles as $article)
-                <article class="bg-white border border-slate-100 rounded-3xl overflow-hidden group hover:border-amber-500/20 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
-                    <div class="p-5 space-y-4">
-                        <div class="aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-3xl font-serif text-slate-400">
+                <article class="bg-white border border-[#e5e0d8]/80 rounded-[2rem] overflow-hidden group hover:border-amber-500/50 shadow-sm hover:shadow-md transition-premium flex flex-col justify-between">
+                    <div class="p-6 space-y-4">
+                        <div class="aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center text-4xl">
                             📚
                         </div>
                         <div class="space-y-2">
-                            <span class="block text-[10px] text-slate-400">{{ $article->published_at ? $article->published_at->format('d M Y') : 'Draft' }}</span>
-                            <h3 class="font-outfit font-bold text-base text-slate-900 group-hover:text-amber-650 transition-all">
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase">{{ $article->published_at ? $article->published_at->format('d M Y') : 'Draft' }}</span>
+                            <h3 class="font-outfit font-bold text-base text-slate-900 group-hover:text-amber-650 transition-premium">
                                 <a href="{{ route('blog.show', $article->slug) }}">{{ $article->title }}</a>
                             </h3>
                             <p class="text-xs text-slate-500 leading-relaxed line-clamp-3">
@@ -335,9 +398,9 @@
                             </p>
                         </div>
                     </div>
-                    <div class="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-between items-center text-xs">
-                        <span class="text-slate-500">Penulis: {{ $article->author->name }}</span>
-                        <a href="{{ route('blog.show', $article->slug) }}" class="font-bold text-amber-650 hover:underline">Baca Lengkap</a>
+                    <div class="p-6 border-t border-slate-100 bg-[#FAF8F5]/40 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Penulis: <strong class="text-slate-700">{{ $article->author->name }}</strong></span>
+                        <a href="{{ route('blog.show', $article->slug) }}" class="font-bold text-amber-650 hover:underline">Baca Lengkap &rarr;</a>
                     </div>
                 </article>
             @empty
@@ -415,7 +478,7 @@
                 document.getElementById('latitude_input').value = pos.coords.latitude;
                 document.getElementById('longitude_input').value = pos.coords.longitude;
                 btn.innerHTML = "Koordinat Berhasil Disinkronkan ✓";
-                btn.className = "bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all shrink-0";
+                btn.className = "bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-4 py-2.5 rounded-xl text-[10px] flex items-center gap-1.5 transition-premium shrink-0";
             },
             (err) => {
                 btn.innerText = "Koordinat Gagal Ditemukan ❌";
@@ -496,14 +559,14 @@
                 } else {
                     outlets.forEach(outlet => {
                         const item = document.createElement('div');
-                        item.className = "p-2 bg-white rounded-xl border border-slate-200/60 shadow-sm flex items-start gap-2 text-[11px]";
+                        item.className = "p-2.5 bg-white rounded-xl border border-slate-200/50 shadow-sm flex items-start gap-2 text-[11px]";
                         
                         const badge = outlet.featured 
-                            ? `<span class="bg-amber-100 text-amber-700 px-1 py-0.5 rounded text-[8px] font-bold">Featured ⭐</span>` 
+                            ? `<span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-bold">Featured ⭐</span>` 
                             : ``;
                         const typeBadge = outlet.is_mitra 
-                            ? `<span class="bg-emerald-100 text-emerald-700 px-1 py-0.5 rounded text-[8px] font-bold">Mitra Resmi 🐾</span>` 
-                            : `<span class="bg-slate-100 text-slate-600 px-1 py-0.5 rounded text-[8px] font-bold">Retailer</span>`;
+                            ? `<span class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[8px] font-bold">Mitra Resmi 🐾</span>` 
+                            : `<span class="bg-slate-100 text-slate-650 px-1.5 py-0.5 rounded text-[8px] font-bold">Retailer</span>`;
 
                         item.innerHTML = `
                             <span class="text-base shrink-0">🏪</span>
@@ -523,7 +586,7 @@
                     if (citySlug) {
                         linkContainer.innerHTML = `
                             💡 Ingin beli eceran langsung ke petshop? Anda juga bisa 
-                            <a href="/kota/${citySlug}" target="_blank" class="text-amber-650 hover:text-amber-750 hover:underline font-bold inline-flex items-center gap-0.5">
+                            <a href="/kota/${citySlug}" target="_blank" class="text-amber-650 hover:text-amber-755 hover:underline font-bold inline-flex items-center gap-0.5">
                                 Kunjungi Halaman Wilayah ${cityName} ↗
                             </a>
                             tanpa mengisi formulir di atas.
@@ -547,7 +610,7 @@
         const wrap1 = document.getElementById('wrapper_varian_level_1');
         const wrap2 = document.getElementById('wrapper_varian_level_2');
         const wrap3 = document.getElementById('wrapper_varian_level_3');
-
+ 
         // Reset all select elements & hide wrappers
         wrap1.classList.add('hidden');
         wrap2.classList.add('hidden');

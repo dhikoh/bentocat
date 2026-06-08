@@ -11,12 +11,28 @@ class SettingSeeder extends Seeder
     {
         $defaults = [
             'site_name' => 'BentoCat',
-            'site_logo' => 'bentocat.png',
+            'site_logo' => 'images/logo.png',
             'site_favicon' => 'favicon.ico',
             'site_description' => 'Platform pencarian distributor & petshop resmi BentoCat seluruh Indonesia. Temukan pasir kucing bentonite premium terdekat.',
             'contact_whatsapp' => '6287777717300',
             'social_instagram' => 'https://instagram.com/bentocat',
             'social_facebook' => 'https://facebook.com/bentocat',
+            
+            // New Hero Section settings
+            'hero_badge_text' => '🐾 BentoCat Premium Bentonite Cat Litter',
+            'hero_title' => 'Pasir Kucing Premium, Sahabat Terbaik Kucing Anda!',
+            'hero_subtitle' => 'Hemat Ongkir! Cari petshop resmi terdekat di kota Anda dengan harga lokal wajar tanpa markup tinggi marketplace.',
+            'hero_media_type' => 'image',
+            'hero_media_path' => 'images/hero_default.png',
+            'hero_product_title' => 'BentoCat Premium',
+            'hero_product_desc' => 'Odor Control • Instant Clumping • 99% Dust Free',
+            'hero_product_image' => 'images/product_default.png',
+            'hero_badge_1_text' => 'Vet Approved',
+            'hero_badge_2_text' => 'Healthy & Natural',
+            'hero_badge_3_title' => 'Complete Care for Every Stage',
+            'hero_badge_3_desc' => 'Dari kitten hingga senior, menjaga kebersihanbox tetap steril.',
+            'cta_primary_text' => 'Cari Toko Terdekat 📍',
+            'cta_secondary_text' => 'Lihat Katalog Produk',
         ];
 
         foreach ($defaults as $key => $value) {
