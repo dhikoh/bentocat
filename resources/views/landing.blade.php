@@ -190,10 +190,10 @@
                 $lvl1 = $product->variants->whereNull('parent_id')->first();
                 $aromas = $lvl1 ? $product->variants->where('parent_id', $lvl1->id)->where('level', 2) : collect();
             @endphp
-            <div class="max-w-4xl mx-auto bg-white border border-[#e5e0d8]/80 rounded-[2.5rem] group hover:border-amber-500/50 hover:shadow-xl transition-premium p-6 md:p-8">
+            <div class="max-w-4xl mx-auto bg-[#FAF8F5] border border-[#e5e0d8]/80 rounded-[2.5rem] group hover:border-amber-500/50 hover:shadow-xl transition-premium p-6 md:p-8">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <!-- Left: Large Image Showcase with Interactive Aromas -->
-                    <div class="md:col-span-5 showcase-container bg-white">
+                    <div class="md:col-span-5 showcase-container bg-[#FAF8F5]">
                         
                         <!-- Floating Badges -->
                         <div class="badge top-left select-none pointer-events-none">
@@ -282,7 +282,7 @@
                             <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Varian Aroma:</span>
                             <div class="flex flex-wrap gap-2">
                                 @forelse($aromas as $aromaItem)
-                                    <span class="bg-[#FAF8F5] hover:bg-amber-50 hover:text-amber-700 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-200/50 transition-premium cursor-default">{{ $aromaItem->nama }}</span>
+                                    <span class="bg-white hover:bg-amber-50 hover:text-amber-700 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-200/50 transition-premium cursor-default">{{ $aromaItem->nama }}</span>
                                 @empty
                                     <span class="text-xs text-slate-400 italic">Varian aroma tidak tersedia.</span>
                                 @endforelse
