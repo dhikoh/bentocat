@@ -29,6 +29,17 @@ Route::post('/api/leads/action', [ClientController::class, 'logAction'])->name('
 Route::get('/blog', [ClientController::class, 'blogIndex'])->name('blog.index');
 Route::get('/blog/{slug}', [ClientController::class, 'blogShow'])->name('blog.show');
 
+// Redirects for old static HTML pages (SEO Migration)
+Route::redirect('/index.html', '/', 301);
+Route::redirect('/mitra.html', '/list-petshop', 301);
+Route::redirect('/tentang-kami.html', '/', 301);
+Route::redirect('/bentocat-5-liter.html', '/', 301);
+Route::redirect('/bentocat-10-liter.html', '/', 301);
+Route::redirect('/bentocat-25-liter.html', '/', 301);
+
+// Sitemap
+Route::get('/sitemap.xml', [ClientController::class, 'sitemap'])->name('sitemap');
+
 // Dynamic Local SEO routes (must be placed at the end or outside prefix to avoid capture)
 Route::get('/kota/{slug}', [ClientController::class, 'cityLanding'])->name('city.landing');
 

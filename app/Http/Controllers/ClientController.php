@@ -411,6 +411,90 @@ class ClientController extends Controller
         return view('list_petshop', compact('provinces', 'product'));
     }
 
+    // Dynamic XML Sitemap Generator
+    public function sitemap()
+    {
+        $urls = [];
+
+        // 1. Static Routes
+        $now = now()->tz('Asia/Jakarta')->toIso8601String();
+        
+        $urls[] = [
+            'loc' => route('home'),
+            'lastmod' => $now,
+            'changefreq' => 'daily',
+            'priority' => '1.0'
+        ];
+        
+        $urls[] = [
+            'loc' => route('blog.index'),
+            'lastmod' => $now,
+            'changefreq' => 'daily',
+            'priority' => '0.8'
+        ];
+        
+        $urls[] = [
+            'loc' => route('petshop.list'),
+            'lastmod' => $now,
+            'changefreq' => 'weekly',
+            'priority' => '0.8'
+        ];
+
+        // 2. Blog Articles
+        $articles = Article::where('status', 'PUBLISHED')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+        foreach ($articles as $article) {
+            $urls[] = [
+                'loc' => route('blog.show', $article->slug),
+                'lastmod' => $article->updated_at->tz('Asia/Jakarta')->toIso8601String(),
+                'changefreq' => 'weekly',
+                'priority' => '0.6'
+            ];
+        }
+
+        // 3. City Landing Pages
+        $cities = City::where('is_hidden', false)
+            ->where(function ($q) {
+                $q->whereHas('outlets', function ($qo) {
+                    $qo->where('status', 'AKTIF')->where('is_hidden', false);
+                })->orWhereHas('distributors', function ($qd) {
+                    $qd->where('status', 'ACTIVE');
+                });
+            })
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        foreach ($cities as $city) {
+            $urls[] = [
+                'loc' => route('city.landing', $city->slug),
+                'lastmod' => $city->updated_at->tz('Asia/Jakarta')->toIso8601String(),
+                'changefreq' => 'weekly',
+                'priority' => '0.7'
+            ];
+        }
+
+        // Generate XML string
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        
+        foreach ($urls as $url) {
+            $xml .= '<url>';
+            $xml .= '<loc>' . htmlspecialchars($url['loc']) . '</loc>';
+            $xml .= '<lastmod>' . $url['lastmod'] . '</lastmod>';
+            $xml .= '<changefreq>' . $url['changefreq'] . '</changefreq>';
+            $xml .= '<priority>' . $url['priority'] . '</priority>';
+            $xml .= '</url>';
+        }
+        
+        $xml .= '</urlset>';
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=utf-8'
+        ]);
+    }
+
     // Haversine Distance Calculation Helper (Returns in km)
     private function haversine($lat1, $lon1, $lat2, $lon2)
     {

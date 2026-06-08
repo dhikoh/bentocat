@@ -3,6 +3,81 @@
 @section('title', 'Jual Pasir Kucing BentoCat Terdekat di ' . $city->nama . ' - Gumpal Premium')
 @section('meta_description', 'Temukan distributor resmi dan outlet petshop terdekat yang menjual pasir kucing BentoCat Premium di ' . $city->nama . '. Harga murah, hemat ongkir!')
 
+@section('schema')
+@php
+    $schemaGraph = [
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => url()->current() . '#breadcrumb',
+            'itemListElement' => [
+                [
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => 'Beranda',
+                    'item' => url('/')
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => 'Pasir Kucing di ' . $city->nama,
+                    'item' => url()->current()
+                ]
+            ]
+        ]
+    ];
+
+    if ($outlets->count() > 0) {
+        $itemListElements = [];
+        foreach ($outlets as $index => $outlet) {
+            $itemListElements[] = [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'item' => [
+                    '@type' => 'LocalBusiness',
+                    'name' => $outlet->nama_outlet,
+                    'image' => asset('images/logo.png'),
+                    'address' => [
+                        '@type' => 'PostalAddress',
+                        'streetAddress' => $outlet->alamat_lengkap,
+                        'addressLocality' => $city->nama,
+                        'addressRegion' => $province->nama,
+                        'addressCountry' => 'ID'
+                    ],
+                    'telephone' => $outlet->whatsapp
+                ]
+            ];
+        }
+        $schemaGraph[] = [
+            '@type' => 'ItemList',
+            '@id' => url()->current() . '#itemList',
+            'name' => 'Petshop Resmi BentoCat di ' . $city->nama,
+            'numberOfItems' => $outlets->count(),
+            'itemListElement' => $itemListElements
+        ];
+    } elseif ($distributor) {
+        $schemaGraph[] = [
+            '@type' => 'LocalBusiness',
+            'name' => 'Distributor BentoCat ' . $city->nama . ' - ' . $distributor->nama,
+            'image' => asset('images/logo.png'),
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => $distributor->alamat,
+                'addressLocality' => $city->nama,
+                'addressRegion' => $province->nama,
+                'addressCountry' => 'ID'
+            ],
+            'telephone' => $distributor->whatsapp
+        ];
+    }
+@endphp
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": {!! json_encode($schemaGraph, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+}
+</script>
+@endsection
+
 @section('content')
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
 

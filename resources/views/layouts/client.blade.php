@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', \App\Models\Setting::get('seo_meta_title', \App\Models\Setting::get('site_name', 'BentoCat') . ' - Premium Cat Litter Discovery'))</title>
     <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_meta_description', \App\Models\Setting::get('site_description', 'Temukan outlet resmi terdekat yang menjual BentoCat Premium Bentonite Cat Litter dengan harga lokal terjangkau.')))">
+    <meta name="keywords" content="@yield('meta_keywords', 'pasir kucing, pasir bentonit, pasir gumpal, pasir kucing premium, bentocat')">
+    <link rel="canonical" href="{{ url()->current() }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ asset(\App\Models\Setting::get('site_favicon', 'favicon.ico')) }}">
 
@@ -158,6 +160,7 @@
     </style>
     @yield('head')
     @stack('styles')
+    @yield('schema')
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-amber-100 selection:text-amber-900">
     @if(\App\Models\Setting::get('gtm_id'))

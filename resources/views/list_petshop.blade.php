@@ -2,6 +2,71 @@
 
 @section('title', 'Daftar Lengkap Petshop & Outlet Resmi BentoCat Seluruh Indonesia')
 @section('meta_description', 'Cari dan temukan daftar lengkap petshop mitra resmi BentoCat terdekat di kota Anda. Dapatkan pasir kucing bentonit premium asli berkualitas ekspor.')
+@section('schema')
+@php
+    $provinceElements = [];
+    foreach ($provinces as $index => $province) {
+        $cityElements = [];
+        foreach ($province->cities as $cityIndex => $city) {
+            $cityElements[] = [
+                '@type' => 'ListItem',
+                'position' => $cityIndex + 1,
+                'item' => [
+                    '@type' => 'WebPage',
+                    'name' => 'Petshop BentoCat di ' . $city->nama,
+                    'url' => route('city.landing', $city->slug)
+                ]
+            ];
+        }
+        $provinceElements[] = [
+            '@type' => 'ListItem',
+            'position' => $index + 1,
+            'item' => [
+                '@type' => 'ItemList',
+                'name' => $province->nama,
+                'numberOfItems' => $province->cities->count(),
+                'itemListElement' => $cityElements
+            ]
+        ];
+    }
+
+    $schemaGraph = [
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => url()->current() . '#breadcrumb',
+            'itemListElement' => [
+                [
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => 'Beranda',
+                    'item' => url('/')
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => 'Direktori Petshop',
+                    'item' => url()->current()
+                ]
+            ]
+        ],
+        [
+            '@type' => 'ItemList',
+            '@id' => url()->current() . '#itemList',
+            'name' => 'Daftar Petshop BentoCat Resmi Indonesia',
+            'description' => 'Cari petshop mitra resmi BentoCat terdekat di berbagai provinsi dan kota.',
+            'numberOfItems' => $provinces->count(),
+            'itemListElement' => $provinceElements
+        ]
+    ];
+@endphp
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": {!! json_encode($schemaGraph, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+}
+</script>
+@endsection
+
 
 @section('head')
 <style>

@@ -3,6 +3,46 @@
 @section('title', $article->seo_title ?: $article->title . ' - BentoCat Blog')
 @section('meta_description', $article->seo_description ?: ($article->summary ?: 'Baca artikel selengkapnya di BentoCat.'))
 
+@section('schema')
+@php
+    $publishDate = $article->published_at ? $article->published_at->tz('Asia/Jakarta')->toIso8601String() : $article->created_at->tz('Asia/Jakarta')->toIso8601String();
+    $modifiedDate = $article->updated_at->tz('Asia/Jakarta')->toIso8601String();
+    $authorName = $article->author->name ?? 'BentoCat Editor';
+    $siteName = \App\Models\Setting::get('site_name', 'BentoCat');
+    $siteLogo = asset(\App\Models\Setting::get('site_logo', 'images/logo.png'));
+    $ogImage = asset(\App\Models\Setting::get('seo_og_image', 'images/logo.png'));
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BlogPosting',
+        'mainEntityOfPage' => [
+            '@type' => 'WebPage',
+            '@id' => url()->current()
+        ],
+        'headline' => $article->title,
+        'description' => $article->seo_description ?: ($article->summary ?: 'Baca artikel selengkapnya di BentoCat.'),
+        'image' => $ogImage,
+        'datePublished' => $publishDate,
+        'dateModified' => $modifiedDate,
+        'author' => [
+            '@type' => 'Person',
+            'name' => $authorName
+        ],
+        'publisher' => [
+            '@type' => 'Organization',
+            'name' => $siteName,
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => $siteLogo
+            ]
+        ]
+    ];
+@endphp
+<script type="application/ld+json">
+{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endsection
+
 @section('content')
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-10">
 

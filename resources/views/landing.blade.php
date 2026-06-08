@@ -1,5 +1,44 @@
 @extends('layouts.client')
 
+@section('schema')
+@php
+    $siteName = \App\Models\Setting::get('site_name', 'BentoCat');
+    $siteLogo = asset(\App\Models\Setting::get('site_logo', 'images/logo.png'));
+    $siteDescription = \App\Models\Setting::get('site_description', 'BentoCat Premium Bentonite Cat Litter');
+    $homeUrl = url('/');
+
+    $schemaGraph = [
+        [
+            '@type' => 'Organization',
+            '@id' => $homeUrl . '/#organization',
+            'name' => $siteName,
+            'url' => $homeUrl,
+            'logo' => $siteLogo,
+            'description' => $siteDescription,
+            'sameAs' => [
+                'https://www.instagram.com/bentocat.id'
+            ]
+        ],
+        [
+            '@type' => 'WebSite',
+            '@id' => $homeUrl . '/#website',
+            'url' => $homeUrl,
+            'name' => $siteName,
+            'description' => $siteDescription,
+            'publisher' => [
+                '@id' => $homeUrl . '/#organization'
+            ]
+        ]
+    ];
+@endphp
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": {!! json_encode($schemaGraph, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+}
+</script>
+@endsection
+
 
 @section('title', \App\Models\Setting::get('site_name', 'BentoCat') . ' - Pasir Kucing Bentonit Premium')
 
