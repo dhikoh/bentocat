@@ -58,12 +58,14 @@
             'itemListElement' => $provinceElements
         ]
     ];
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@graph' => $schemaGraph
+    ];
 @endphp
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": {!! json_encode($schemaGraph, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
-}
+{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
 </script>
 @endsection
 
