@@ -43,6 +43,9 @@
         <button type="button" onclick="switchTab('contact')" id="tab-btn-contact" class="tab-btn px-5 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer">
             💬 Kontak & Medsos
         </button>
+        <button type="button" onclick="switchTab('features')" id="tab-btn-features" class="tab-btn px-5 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer">
+            ⭐ Fitur Keunggulan
+        </button>
     </div>
 
     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -260,6 +263,81 @@
                         <input type="url" name="social_facebook" id="social_facebook" placeholder="https://facebook.com/bentocat"
                                value="{{ old('social_facebook', $settings['social_facebook']) }}"
                                class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 6: Fitur Keunggulan -->
+        <div id="tab-pane-features" class="tab-pane hidden space-y-6">
+            <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6">
+                <h2 class="text-xl font-bold text-amber-400 pb-1 flex items-center gap-2">
+                    <span>⭐</span> Tiga Fitur Keunggulan Premium
+                </h2>
+                
+                <!-- Fitur 1 -->
+                <div class="border-b border-slate-800/80 pb-6 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300">⚡ Fitur 1 (Molecular Bonding)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label for="feature_1_icon" class="block text-xs font-bold text-slate-400 uppercase">Ikon / Emoji</label>
+                            <input type="text" name="feature_1_icon" id="feature_1_icon" value="{{ old('feature_1_icon', $settings['feature_1_icon']) }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="feature_1_title" class="block text-xs font-bold text-slate-400 uppercase">Judul Fitur</label>
+                            <input type="text" name="feature_1_title" id="feature_1_title" value="{{ old('feature_1_title', $settings['feature_1_title']) }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-3">
+                            <label for="feature_1_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur (Mendukung HTML seperti &lt;strong&gt; atau &lt;b&gt;)</label>
+                            <textarea name="feature_1_desc" id="feature_1_desc" rows="2" required
+                                      class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('feature_1_desc', $settings['feature_1_desc']) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fitur 2 -->
+                <div class="border-b border-slate-800/80 pb-6 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300">🌸 Fitur 2 (Zero-Dust Tech)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label for="feature_2_icon" class="block text-xs font-bold text-slate-400 uppercase">Ikon / Emoji</label>
+                            <input type="text" name="feature_2_icon" id="feature_2_icon" value="{{ old('feature_2_icon', $settings['feature_2_icon']) }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="feature_2_title" class="block text-xs font-bold text-slate-400 uppercase">Judul Fitur</label>
+                            <input type="text" name="feature_2_title" id="feature_2_title" value="{{ old('feature_2_title', $settings['feature_2_title']) }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-3">
+                            <label for="feature_2_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur (Mendukung HTML seperti &lt;strong&gt; atau &lt;b&gt;)</label>
+                            <textarea name="feature_2_desc" id="feature_2_desc" rows="2" required
+                                      class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('feature_2_desc', $settings['feature_2_desc']) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fitur 3 -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300">🍃 Fitur 3 (Odor Encapsulation)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label for="feature_3_icon" class="block text-xs font-bold text-slate-400 uppercase">Ikon / Emoji</label>
+                            <input type="text" name="feature_3_icon" id="feature_3_icon" value="{{ old('feature_3_icon', $settings['feature_3_icon']) }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="feature_3_title" class="block text-xs font-bold text-slate-400 uppercase">Judul Fitur</label>
+                            <input type="text" name="feature_3_title" id="feature_3_title" value="{{ old('feature_3_title', $settings['feature_3_title']) }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-3">
+                            <label for="feature_3_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur (Mendukung HTML seperti &lt;strong&gt; atau &lt;b&gt;)</label>
+                            <textarea name="feature_3_desc" id="feature_3_desc" rows="2" required
+                                      class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('feature_3_desc', $settings['feature_3_desc']) }}</textarea>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -33,6 +33,17 @@ class SettingSeeder extends Seeder
             'hero_badge_3_desc' => 'Dari kitten hingga senior, menjaga kebersihanbox tetap steril.',
             'cta_primary_text' => 'Cari Toko Terdekat 📍',
             'cta_secondary_text' => 'Lihat Katalog Produk',
+
+            // Fitur Keunggulan Premium
+            'feature_1_icon' => '🧪',
+            'feature_1_title' => 'Molecular Bonding',
+            'feature_1_desc' => 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.',
+            'feature_2_icon' => '💨',
+            'feature_2_title' => 'Zero-Dust Tech',
+            'feature_2_desc' => 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.',
+            'feature_3_icon' => '🛡️',
+            'feature_3_title' => 'Odor Encapsulation',
+            'feature_3_desc' => 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.',
         ];
 
         foreach ($defaults as $key => $value) {

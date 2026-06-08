@@ -92,26 +92,158 @@
     <!-- 2. Keunggulan Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-premium space-y-4">
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-xl">⚡</div>
-                <h3 class="font-outfit font-bold text-lg text-slate-900">Gumpalan Instan & Kuat</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Menyerap cairan dalam hitungan detik untuk mengunci urin seketika. Gumpalan padat tidak mudah pecah saat diserok, menjaga pasir bersih tetap higienis.
-                </p>
+            <!-- Feature 1: Molecular Bonding -->
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-amber-500/30 transition-premium space-y-6 flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                            {{ \App\Models\Setting::get('feature_1_icon', '🧪') }}
+                        </div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full font-bold">Instan & Padat</span>
+                    </div>
+                    
+                    <!-- Diagram Schematic: Molecular Lattice -->
+                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative">
+                        <svg class="w-full h-28 text-amber-500" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="glow-amber" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="3" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
+                            <!-- Background grid lines -->
+                            <path d="M 20,50 L 180,50 M 100,10 L 100,90" stroke="#f1ece4" stroke-width="1.5" stroke-dasharray="4 4" />
+                            
+                            <!-- Connection lines -->
+                            <line x1="60" y1="30" x2="100" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="animate-pulse" />
+                            <line x1="100" y1="15" x2="140" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="animate-pulse" />
+                            <line x1="140" y1="30" x2="140" y2="70" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="animate-pulse" />
+                            <line x1="140" y1="70" x2="100" y2="85" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="animate-pulse" />
+                            <line x1="100" y1="85" x2="60" y2="70" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="animate-pulse" />
+                            <line x1="60" y1="70" x2="60" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="animate-pulse" />
+                            
+                            <line x1="60" y1="30" x2="100" y2="50" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" />
+                            <line x1="140" y1="30" x2="100" y2="50" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" />
+                            <line x1="100" y1="85" x2="100" y2="50" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" />
+
+                            <!-- Nodes with bounce/pulse animation -->
+                            <circle cx="100" cy="15" r="7" fill="currentColor" class="animate-bounce" style="animation-duration: 3s;" filter="url(#glow-amber)" />
+                            <circle cx="140" cy="30" r="5" fill="currentColor" class="animate-bounce" style="animation-duration: 2.5s; animation-delay: 0.2s;" />
+                            <circle cx="140" cy="70" r="5" fill="currentColor" class="animate-bounce" style="animation-duration: 2.8s; animation-delay: 0.4s;" />
+                            <circle cx="100" cy="85" r="7" fill="currentColor" class="animate-bounce" style="animation-duration: 3.2s; animation-delay: 0.6s;" filter="url(#glow-amber)" />
+                            <circle cx="60" cy="70" r="5" fill="currentColor" class="animate-bounce" style="animation-duration: 2.7s; animation-delay: 0.8s;" />
+                            <circle cx="60" cy="30" r="5" fill="currentColor" class="animate-bounce" style="animation-duration: 2.9s; animation-delay: 1s;" />
+                            <circle cx="100" cy="50" r="8" fill="#f59e0b" class="animate-ping" style="animation-duration: 2s;" />
+                            <circle cx="100" cy="50" r="5" fill="currentColor" />
+                        </svg>
+                    </div>
+
+                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-amber-600 transition-premium">
+                        {{ \App\Models\Setting::get('feature_1_title', 'Molecular Bonding') }}
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        {!! \App\Models\Setting::get('feature_1_desc', 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.') !!}
+                    </p>
+                </div>
             </div>
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-premium space-y-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl">🌸</div>
-                <h3 class="font-outfit font-bold text-lg text-slate-900">Kontrol Bau Ekstra (Scented)</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Dilengkapi dengan aroma wangi premium (Lavender, Coffee, Apple) yang menyebarkan kesegaran alami dan menetralkan bau amonia kotoran secara maksimal.
-                </p>
+
+            <!-- Feature 2: Zero-Dust Tech -->
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-premium space-y-6 flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                            {{ \App\Models\Setting::get('feature_2_icon', '💨') }}
+                        </div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full font-bold">99.9% Bebas Debu</span>
+                    </div>
+
+                    <!-- Diagram Schematic: Double Dust Filtration -->
+                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative">
+                        <svg class="w-full h-28 text-emerald-500" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Double filter grids -->
+                            <line x1="30" y1="35" x2="170" y2="35" stroke="currentColor" stroke-width="2.5" stroke-dasharray="8 5" class="animate-pulse" />
+                            <line x1="30" y1="65" x2="170" y2="65" stroke="currentColor" stroke-width="2.5" stroke-dasharray="5 8" class="animate-pulse" style="animation-delay: 0.5s;" />
+
+                            <!-- Clean air flowing down -->
+                            <path d="M 60,10 Q 60,25 50,35 T 60,65 T 55,90" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" class="air-flow" />
+                            <path d="M 100,10 Q 100,25 90,35 T 100,65 T 95,90" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" class="air-flow" style="animation-delay: 0.3s;" />
+                            <path d="M 140,10 Q 140,25 130,35 T 140,65 T 135,90" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" class="air-flow" style="animation-delay: 0.6s;" />
+
+                            <!-- Falling dust deflected -->
+                            <circle cx="45" cy="15" r="2.5" fill="#94a3b8" class="dust-1" />
+                            <circle cx="85" cy="12" r="3" fill="#94a3b8" class="dust-2" />
+                            <circle cx="125" cy="18" r="2.5" fill="#94a3b8" class="dust-3" />
+                            <circle cx="165" cy="14" r="3" fill="#94a3b8" class="dust-4" />
+                        </svg>
+                        <style>
+                            @keyframes flow { to { stroke-dashoffset: 0; } }
+                            .air-flow { animation: flow 2.2s linear infinite; }
+                            @keyframes bounce1 {
+                                0% { transform: translate(0, 0); opacity: 1; }
+                                50% { transform: translate(-8px, 18px); opacity: 0.8; }
+                                100% { transform: translate(-20px, 12px); opacity: 0; }
+                            }
+                            @keyframes bounce2 {
+                                0% { transform: translate(0, 0); opacity: 1; }
+                                40% { transform: translate(10px, 22px); opacity: 0.8; }
+                                100% { transform: translate(24px, 16px); opacity: 0; }
+                            }
+                            .dust-1 { animation: bounce1 1.8s ease-in-out infinite; }
+                            .dust-2 { animation: bounce2 2s ease-in-out infinite; }
+                            .dust-3 { animation: bounce1 1.6s ease-in-out infinite; animation-delay: 0.4s; }
+                            .dust-4 { animation: bounce2 1.9s ease-in-out infinite; animation-delay: 0.7s; }
+                        </style>
+                    </div>
+
+                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-emerald-600 transition-premium">
+                        {{ \App\Models\Setting::get('feature_2_title', 'Zero-Dust Tech') }}
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        {!! \App\Models\Setting::get('feature_2_desc', 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.') !!}
+                    </p>
+                </div>
             </div>
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-premium space-y-4">
-                <div class="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center text-xl">🍃</div>
-                <h3 class="font-outfit font-bold text-lg text-slate-900">Minim Debu (Dust-Free)</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Diproses melalui penyaringan ganda sehingga aman bagi pernapasan kucing peliharaan maupun pemilik rumah. Mencegah noda jejak kaki kucing di lantai.
-                </p>
+
+            <!-- Feature 3: Odor Encapsulation -->
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-teal-500/30 transition-premium space-y-6 flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                            {{ \App\Models\Setting::get('feature_3_icon', '🛡️') }}
+                        </div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full font-bold">Kontrol Bau Maksimal</span>
+                    </div>
+
+                    <!-- Diagram Schematic: Active Carbon Hexagon Capture -->
+                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative">
+                        <svg class="w-full h-28 text-teal-500" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Carbon Frame -->
+                            <polygon points="100,20 130,37 130,72 100,90 70,72 70,37" fill="none" stroke="currentColor" stroke-width="2" class="animate-pulse" />
+                            <polygon points="100,28 123,40 123,68 100,80 77,68 77,40" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 2" />
+                            
+                            <!-- Captured Odor Core -->
+                            <circle cx="100" cy="54" r="12" fill="#14b8a6" class="animate-ping" style="animation-duration: 2.8s;" />
+                            <circle cx="100" cy="54" r="6" fill="currentColor" />
+
+                            <!-- Odor lines sucked inside -->
+                            <path d="M 20,20 Q 50,30 80,50" fill="none" stroke="#99f6e4" stroke-width="1.5" stroke-dasharray="4 4" class="odor-flow" />
+                            <path d="M 180,20 Q 150,30 120,50" fill="none" stroke="#99f6e4" stroke-width="1.5" stroke-dasharray="4 4" class="odor-flow" />
+                            <path d="M 40,85 Q 70,80 90,65" fill="none" stroke="#99f6e4" stroke-width="1.5" stroke-dasharray="4 4" class="odor-flow" />
+                            <path d="M 160,85 Q 130,80 110,65" fill="none" stroke="#99f6e4" stroke-width="1.5" stroke-dasharray="4 4" class="odor-flow" />
+                        </svg>
+                        <style>
+                            @keyframes odorDash { to { stroke-dashoffset: -20; } }
+                            .odor-flow { animation: odorDash 1.2s linear infinite; }
+                        </style>
+                    </div>
+
+                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-teal-600 transition-premium">
+                        {{ \App\Models\Setting::get('feature_3_title', 'Odor Encapsulation') }}
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        {!! \App\Models\Setting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.') !!}
+                    </p>
+                </div>
             </div>
         </div>
     </section>

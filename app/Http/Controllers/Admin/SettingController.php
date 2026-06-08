@@ -39,6 +39,17 @@ class SettingController extends Controller
             'hero_badge_3_desc' => Setting::get('hero_badge_3_desc', 'Dari kitten hingga senior, menjaga kebersihanbox tetap steril.'),
             'cta_primary_text' => Setting::get('cta_primary_text', 'Cari Toko Terdekat 📍'),
             'cta_secondary_text' => Setting::get('cta_secondary_text', 'Lihat Katalog Produk'),
+            
+            // Fitur Keunggulan
+            'feature_1_icon' => Setting::get('feature_1_icon', '🧪'),
+            'feature_1_title' => Setting::get('feature_1_title', 'Molecular Bonding'),
+            'feature_1_desc' => Setting::get('feature_1_desc', 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.'),
+            'feature_2_icon' => Setting::get('feature_2_icon', '💨'),
+            'feature_2_title' => Setting::get('feature_2_title', 'Zero-Dust Tech'),
+            'feature_2_desc' => Setting::get('feature_2_desc', 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.'),
+            'feature_3_icon' => Setting::get('feature_3_icon', '🛡️'),
+            'feature_3_title' => Setting::get('feature_3_title', 'Odor Encapsulation'),
+            'feature_3_desc' => Setting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.'),
         ];
 
         return view('admin.settings.index', compact('settings'));
@@ -74,6 +85,17 @@ class SettingController extends Controller
             'hero_badge_3_desc' => 'required|string',
             'cta_primary_text' => 'required|string|max:255',
             'cta_secondary_text' => 'required|string|max:255',
+
+            // Fitur Keunggulan
+            'feature_1_icon' => 'required|string|max:50',
+            'feature_1_title' => 'required|string|max:255',
+            'feature_1_desc' => 'required|string',
+            'feature_2_icon' => 'required|string|max:50',
+            'feature_2_title' => 'required|string|max:255',
+            'feature_2_desc' => 'required|string',
+            'feature_3_icon' => 'required|string|max:50',
+            'feature_3_title' => 'required|string|max:255',
+            'feature_3_desc' => 'required|string',
         ]);
 
         Setting::set('site_name', $request->site_name);
@@ -94,6 +116,16 @@ class SettingController extends Controller
         Setting::set('hero_badge_3_desc', $request->hero_badge_3_desc);
         Setting::set('cta_primary_text', $request->cta_primary_text);
         Setting::set('cta_secondary_text', $request->cta_secondary_text);
+
+        Setting::set('feature_1_icon', $request->feature_1_icon);
+        Setting::set('feature_1_title', $request->feature_1_title);
+        Setting::set('feature_1_desc', $request->feature_1_desc);
+        Setting::set('feature_2_icon', $request->feature_2_icon);
+        Setting::set('feature_2_title', $request->feature_2_title);
+        Setting::set('feature_2_desc', $request->feature_2_desc);
+        Setting::set('feature_3_icon', $request->feature_3_icon);
+        Setting::set('feature_3_title', $request->feature_3_title);
+        Setting::set('feature_3_desc', $request->feature_3_desc);
 
         if ($request->hasFile('site_logo')) {
             $logoPath = $request->file('site_logo')->store('branding', 'public');
