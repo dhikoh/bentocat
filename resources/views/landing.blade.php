@@ -100,30 +100,35 @@
             /* --- 1. MOLECULAR BONDING (BENTONITE CLUMPING) --- */
             .droplet {
                 animation: dropletFall 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: transform, opacity;
             }
             .ripple-ring {
                 animation: rippleWave 5s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
                 transform-origin: 100px 95px;
+                will-change: transform, opacity;
             }
             .clump-grain {
                 transition: transform 0.5s ease, fill 0.5s ease;
                 animation: grainClump 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: transform, fill, stroke;
             }
-            .grain-a { transform-origin: 85px 95px; --target-x: 10px; --target-y: 5px; }
-            .grain-b { transform-origin: 93px 110px; --target-x: 4px; --target-y: -8px; }
-            .grain-c { transform-origin: 100px 90px; --target-x: 0px; --target-y: 9px; }
-            .grain-d { transform-origin: 107px 108px; --target-x: -5px; --target-y: -6px; }
-            .grain-e { transform-origin: 115px 96px; --target-x: -11px; --target-y: 4px; }
-            .grain-f { transform-origin: 100px 115px; --target-x: 0px; --target-y: -11px; }
+            .grain-a { transform-origin: 60px 80px; --target-x: 28px; --target-y: 10px; }
+            .grain-b { transform-origin: 80px 115px; --target-x: 14px; --target-y: -11px; }
+            .grain-c { transform-origin: 100px 75px; --target-x: 0px; --target-y: 11px; }
+            .grain-d { transform-origin: 120px 110px; --target-x: -14px; --target-y: -6px; }
+            .grain-e { transform-origin: 140px 80px; --target-x: -28px; --target-y: 10px; }
+            .grain-f { transform-origin: 100px 125px; --target-x: 0px; --target-y: -15px; }
 
             .bond-mesh {
                 stroke-dasharray: 40;
                 stroke-dashoffset: 40;
                 animation: meshActivate 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: stroke-dashoffset, opacity;
             }
             .clump-glow {
-                transform-origin: 100px 102px;
+                transform-origin: 100px 98px;
                 animation: glowActivate 5s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
+                will-change: transform, opacity;
             }
             .status-text-inactive {
                 animation: textInactive 5s infinite steps(1);
@@ -133,32 +138,32 @@
             }
 
             @keyframes dropletFall {
-                0% { transform: translateY(-30px) scaleY(1.3); opacity: 0; }
+                0% { transform: translate3d(0, -30px, 0) scaleY(1.3); opacity: 0; }
                 5% { opacity: 0.8; }
-                18% { transform: translateY(80px) scaleY(1); opacity: 1; }
-                20% { transform: translateY(95px) scaleY(0.7); opacity: 1; }
-                22%, 100% { transform: translateY(95px) scaleY(0); opacity: 0; }
+                18% { transform: translate3d(0, 80px, 0) scaleY(1); opacity: 1; }
+                20% { transform: translate3d(0, 95px, 0) scaleY(0.7); opacity: 1; }
+                22%, 100% { transform: translate3d(0, 95px, 0) scaleY(0); opacity: 0; }
             }
             @keyframes rippleWave {
-                0%, 20% { transform: scale(0); opacity: 0; }
-                21% { transform: scale(0); opacity: 1; stroke-width: 3; }
-                40% { transform: scale(3.5); opacity: 0; stroke-width: 0.5; }
-                100% { transform: scale(3.5); opacity: 0; }
+                0%, 20% { transform: scale3d(0, 0, 1); opacity: 0; }
+                21% { transform: scale3d(0, 0, 1); opacity: 1; stroke-width: 3; }
+                40% { transform: scale3d(3.5, 3.5, 1); opacity: 0; stroke-width: 0.5; }
+                100% { transform: scale3d(3.5, 3.5, 1); opacity: 0; }
             }
             @keyframes grainClump {
                 0%, 20% {
-                    transform: translate(0, 0) scale(1);
+                    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
                     fill: url(#dryGrainGrad);
                     stroke: #cbd5e1;
                 }
                 30%, 80% {
-                    transform: translate(var(--target-x), var(--target-y)) scale(1.2);
+                    transform: translate3d(var(--target-x), var(--target-y), 0) scale3d(1.2, 1.2, 1);
                     fill: url(#wetGrainGrad);
                     stroke: #3b82f6;
                     filter: drop-shadow(0 2px 4px rgba(59,130,246,0.3));
                 }
                 88%, 100% {
-                    transform: translate(0, 0) scale(1);
+                    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
                     fill: url(#dryGrainGrad);
                     stroke: #cbd5e1;
                 }
@@ -169,9 +174,9 @@
                 88%, 100% { stroke-dashoffset: 40; opacity: 0; }
             }
             @keyframes glowActivate {
-                0%, 20% { transform: scale(0.6); opacity: 0; }
-                30%, 80% { transform: scale(1.15); opacity: 0.18; }
-                88%, 100% { transform: scale(0.6); opacity: 0; }
+                0%, 20% { transform: scale3d(0.6, 0.6, 1); opacity: 0; }
+                30%, 80% { transform: scale3d(1.15, 1.15, 1); opacity: 0.18; }
+                88%, 100% { transform: scale3d(0.6, 0.6, 1); opacity: 0; }
             }
             @keyframes textInactive {
                 0%, 19% { opacity: 1; }
@@ -187,10 +192,12 @@
             /* --- 2. DUSTING ANIMATIONS --- */
             .sieve-plate {
                 animation: sieveVibrate 0.15s infinite linear;
+                will-change: transform;
             }
             .granule {
                 transform-origin: center;
                 opacity: 0;
+                will-change: transform, opacity;
             }
             .granule-1 {
                 animation: granulePath1 4s infinite cubic-bezier(0.25, 1, 0.5, 1);
@@ -206,6 +213,7 @@
             .dust-particle {
                 transform-origin: center;
                 opacity: 0;
+                will-change: transform, opacity;
             }
             .dust-1 {
                 animation: dustPath1 4s infinite ease-in;
@@ -221,68 +229,69 @@
             .suction-current {
                 stroke-dasharray: 6 3;
                 animation: suctionDash 1s infinite linear;
+                will-change: stroke-dashoffset;
             }
 
             @keyframes sieveVibrate {
-                0%, 100% { transform: translateY(0) translateX(0); }
-                25% { transform: translateY(0.5px) translateX(-0.5px); }
-                75% { transform: translateY(-0.5px) translateX(0.5px); }
+                0%, 100% { transform: translate3d(0, 0, 0); }
+                25% { transform: translate3d(-0.5px, 0.5px, 0); }
+                75% { transform: translate3d(0.5px, -0.5px, 0); }
             }
             @keyframes granulePath1 {
-                0% { transform: translate(45px, -15px) scale(0.6); opacity: 0; }
-                5% { opacity: 1; transform: translate(45px, -15px) scale(1); }
-                18% { transform: translate(48px, 48px) rotate(15deg); }
-                22% { transform: translate(50px, 58px) scale(0.95); } /* hits sieve 1 */
-                35% { transform: translate(54px, 88px) rotate(45deg); }
-                38% { transform: translate(56px, 94px) scale(0.9); } /* hits sieve 2 */
-                55% { transform: translate(58px, 126px) rotate(90deg); opacity: 1; } /* lands */
-                85% { opacity: 1; transform: translate(58px, 126px) rotate(90deg); }
-                95%, 100% { opacity: 0; transform: translate(58px, 126px) rotate(90deg); }
+                0% { transform: translate3d(45px, -15px, 0) scale3d(0.6, 0.6, 1); opacity: 0; }
+                5% { opacity: 1; transform: translate3d(45px, -15px, 0) scale3d(1, 1, 1); }
+                18% { transform: translate3d(48px, 48px, 0) rotate(15deg); }
+                22% { transform: translate3d(50px, 58px, 0) scale3d(0.95, 0.95, 1); }
+                35% { transform: translate3d(54px, 88px, 0) rotate(45deg); }
+                38% { transform: translate3d(56px, 94px, 0) scale3d(0.9, 0.9, 1); }
+                55% { transform: translate3d(58px, 126px, 0) rotate(90deg); opacity: 1; }
+                85% { opacity: 1; transform: translate3d(58px, 126px, 0) rotate(90deg); }
+                95%, 100% { opacity: 0; transform: translate3d(58px, 126px, 0) rotate(90deg); }
             }
             @keyframes granulePath2 {
-                0% { transform: translate(85px, -15px) scale(0.6); opacity: 0; }
-                5% { opacity: 1; transform: translate(85px, -15px) scale(1); }
-                20% { transform: translate(88px, 48px) rotate(-10deg); }
-                24% { transform: translate(90px, 58px) scale(0.95); }
-                38% { transform: translate(92px, 88px) rotate(-30deg); }
-                41% { transform: translate(94px, 94px) scale(0.9); }
-                60% { transform: translate(98px, 128px) rotate(-60deg); opacity: 1; }
-                85% { opacity: 1; transform: translate(98px, 128px) rotate(-60deg); }
-                95%, 100% { opacity: 0; transform: translate(98px, 128px) rotate(-60deg); }
+                0% { transform: translate3d(85px, -15px, 0) scale3d(0.6, 0.6, 1); opacity: 0; }
+                5% { opacity: 1; transform: translate3d(85px, -15px, 0) scale3d(1, 1, 1); }
+                20% { transform: translate3d(88px, 48px, 0) rotate(-10deg); }
+                24% { transform: translate3d(90px, 58px, 0) scale3d(0.95, 0.95, 1); }
+                38% { transform: translate3d(92px, 88px, 0) rotate(-30deg); }
+                41% { transform: translate3d(94px, 94px, 0) scale3d(0.9, 0.9, 1); }
+                60% { transform: translate3d(98px, 128px, 0) rotate(-60deg); opacity: 1; }
+                85% { opacity: 1; transform: translate3d(98px, 128px, 0) rotate(-60deg); }
+                95%, 100% { opacity: 0; transform: translate3d(98px, 128px, 0) rotate(-60deg); }
             }
             @keyframes granulePath3 {
-                0% { transform: translate(125px, -15px) scale(0.6); opacity: 0; }
-                5% { opacity: 1; transform: translate(125px, -15px) scale(1); }
-                22% { transform: translate(122px, 48px) rotate(20deg); }
-                26% { transform: translate(120px, 58px) scale(0.95); }
-                40% { transform: translate(116px, 88px) rotate(40deg); }
-                43% { transform: translate(114px, 94px) scale(0.9); }
-                62% { transform: translate(110px, 127px) rotate(80deg); opacity: 1; }
-                85% { opacity: 1; transform: translate(110px, 127px) rotate(80deg); }
-                95%, 100% { opacity: 0; transform: translate(110px, 127px) rotate(80deg); }
+                0% { transform: translate3d(125px, -15px, 0) scale3d(0.6, 0.6, 1); opacity: 0; }
+                5% { opacity: 1; transform: translate3d(125px, -15px, 0) scale3d(1, 1, 1); }
+                22% { transform: translate3d(122px, 48px, 0) rotate(20deg); }
+                26% { transform: translate3d(120px, 58px, 0) scale3d(0.95, 0.95, 1); }
+                40% { transform: translate3d(116px, 88px, 0) rotate(40deg); }
+                43% { transform: translate3d(114px, 94px, 0) scale3d(0.9, 0.9, 1); }
+                62% { transform: translate3d(110px, 127px, 0) rotate(80deg); opacity: 1; }
+                85% { opacity: 1; transform: translate3d(110px, 127px, 0) rotate(80deg); }
+                95%, 100% { opacity: 0; transform: translate3d(110px, 127px, 0) rotate(80deg); }
             }
             @keyframes dustPath1 {
-                0% { transform: translate(55px, 10px) scale(0.5); opacity: 0; }
-                10% { opacity: 1; transform: translate(58px, 25px) scale(1); }
-                30% { transform: translate(65px, 45px); opacity: 1; }
-                45% { transform: translate(110px, 20px) scale(0.6); opacity: 0.8; }
-                55% { transform: translate(165px, 15px) scale(0.2); opacity: 0; }
+                0% { transform: translate3d(55px, 10px, 0) scale3d(0.5, 0.5, 1); opacity: 0; }
+                10% { opacity: 1; transform: translate3d(58px, 25px, 0) scale3d(1, 1, 1); }
+                30% { transform: translate3d(65px, 45px, 0); opacity: 1; }
+                45% { transform: translate3d(110px, 20px, 0) scale3d(0.6, 0.6, 1); opacity: 0.8; }
+                55% { transform: translate3d(165px, 15px, 0) scale3d(0.2, 0.2, 1); opacity: 0; }
                 100% { opacity: 0; }
             }
             @keyframes dustPath2 {
-                0% { transform: translate(95px, 5px) scale(0.5); opacity: 0; }
-                10% { opacity: 1; transform: translate(98px, 20px) scale(1); }
-                28% { transform: translate(105px, 40px); opacity: 1; }
-                43% { transform: translate(130px, 22px) scale(0.6); opacity: 0.8; }
-                53% { transform: translate(168px, 18px) scale(0.2); opacity: 0; }
+                0% { transform: translate3d(95px, 5px, 0) scale3d(0.5, 0.5, 1); opacity: 0; }
+                10% { opacity: 1; transform: translate3d(98px, 20px, 0) scale3d(1, 1, 1); }
+                28% { transform: translate3d(105px, 40px, 0); opacity: 1; }
+                43% { transform: translate3d(130px, 22px, 0) scale3d(0.6, 0.6, 1); opacity: 0.8; }
+                53% { transform: translate3d(168px, 18px, 0) scale3d(0.2, 0.2, 1); opacity: 0; }
                 100% { opacity: 0; }
             }
             @keyframes dustPath3 {
-                0% { transform: translate(135px, 12px) scale(0.5); opacity: 0; }
-                10% { opacity: 1; transform: translate(132px, 28px) scale(1); }
-                32% { transform: translate(122px, 48px); opacity: 1; }
-                47% { transform: translate(145px, 24px) scale(0.6); opacity: 0.8; }
-                57% { transform: translate(170px, 20px) scale(0.2); opacity: 0; }
+                0% { transform: translate3d(135px, 12px, 0) scale3d(0.5, 0.5, 1); opacity: 0; }
+                10% { opacity: 1; transform: translate3d(132px, 28px, 0) scale3d(1, 1, 1); }
+                32% { transform: translate3d(122px, 48px, 0); opacity: 1; }
+                47% { transform: translate3d(145px, 24px, 0) scale3d(0.6, 0.6, 1); opacity: 0.8; }
+                57% { transform: translate3d(170px, 20px, 0) scale3d(0.2, 0.2, 1); opacity: 0; }
                 100% { opacity: 0; }
             }
             @keyframes suctionDash {
@@ -293,10 +302,12 @@
             .carbon-orbit {
                 transform-origin: 100px 70px;
                 animation: orbitRotate 15s infinite linear;
+                will-change: transform;
             }
             .odor-molecule {
                 transform-origin: center;
                 opacity: 0;
+                will-change: transform, opacity;
             }
             .odor-1 {
                 animation: odorSuck1 5s infinite cubic-bezier(0.25, 1, 0.5, 1);
@@ -312,6 +323,7 @@
             .trap-pulse {
                 transform-origin: center;
                 animation: trapLock1 5s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                will-change: transform, opacity, stroke;
             }
             .trap-pulse-1 { transform-origin: 75px 55px; }
             .trap-pulse-2 { transform-origin: 125px 55px; }
@@ -325,6 +337,7 @@
             .scent-sparkle {
                 transform-origin: center;
                 opacity: 0;
+                will-change: transform, opacity;
             }
             .scent-1 {
                 animation: scentFloat1 5s infinite ease-out;
@@ -340,47 +353,47 @@
             }
 
             @keyframes orbitRotate {
+                0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
             @keyframes odorSuck1 {
-                0% { transform: translate(25px, 110px) scale(0); opacity: 0; }
-                10% { opacity: 0.9; transform: translate(30px, 95px) scale(1); }
-                30% { transform: translate(65px, 60px) scale(0.8); opacity: 0.9; }
-                36%, 100% { transform: translate(75px, 55px) scale(0); opacity: 0; }
+                0% { transform: translate3d(25px, 110px, 0) scale3d(0, 0, 1); opacity: 0; }
+                10% { opacity: 0.9; transform: translate3d(30px, 95px, 0) scale3d(1, 1, 1); }
+                30% { transform: translate3d(65px, 60px, 0) scale3d(0.8, 0.8, 1); opacity: 0.9; }
+                36%, 100% { transform: translate3d(75px, 55px, 0) scale3d(0, 0, 1); opacity: 0; }
             }
             @keyframes odorSuck2 {
-                0% { transform: translate(145px, 110px) scale(0); opacity: 0; }
-                10% { opacity: 0.9; transform: translate(140px, 95px) scale(1); }
-                30% { transform: translate(130px, 60px) scale(0.8); opacity: 0.9; }
-                36%, 100% { transform: translate(125px, 55px) scale(0); opacity: 0; }
+                0% { transform: translate3d(145px, 110px, 0) scale3d(0, 0, 1); opacity: 0; }
+                10% { opacity: 0.9; transform: translate3d(140px, 95px, 0) scale3d(1, 1, 1); }
+                30% { transform: translate3d(130px, 60px, 0) scale3d(0.8, 0.8, 1); opacity: 0.9; }
+                36%, 100% { transform: translate3d(125px, 55px, 0) scale3d(0, 0, 1); opacity: 0; }
             }
             @keyframes odorSuck3 {
-                0% { transform: translate(85px, 125px) scale(0); opacity: 0; }
-                10% { opacity: 0.9; transform: translate(88px, 115px) scale(1); }
-                30% { transform: translate(95px, 100px) scale(0.8); opacity: 0.9; }
-                36%, 100% { transform: translate(100px, 95px) scale(0); opacity: 0; }
+                0% { transform: translate3d(85px, 125px, 0) scale3d(0, 0, 1); opacity: 0; }
+                10% { opacity: 0.9; transform: translate3d(88px, 115px, 0) scale3d(1, 1, 1); }
+                30% { transform: translate3d(95px, 100px, 0) scale3d(0.8, 0.8, 1); opacity: 0.9; }
+                36%, 100% { transform: translate3d(100px, 95px, 0) scale3d(0, 0, 1); opacity: 0; }
             }
             @keyframes trapLock1 {
-                0%, 28% { transform: scale(1.6); opacity: 0; stroke: #a855f7; }
-                34% { transform: scale(1); opacity: 1; stroke: #a855f7; stroke-width: 2.5; }
-                45% { transform: scale(1); opacity: 0.4; stroke: #3b82f6; stroke-width: 1.5; }
+                0%, 28% { transform: scale3d(1.6, 1.6, 1); opacity: 0; stroke: #a855f7; }
+                34% { transform: scale3d(1, 1, 1); opacity: 1; stroke: #a855f7; stroke-width: 2.5; }
+                45% { transform: scale3d(1, 1, 1); opacity: 0.4; stroke: #3b82f6; stroke-width: 1.5; }
                 80% { opacity: 0.4; }
-                88%, 100% { opacity: 0; transform: scale(1.6); }
+                88%, 100% { opacity: 0; transform: scale3d(1.6, 1.6, 1); }
             }
             @keyframes scentFloat1 {
-                0%, 35% { transform: translate(100px, 70px) scale(0); opacity: 0; }
-                42% { opacity: 1; transform: translate(80px, 35px) scale(1.2); }
-                70% { opacity: 1; transform: translate(65px, 10px) scale(1); }
-                85% { opacity: 0; transform: translate(55px, -15px) scale(0.8); }
+                0%, 35% { transform: translate3d(100px, 70px, 0) scale3d(0, 0, 1); opacity: 0; }
+                42% { opacity: 1; transform: translate3d(80px, 35px, 0) scale3d(1.2, 1.2, 1); }
+                70% { opacity: 1; transform: translate3d(65px, 10px, 0) scale3d(1, 1, 1); }
+                85% { opacity: 0; transform: translate3d(55px, -15px, 0) scale3d(0.8, 0.8, 1); }
                 100% { opacity: 0; }
             }
             @keyframes scentFloat2 {
-                0%, 38% { transform: translate(100px, 70px) scale(0); opacity: 0; }
-                45% { opacity: 1; transform: translate(120px, 32px) scale(1.2); }
-                72% { opacity: 1; transform: translate(135px, 8px) scale(1); }
-                87% { opacity: 0; transform: translate(145px, -18px) scale(0.8); }
+                0%, 38% { transform: translate3d(100px, 70px, 0) scale3d(0, 0, 1); opacity: 0; }
+                45% { opacity: 1; transform: translate3d(120px, 32px, 0) scale3d(1.2, 1.2, 1); }
+                72% { opacity: 1; transform: translate3d(135px, 8px, 0) scale3d(1, 1, 1); }
+                87% { opacity: 0; transform: translate3d(145px, -18px, 0) scale3d(0.8, 0.8, 1); }
                 100% { opacity: 0; }
-            }
         </style>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -430,58 +443,58 @@
                                         <stop offset="100%" stop-color="#334155" />
                                     </linearGradient>
                                     <!-- Organic Sand Grain Templates -->
-                                    <path id="sand1" d="M -4 -3 C -2 -5, 2 -5, 4 -3 C 5 -1, 3 3, 0 4 C -3 4, -5 2, -5 -1 Z" />
-                                    <path id="sand2" d="M -3 -4 C 1 -5, 4 -3, 3 1 C 2 4, -2 5, -4 2 C -5 -1, -4 -3, -3 -4 Z" />
-                                    <path id="sand3" d="M -4 -2 C -3 -4, 2 -4, 3 -1 C 4 2, 1 4, -2 4 C -4 3, -5 1, -4 -2 Z" />
+                                    <path id="sand1" d="M -10 -8 C -5 -12, 5 -12, 10 -8 C 12 -3, 8 8, 0 10 C -8 10, -12 5, -12 -3 Z" />
+                                    <path id="sand2" d="M -8 -10 C 2 -12, 10 -8, 8 2 C 5 10, -5 12, -10 5 C -12 -2, -10 -8, -8 -10 Z" />
+                                    <path id="sand3" d="M -10 -5 C -8 -10, 5 -10, 8 -3 C 10 5, 2 10, -5 10 C -10 8, -12 2, -10 -5 Z" />
                                 </defs>
 
                                 <rect width="100%" height="100%" fill="url(#subtleGrid)" />
 
                                 <!-- Clump Glow Shield -->
-                                <ellipse cx="100" cy="102" rx="22" ry="15" fill="#3b82f6" opacity="0" class="clump-glow" style="filter: blur(4px);" />
+                                <ellipse cx="100" cy="98" rx="30" ry="20" fill="#3b82f6" opacity="0" class="clump-glow" style="filter: blur(6px);" />
 
                                 <!-- Molecular grid lines (kisi molekul) active when clumped -->
                                 <g stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" opacity="0">
-                                    <line x1="95" y1="100" x2="100" y2="99" class="bond-mesh" />
-                                    <line x1="100" y1="99" x2="104" y2="100" class="bond-mesh" />
-                                    <line x1="104" y1="100" x2="102" y2="102" class="bond-mesh" />
-                                    <line x1="102" y1="102" x2="100" y2="104" class="bond-mesh" />
-                                    <line x1="100" y1="104" x2="97" y2="102" class="bond-mesh" />
-                                    <line x1="97" y1="102" x2="95" y2="100" class="bond-mesh" />
-                                    <!-- Inner bonds -->
-                                    <line x1="100" y1="99" x2="100" y2="104" class="bond-mesh" />
-                                    <line x1="95" y1="100" x2="102" y2="102" class="bond-mesh" />
-                                    <line x1="97" y1="102" x2="104" y2="100" class="bond-mesh" />
+                                    <line x1="100" y1="86" x2="88" y2="90" class="bond-mesh" />
+                                    <line x1="100" y1="86" x2="112" y2="90" class="bond-mesh" />
+                                    <line x1="88" y1="90" x2="94" y2="104" class="bond-mesh" />
+                                    <line x1="112" y1="90" x2="106" y2="104" class="bond-mesh" />
+                                    <line x1="94" y1="104" x2="100" y2="110" class="bond-mesh" />
+                                    <line x1="106" y1="104" x2="100" y2="110" class="bond-mesh" />
+                                    <line x1="88" y1="90" x2="100" y2="110" class="bond-mesh" />
+                                    <line x1="112" y1="90" x2="100" y2="110" class="bond-mesh" />
+                                    <line x1="100" y1="86" x2="100" y2="110" class="bond-mesh" />
                                 </g>
 
-                                <!-- Dry background/surrounding granules -->
-                                <use href="#sand1" x="70" y="90" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand2" x="75" y="115" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand3" x="80" y="125" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand1" x="122" y="115" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand2" x="128" y="95" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand3" x="118" y="125" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand1" x="90" y="83" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
-                                <use href="#sand2" x="110" y="83" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <!-- Dry background/surrounding granules (spread wider to fill card) -->
+                                <use href="#sand1" x="35" y="105" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand2" x="50" y="125" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand3" x="65" y="85" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand1" x="80" y="135" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand2" x="120" y="135" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand3" x="135" y="85" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand1" x="150" y="125" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand2" x="165" y="105" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand3" x="100" y="55" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
 
                                 <!-- Active clumping granules -->
                                 <g class="clump-grain grain-a">
-                                    <use href="#sand1" x="85" y="95" stroke-width="0.75" />
+                                    <use href="#sand1" x="60" y="80" stroke-width="0.75" />
                                 </g>
                                 <g class="clump-grain grain-b">
-                                    <use href="#sand2" x="93" y="110" stroke-width="0.75" />
+                                    <use href="#sand2" x="80" y="115" stroke-width="0.75" />
                                 </g>
                                 <g class="clump-grain grain-c">
-                                    <use href="#sand3" x="100" y="90" stroke-width="0.75" />
+                                    <use href="#sand3" x="100" y="75" stroke-width="0.75" />
                                 </g>
                                 <g class="clump-grain grain-d">
-                                    <use href="#sand1" x="107" y="108" stroke-width="0.75" />
+                                    <use href="#sand1" x="120" y="110" stroke-width="0.75" />
                                 </g>
                                 <g class="clump-grain grain-e">
-                                    <use href="#sand2" x="115" y="96" stroke-width="0.75" />
+                                    <use href="#sand2" x="140" y="80" stroke-width="0.75" />
                                 </g>
                                 <g class="clump-grain grain-f">
-                                    <use href="#sand3" x="100" y="115" stroke-width="0.75" />
+                                    <use href="#sand3" x="100" y="125" stroke-width="0.75" />
                                 </g>
 
                                 <!-- Falling liquid droplet -->
