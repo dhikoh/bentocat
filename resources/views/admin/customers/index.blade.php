@@ -80,6 +80,7 @@
                     <tr>
                         <th class="px-6 py-4">Nama Pelanggan</th>
                         <th class="px-6 py-4">Nomor WhatsApp</th>
+                        <th class="px-6 py-4">Follow-up Terakhir</th>
                         <th class="px-6 py-4">Alamat Lengkap</th>
                         <th class="px-6 py-4">Lokasi (GPS)</th>
                         <th class="px-6 py-4">Total Leads (Interaksi)</th>
@@ -97,6 +98,34 @@
                                 <a href="https://wa.me/{{ $customer->formatted_whatsapp }}" target="_blank" class="text-slate-300 hover:text-amber-500 font-medium hover:underline flex items-center gap-1.5">
                                     💬 {{ $customer->whatsapp }}
                                 </a>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($customer->latestMarketingLog)
+                                    <div class="space-y-1">
+                                        <div class="text-xs font-semibold text-white">
+                                            {{ $customer->latestMarketingLog->log_date->format('d M Y') }}
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">
+                                            Oleh: <span class="text-amber-400 font-semibold">{{ $customer->latestMarketingLog->user->name ?? '-' }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold 
+                                                @if($customer->latestMarketingLog->crm_stage === 'Hot') bg-rose-500/10 text-rose-400 border border-rose-500/20
+                                                @elseif($customer->latestMarketingLog->crm_stage === 'Warm') bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                                @elseif($customer->latestMarketingLog->crm_stage === 'Closed-Won') bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                                                @elseif($customer->latestMarketingLog->crm_stage === 'Closed-Lost') bg-slate-800 text-slate-500 border border-slate-700
+                                                @else bg-sky-500/10 text-sky-400 border border-sky-500/20
+                                                @endif">
+                                                {{ $customer->latestMarketingLog->crm_stage }}
+                                            </span>
+                                            <span class="text-[10px] text-slate-400 font-bold">
+                                                {{ $customer->latestMarketingLog->potential_closing }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-xs text-slate-500 italic">Belum di-followup</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 max-w-xs truncate text-xs text-slate-400" title="{{ $customer->alamat }}">
                                 {{ $customer->alamat }}
@@ -130,7 +159,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan data pelanggan.</td>
+                            <td colspan="8" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan data pelanggan.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -17,6 +17,7 @@ class CustomerController extends Controller
         $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
 
         $customers = CustomerProfile::withCount('leadRequests')
+            ->with(['latestMarketingLog', 'latestMarketingLog.user'])
             ->when($search, function ($query, $search) {
                 $lowered = '%' . strtolower($search) . '%';
                 $query->where(function($q) use ($lowered) {

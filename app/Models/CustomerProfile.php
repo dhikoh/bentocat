@@ -24,6 +24,11 @@ class CustomerProfile extends Model
         return $this->hasMany(LeadRequest::class, 'customer_id');
     }
 
+    public function latestMarketingLog()
+    {
+        return $this->hasOne(MarketingLog::class, 'customer_profile_id')->latestOfMany();
+    }
+
     public function setWhatsappAttribute($value)
     {
         $clean = preg_replace('/[^0-9]/', '', $value);

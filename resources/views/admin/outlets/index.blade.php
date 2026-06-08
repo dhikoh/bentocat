@@ -260,6 +260,7 @@
                         <th class="px-6 py-4 text-center">Status Mitra</th>
                         <th class="px-6 py-4">Distributor Penyuplai</th>
                         <th class="px-6 py-4">PIC / WhatsApp</th>
+                        <th class="px-6 py-4">Follow-up Terakhir</th>
                         <th class="px-6 py-4 text-center">Metode Pengiriman</th>
                         <th class="px-6 py-4 text-center">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
@@ -301,6 +302,34 @@
                                 <a href="https://wa.me/{{ $outlet->formatted_whatsapp }}" target="_blank" class="text-xs text-slate-400 hover:underline hover:text-amber-500 flex items-center gap-1">
                                     💬 {{ $outlet->whatsapp }}
                                 </a>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($outlet->latestMarketingLog)
+                                    <div class="space-y-1">
+                                        <div class="text-xs font-semibold text-white">
+                                            {{ $outlet->latestMarketingLog->log_date->format('d M Y') }}
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">
+                                            Oleh: <span class="text-amber-400 font-semibold">{{ $outlet->latestMarketingLog->user->name ?? '-' }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold 
+                                                @if($outlet->latestMarketingLog->crm_stage === 'Hot') bg-rose-500/10 text-rose-400 border border-rose-500/20
+                                                @elseif($outlet->latestMarketingLog->crm_stage === 'Warm') bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                                @elseif($outlet->latestMarketingLog->crm_stage === 'Closed-Won') bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                                                @elseif($outlet->latestMarketingLog->crm_stage === 'Closed-Lost') bg-slate-800 text-slate-500 border border-slate-700
+                                                @else bg-sky-500/10 text-sky-400 border border-sky-500/20
+                                                @endif">
+                                                {{ $outlet->latestMarketingLog->crm_stage }}
+                                            </span>
+                                            <span class="text-[10px] text-slate-400 font-bold">
+                                                {{ $outlet->latestMarketingLog->potential_closing }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-xs text-slate-500 italic">Belum di-followup</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-center text-xs text-slate-400">
                                 @if($outlet->delivery_mode === 'SELF_DELIVERY')

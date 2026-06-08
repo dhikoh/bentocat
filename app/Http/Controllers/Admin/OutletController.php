@@ -40,7 +40,7 @@ class OutletController extends Controller
         $perPage = $request->input('per_page', 10);
         $perPageLimit = ($perPage === 'all') ? 9999 : (int)$perPage;
         
-        $outlets = Outlet::with(['distributor', 'city'])
+        $outlets = Outlet::with(['distributor', 'city', 'latestMarketingLog', 'latestMarketingLog.user'])
             ->when($search, function ($query, $search) {
                 $lowered = '%' . strtolower($search) . '%';
                 $query->where(function($q) use ($lowered, $search) {

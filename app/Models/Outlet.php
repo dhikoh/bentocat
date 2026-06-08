@@ -48,6 +48,11 @@ class Outlet extends Model
         return $this->belongsTo(City::class, 'kota_id');
     }
 
+    public function latestMarketingLog()
+    {
+        return $this->hasOne(MarketingLog::class, 'outlet_id')->latestOfMany();
+    }
+
     public function shippingContacts(): BelongsToMany
     {
         return $this->belongsToMany(ShippingContact::class, 'petshop_shipping_contacts', 'petshop_id', 'shipping_contact_id')

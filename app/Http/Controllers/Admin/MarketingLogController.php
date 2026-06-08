@@ -13,15 +13,26 @@ class MarketingLogController extends Controller
     /**
      * Display a listing of the authenticated marketing user's logs.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
-        $logs = MarketingLog::with(['outlet', 'customerProfile'])
-            ->where('user_id', $user->id)
-            ->orderBy('log_date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = MarketingLog::with(['outlet', 'customerProfile'])
+            ->where('user_id', $user->id);
+
+        // Sort by potential closing or default to log date
+        $sortBy = $request->input('sort_by', 'log_date');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        if ($sortBy === 'potential_closing') {
+            $query->orderBy('potential_closing', $sortOrder)
+                  ->orderBy('log_date', 'desc');
+        } else {
+            $query->orderBy('log_date', 'desc')
+                  ->orderBy('created_at', 'desc');
+        }
+
+        $logs = $query->paginate(15);
 
         return view('admin.my-logs.index', compact('logs'));
     }
@@ -31,7 +42,7 @@ class MarketingLogController extends Controller
      */
     public function create()
     {
-        $outlets = \App\Models\Outlet::orderBy('name', 'asc')->get();
+        $outlets = \App\Models\Outlet::orderBy('nama_outlet', 'asc')->get();
         $customers = \App\Models\CustomerProfile::orderBy('nama', 'asc')->get();
         return view('admin.my-logs.create', compact('outlets', 'customers'));
     }
@@ -48,6 +59,9 @@ class MarketingLogController extends Controller
             'outlet_id' => 'nullable|exists:outlets,id',
             'customer_profile_id' => 'nullable|exists:customer_profiles,id',
             'agenda' => 'nullable|string',
+            'potential_closing' => 'nullable|integer|min:0|max:100',
+            'followup_feedback' => 'nullable|string',
+            'crm_stage' => 'nullable|string|in:Cold,Warm,Hot,Closed-Won,Closed-Lost',
         ], [
             'log_date.before_or_equal' => 'Tanggal log tidak boleh di masa depan.',
             'activity_title.required' => 'Judul aktivitas wajib diisi.',
@@ -64,6 +78,9 @@ class MarketingLogController extends Controller
             'outlet_id' => $request->outlet_id,
             'customer_profile_id' => $request->customer_profile_id,
             'agenda' => $request->agenda,
+            'potential_closing' => $request->potential_closing ?? 0,
+            'followup_feedback' => $request->followup_feedback,
+            'crm_stage' => $request->crm_stage ?? 'Cold',
         ]);
 
         return redirect()->route('admin.my-logs.index')
@@ -80,7 +97,7 @@ class MarketingLogController extends Controller
             abort(403, 'Anda tidak memiliki akses ke log ini.');
         }
 
-        $outlets = \App\Models\Outlet::orderBy('name', 'asc')->get();
+        $outlets = \App\Models\Outlet::orderBy('nama_outlet', 'asc')->get();
         $customers = \App\Models\CustomerProfile::orderBy('nama', 'asc')->get();
 
         return view('admin.my-logs.edit', compact('log', 'outlets', 'customers'));
@@ -103,6 +120,9 @@ class MarketingLogController extends Controller
             'outlet_id' => 'nullable|exists:outlets,id',
             'customer_profile_id' => 'nullable|exists:customer_profiles,id',
             'agenda' => 'nullable|string',
+            'potential_closing' => 'nullable|integer|min:0|max:100',
+            'followup_feedback' => 'nullable|string',
+            'crm_stage' => 'nullable|string|in:Cold,Warm,Hot,Closed-Won,Closed-Lost',
         ], [
             'log_date.before_or_equal' => 'Tanggal log tidak boleh di masa depan.',
             'activity_title.required' => 'Judul aktivitas wajib diisi.',
@@ -118,6 +138,9 @@ class MarketingLogController extends Controller
             'outlet_id' => $request->outlet_id,
             'customer_profile_id' => $request->customer_profile_id,
             'agenda' => $request->agenda,
+            'potential_closing' => $request->potential_closing ?? 0,
+            'followup_feedback' => $request->followup_feedback,
+            'crm_stage' => $request->crm_stage ?? 'Cold',
         ]);
 
         return redirect()->route('admin.my-logs.index')
@@ -165,9 +188,24 @@ class MarketingLogController extends Controller
             $query->whereDate('log_date', '<=', $request->end_date);
         }
 
-        $logs = $query->orderBy('log_date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        // Filter by crm_stage
+        if ($request->filled('crm_stage')) {
+            $query->where('crm_stage', $request->crm_stage);
+        }
+
+        // Sort by potential closing or default to log date
+        $sortBy = $request->input('sort_by', 'log_date');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        if ($sortBy === 'potential_closing') {
+            $query->orderBy('potential_closing', $sortOrder)
+                  ->orderBy('log_date', 'desc');
+        } else {
+            $query->orderBy('log_date', 'desc')
+                  ->orderBy('created_at', 'desc');
+        }
+
+        $logs = $query->paginate(20);
 
         // Fetch all marketing users for filter options
         $marketingUsers = User::where('role', 'marketing')->get();
@@ -221,6 +259,9 @@ class MarketingLogController extends Controller
         if ($request->filled('end_date')) {
             $query->whereDate('log_date', '<=', $request->end_date);
         }
+        if ($request->filled('crm_stage')) {
+            $query->where('crm_stage', $request->crm_stage);
+        }
 
         $logs = $query->orderBy('log_date', 'asc')->get();
 
@@ -240,7 +281,7 @@ class MarketingLogController extends Controller
             // Add UTF-8 BOM for Excel compatibility
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             
-            fputcsv($file, ['ID', 'Nama Staff', 'Email Staff', 'Tanggal Kegiatan', 'Judul Aktivitas', 'Detail Aktivitas', 'Outlet/Petshop', 'Pelanggan/Customer', 'Agenda Tindak Lanjut', 'Rating Kinerja', 'Catatan Evaluasi', 'Dibuat Pada']);
+            fputcsv($file, ['ID', 'Nama Staff', 'Email Staff', 'Tanggal Kegiatan', 'Judul Aktivitas', 'Detail Aktivitas', 'Outlet/Petshop', 'Pelanggan/Customer', 'Agenda Tindak Lanjut', 'Status CRM', 'Potensi Closing (%)', 'Tanggapan Customer', 'Rating Kinerja', 'Catatan Evaluasi', 'Dibuat Pada']);
 
             foreach ($logs as $log) {
                 fputcsv($file, [
@@ -250,9 +291,12 @@ class MarketingLogController extends Controller
                     $log->log_date->format('Y-m-d'),
                     $log->activity_title,
                     $log->activity_details,
-                    $log->outlet->name ?? 'N/A',
+                    $log->outlet->nama_outlet ?? 'N/A',
                     $log->customerProfile->nama ?? 'N/A',
                     $log->agenda ?? '',
+                    $log->crm_stage,
+                    $log->potential_closing . '%',
+                    $log->followup_feedback ?? '',
                     $log->rating ?? 'Belum Dinilai',
                     $log->notes ?? '',
                     $log->created_at->format('Y-m-d H:i:s'),
@@ -290,6 +334,9 @@ class MarketingLogController extends Controller
         if ($request->filled('end_date')) {
             $query->whereDate('log_date', '<=', $request->end_date);
         }
+        if ($request->filled('crm_stage')) {
+            $query->where('crm_stage', $request->crm_stage);
+        }
 
         // Fetch logs for compiling prompt
         $logs = $query->orderBy('log_date', 'asc')->get();
@@ -307,8 +354,11 @@ class MarketingLogController extends Controller
         foreach ($logs as $index => $log) {
             $dateStr = $log->log_date->format('d M Y');
             $prompt .= ($index + 1) . ". [" . $dateStr . "] - " . $log->activity_title . "\n";
-            $prompt .= "   Outlet / Petshop: " . ($log->outlet->name ?? '-') . "\n";
+            $prompt .= "   Outlet / Petshop: " . ($log->outlet->nama_outlet ?? '-') . "\n";
             $prompt .= "   Customer: " . ($log->customerProfile->nama ?? '-') . "\n";
+            $prompt .= "   Status Prospek (CRM Stage): " . $log->crm_stage . "\n";
+            $prompt .= "   Potensi Closing: " . $log->potential_closing . "%\n";
+            $prompt .= "   Tanggapan / Respon Pelanggan: " . ($log->followup_feedback ?? '-') . "\n";
             $prompt .= "   Agenda: " . ($log->agenda ?? '-') . "\n";
             $prompt .= "   Detail: " . str_replace("\n", "\n   ", trim($log->activity_details)) . "\n\n";
         }

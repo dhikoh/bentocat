@@ -18,16 +18,28 @@
 
     <!-- Filters Section -->
     <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6">
-        <form action="{{ route('admin.marketing-logs.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <form action="{{ route('admin.marketing-logs.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div class="space-y-2">
                 <label for="user_id" class="block text-xs font-bold text-slate-400 uppercase">Staf Pemasaran</label>
                 <select name="user_id" id="user_id" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
                     <option value="">Semua Marketing</option>
                     @foreach($marketingUsers as $user)
                         <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
-                            {{ $user->name }} ({{ $user->email }})
+                            {{ $user->name }}
                         </option>
                     @endforeach
+                </select>
+            </div>
+
+            <div class="space-y-2">
+                <label for="crm_stage" class="block text-xs font-bold text-slate-400 uppercase">Status Prospek</label>
+                <select name="crm_stage" id="crm_stage" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                    <option value="">Semua Status</option>
+                    <option value="Cold" {{ request('crm_stage') == 'Cold' ? 'selected' : '' }}>❄️ Cold (Dingin)</option>
+                    <option value="Warm" {{ request('crm_stage') == 'Warm' ? 'selected' : '' }}>🔥 Warm (Hangat)</option>
+                    <option value="Hot" {{ request('crm_stage') == 'Hot' ? 'selected' : '' }}>⚡ Hot (Potensial)</option>
+                    <option value="Closed-Won" {{ request('crm_stage') == 'Closed-Won' ? 'selected' : '' }}>🎉 Won (Berhasil)</option>
+                    <option value="Closed-Lost" {{ request('crm_stage') == 'Closed-Lost' ? 'selected' : '' }}>❌ Lost (Batal)</option>
                 </select>
             </div>
             
@@ -59,7 +71,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    <span>🤖</span> Prompt Evaluasi Kinerja AI
+                     <span>🤖</span> Prompt Evaluasi Kinerja AI
                 </h2>
                 <p class="text-xs text-slate-400 mt-0.5">Prompt di bawah ini berisi seluruh log aktivitas yang terfilter. Anda dapat menyalinnya langsung untuk dievaluasi pada AI (ChatGPT/Gemini/Claude).</p>
             </div>
@@ -93,6 +105,16 @@
                             <th class="px-6 py-4">Nama Staff</th>
                             <th class="px-6 py-4">Tanggal & Aktivitas</th>
                             <th class="px-6 py-4">Outlet & Customer</th>
+                            <th class="px-6 py-4">
+                                <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'potential_closing', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" class="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+                                    CRM & Potensi
+                                    @if(request('sort_by') === 'potential_closing')
+                                        <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                    @else
+                                        <span class="text-slate-600">⇅</span>
+                                    @endif
+                                </a>
+                            </th>
                             <th class="px-6 py-4">Agenda Tindak Lanjut</th>
                             <th class="px-6 py-4">Evaluasi & Kinerja</th>
                         </tr>
@@ -112,11 +134,11 @@
                                         {{ $log->activity_title }}
                                     </div>
                                     <div class="space-y-1">
-                                        <p class="text-slate-400 text-xs line-clamp-2" id="detail-summary-{{ $log->id }}">
+                                        <p class="text-slate-400 text-xs line-clamp-2 leading-relaxed" id="detail-summary-{{ $log->id }}">
                                             {{ Str::limit($log->activity_details, 150) }}
                                         </p>
                                         @if(strlen($log->activity_details) > 150)
-                                            <button type="button" onclick="toggleDetail({{ $log->id }})" id="btn-toggle-{{ $log->id }}" class="text-xs text-amber-500 font-semibold hover:underline focus:outline-none cursor-pointer">
+                                            <button type="button" onclick="toggleDetail({{ $log->id }})" id="btn-toggle-{{ $log->id }}" class="text-xs text-amber-500 font-semibold hover:underline focus:outline-none cursor-pointer mb-2">
                                                 Selengkapnya ↓
                                             </button>
                                             <p class="text-slate-400 text-xs hidden whitespace-pre-wrap leading-relaxed mt-2 p-3 bg-slate-950/40 rounded-xl border border-slate-800" id="detail-full-{{ $log->id }}">
@@ -124,13 +146,19 @@
                                             </p>
                                         @endif
                                     </div>
+                                    @if($log->followup_feedback)
+                                        <div class="mt-2 p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-xl text-xs text-slate-300 whitespace-normal">
+                                            <span class="font-bold text-amber-500 block text-[10px] uppercase tracking-wider mb-0.5">Respon Pelanggan:</span>
+                                            {{ $log->followup_feedback }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 align-top whitespace-nowrap">
                                     <div class="space-y-1">
                                         @if($log->outlet)
                                             <div class="flex items-center gap-1.5 text-xs text-emerald-400">
                                                 <span>🏢</span>
-                                                <span class="font-semibold">{{ $log->outlet->name }}</span>
+                                                <span class="font-semibold">{{ $log->outlet->nama_outlet }}</span>
                                             </div>
                                         @endif
                                         @if($log->customerProfile)
@@ -142,6 +170,36 @@
                                         @if(!$log->outlet && !$log->customerProfile)
                                             <span class="text-xs text-slate-500 italic">-</span>
                                         @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 align-top whitespace-nowrap">
+                                    <div class="space-y-1.5">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold 
+                                            @if($log->crm_stage === 'Hot') bg-rose-500/10 text-rose-400 border border-rose-500/20
+                                            @elseif($log->crm_stage === 'Warm') bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                            @elseif($log->crm_stage === 'Closed-Won') bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                                            @elseif($log->crm_stage === 'Closed-Lost') bg-slate-800 text-slate-500 border border-slate-700
+                                            @else bg-sky-500/10 text-sky-400 border border-sky-500/20
+                                            @endif">
+                                            @if($log->crm_stage === 'Hot') ⚡ Hot
+                                            @elseif($log->crm_stage === 'Warm') 🔥 Warm
+                                            @elseif($log->crm_stage === 'Closed-Won') 🎉 Won
+                                            @elseif($log->crm_stage === 'Closed-Lost') ❌ Lost
+                                            @else ❄️ Cold
+                                            @endif
+                                        </span>
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="w-16 bg-slate-950 rounded-full h-1.5 border border-slate-800/80 overflow-hidden">
+                                                <div class="h-full rounded-full 
+                                                    @if($log->potential_closing >= 70) bg-rose-500
+                                                    @elseif($log->potential_closing >= 30) bg-amber-500
+                                                    @else bg-sky-500
+                                                    @endif" 
+                                                    style="width: {{ $log->potential_closing }}%">
+                                                </div>
+                                            </div>
+                                            <span class="text-xs text-slate-400 font-bold">{{ $log->potential_closing }}%</span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 align-top max-w-xs">

@@ -46,7 +46,7 @@
                             <option value="">-- Tidak Ada / Tidak Melakukan Kunjungan --</option>
                             @foreach($outlets as $outlet)
                                 <option value="{{ $outlet->id }}" {{ old('outlet_id', $log->outlet_id) == $outlet->id ? 'selected' : '' }}>
-                                    {{ $outlet->name }} ({{ $outlet->city->name ?? 'N/A' }})
+                                    {{ $outlet->nama_outlet }} ({{ $outlet->city->nama ?? 'N/A' }})
                                 </option>
                             @endforeach
                         </select>
@@ -80,6 +80,33 @@
                 <label for="activity_details" class="block text-xs font-bold text-slate-400 uppercase">Detail Kegiatan (Workflow & Hasil)</label>
                 <textarea name="activity_details" id="activity_details" rows="6" required
                           class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('activity_details', $log->activity_details) }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-800 pt-6">
+                <div class="space-y-2">
+                    <label for="crm_stage" class="block text-xs font-bold text-slate-400 uppercase">Status Prospek (CRM Stage)</label>
+                    <select name="crm_stage" id="crm_stage" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        <option value="Cold" {{ old('crm_stage', $log->crm_stage) == 'Cold' ? 'selected' : '' }}>❄️ Cold (Dingin)</option>
+                        <option value="Warm" {{ old('crm_stage', $log->crm_stage) == 'Warm' ? 'selected' : '' }}>🔥 Warm (Hangat)</option>
+                        <option value="Hot" {{ old('crm_stage', $log->crm_stage) == 'Hot' ? 'selected' : '' }}>⚡ Hot (Sangat Potensial)</option>
+                        <option value="Closed-Won" {{ old('crm_stage', $log->crm_stage) == 'Closed-Won' ? 'selected' : '' }}>🎉 Closed-Won (Berhasil)</option>
+                        <option value="Closed-Lost" {{ old('crm_stage', $log->crm_stage) == 'Closed-Lost' ? 'selected' : '' }}>❌ Closed-Lost (Gagal/Batal)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="potential_closing" class="block text-xs font-bold text-slate-400 uppercase">Potensi Closing: <span id="potential_val" class="text-amber-400 font-extrabold">0%</span></label>
+                    <div class="flex items-center gap-4 py-2">
+                        <input type="range" name="potential_closing" id="potential_closing" min="0" max="100" value="{{ old('potential_closing', $log->potential_closing ?? 0) }}" 
+                               class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-amber-500 border border-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="followup_feedback" class="block text-xs font-bold text-slate-400 uppercase">Tanggapan / Respon Pelanggan</label>
+                <textarea name="followup_feedback" id="followup_feedback" rows="3" placeholder="Tuliskan respon, feedback, tanggapan, atau negosiasi yang terjadi dari pihak pelanggan."
+                          class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('followup_feedback', $log->followup_feedback) }}</textarea>
             </div>
 
             <div class="space-y-2">
@@ -131,6 +158,17 @@
                 }
             });
         });
+
+        // Potential Closing slider display
+        const potentialInput = document.getElementById('potential_closing');
+        const potentialVal = document.getElementById('potential_val');
+        
+        function updatePotentialDisplay() {
+            potentialVal.textContent = potentialInput.value + '%';
+        }
+        
+        potentialInput.addEventListener('input', updatePotentialDisplay);
+        updatePotentialDisplay();
     });
 </script>
 @endsection

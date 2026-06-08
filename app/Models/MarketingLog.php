@@ -21,6 +21,9 @@ class MarketingLog extends Model
         'agenda',
         'rating',
         'notes',
+        'followup_feedback',
+        'potential_closing',
+        'crm_stage',
     ];
 
     protected $casts = [
