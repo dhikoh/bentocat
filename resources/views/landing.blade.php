@@ -459,10 +459,10 @@
                         </div>
 
                         <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-blue-600 transition-premium">
-                            {{ AppModelsSetting::get('feature_1_title', 'Molecular Bonding') }}
+                            {{ \App\Models\Setting::get('feature_1_title', 'Molecular Bonding') }}
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed font-outfit">
-                            {!! AppModelsSetting::get('feature_1_desc', 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.') !!}
+                            {!! \App\Models\Setting::get('feature_1_desc', 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.') !!}
                         </p>
                     </div>
                 </div>
@@ -572,10 +572,10 @@
                         </div>
 
                         <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-cyan-600 transition-premium">
-                            {{ AppModelsSetting::get('feature_2_title', 'Zero-Dust Tech') }}
+                            {{ \App\Models\Setting::get('feature_2_title', 'Zero-Dust Tech') }}
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed font-outfit">
-                            {!! AppModelsSetting::get('feature_2_desc', 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.') !!}
+                            {!! \App\Models\Setting::get('feature_2_desc', 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.') !!}
                         </p>
                     </div>
                 </div>
@@ -670,10 +670,10 @@
                         </div>
 
                         <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-purple-600 transition-premium">
-                            {{ AppModelsSetting::get('feature_3_title', 'Odor Encapsulation') }}
+                            {{ \App\Models\Setting::get('feature_3_title', 'Odor Encapsulation') }}
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed font-outfit">
-                            {!! AppModelsSetting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.') !!}
+                            {!! \App\Models\Setting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.') !!}
                         </p>
                     </div>
                 </div>
