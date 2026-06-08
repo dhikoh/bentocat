@@ -35,6 +35,40 @@
                        class="w-full max-w-xs bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label for="outlet_id" class="block text-xs font-bold text-slate-400 uppercase">Outlet / Petshop yang Dikunjungi</label>
+                    <div class="relative">
+                        <input type="text" id="outlet_search" placeholder="🔍 Cari Petshop/Outlet..." 
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none transition-all mb-2">
+                        <select name="outlet_id" id="outlet_id" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                            <option value="">-- Tidak Ada / Tidak Melakukan Kunjungan --</option>
+                            @foreach($outlets as $outlet)
+                                <option value="{{ $outlet->id }}" {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
+                                    {{ $outlet->name }} ({{ $outlet->city->name ?? 'N/A' }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="customer_profile_id" class="block text-xs font-bold text-slate-400 uppercase">Pelanggan yang Dihubungi (CRM)</label>
+                    <div class="relative">
+                        <input type="text" id="customer_search" placeholder="🔍 Cari Pelanggan..." 
+                               class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none transition-all mb-2">
+                        <select name="customer_profile_id" id="customer_profile_id" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                            <option value="">-- Tidak Ada / Tidak Menghubungi Pelanggan --</option>
+                            @foreach($customers as $customer)
+                                <option value="{{ $customer->id }}" {{ old('customer_profile_id') == $customer->id ? 'selected' : '' }}>
+                                    {{ $customer->nama }} ({{ $customer->whatsapp }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div class="space-y-2">
                 <label for="activity_title" class="block text-xs font-bold text-slate-400 uppercase">Judul Aktivitas / Pekerjaan</label>
                 <input type="text" name="activity_title" id="activity_title" placeholder="Contoh: Kunjungan Petshop di Jakarta Selatan, Riset Kompetitor, dsb." value="{{ old('activity_title') }}" required
@@ -43,8 +77,14 @@
 
             <div class="space-y-2">
                 <label for="activity_details" class="block text-xs font-bold text-slate-400 uppercase">Detail Kegiatan (Workflow & Hasil)</label>
-                <textarea name="activity_details" id="activity_details" rows="8" placeholder="Tuliskan secara detail apa yang dikerjakan, siapa yang dihubungi, apa hasilnya, dan tantangan yang ditemui agar dapat dievaluasi oleh sistem AI." required
+                <textarea name="activity_details" id="activity_details" rows="6" placeholder="Tuliskan secara detail apa yang dikerjakan, siapa yang dihubungi, apa hasilnya, dan tantangan yang ditemui agar dapat dievaluasi oleh sistem AI." required
                           class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('activity_details') }}</textarea>
+            </div>
+
+            <div class="space-y-2">
+                <label for="agenda" class="block text-xs font-bold text-slate-400 uppercase">Rencana Tindak Lanjut / Agenda Berikutnya</label>
+                <textarea name="agenda" id="agenda" rows="3" placeholder="Tuliskan rencana, jadwal follow-up berikutnya, atau janji temu yang telah disepakati."
+                          class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('agenda') }}</textarea>
             </div>
 
             <div class="flex items-center justify-between border-t border-slate-800 pt-6">
@@ -56,4 +96,40 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const outletSearch = document.getElementById('outlet_search');
+        const outletSelect = document.getElementById('outlet_id');
+        const outletOptions = Array.from(outletSelect.options);
+
+        outletSearch.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            outletSelect.innerHTML = '';
+            
+            outletOptions.forEach(opt => {
+                if (opt.value === '' || opt.text.toLowerCase().includes(query)) {
+                    outletSelect.appendChild(opt);
+                }
+            });
+        });
+
+        const customerSearch = document.getElementById('customer_search');
+        const customerSelect = document.getElementById('customer_profile_id');
+        const customerOptions = Array.from(customerSelect.options);
+
+        customerSearch.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            customerSelect.innerHTML = '';
+            
+            customerOptions.forEach(opt => {
+                if (opt.value === '' || opt.text.toLowerCase().includes(query)) {
+                    customerSelect.appendChild(opt);
+                }
+            });
+        });
+    });
+</script>
 @endsection

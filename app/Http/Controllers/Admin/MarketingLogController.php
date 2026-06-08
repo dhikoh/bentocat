@@ -17,7 +17,8 @@ class MarketingLogController extends Controller
     {
         $user = Auth::user();
         
-        $logs = MarketingLog::where('user_id', $user->id)
+        $logs = MarketingLog::with(['outlet', 'customerProfile'])
+            ->where('user_id', $user->id)
             ->orderBy('log_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
@@ -30,7 +31,9 @@ class MarketingLogController extends Controller
      */
     public function create()
     {
-        return view('admin.my-logs.create');
+        $outlets = \App\Models\Outlet::orderBy('name', 'asc')->get();
+        $customers = \App\Models\CustomerProfile::orderBy('nama', 'asc')->get();
+        return view('admin.my-logs.create', compact('outlets', 'customers'));
     }
 
     /**
@@ -42,10 +45,15 @@ class MarketingLogController extends Controller
             'log_date' => 'required|date|before_or_equal:today',
             'activity_title' => 'required|string|max:255',
             'activity_details' => 'required|string',
+            'outlet_id' => 'nullable|exists:outlets,id',
+            'customer_profile_id' => 'nullable|exists:customer_profiles,id',
+            'agenda' => 'nullable|string',
         ], [
             'log_date.before_or_equal' => 'Tanggal log tidak boleh di masa depan.',
             'activity_title.required' => 'Judul aktivitas wajib diisi.',
             'activity_details.required' => 'Detail aktivitas wajib diisi.',
+            'outlet_id.exists' => 'Outlet/Petshop yang dipilih tidak valid.',
+            'customer_profile_id.exists' => 'Pelanggan yang dipilih tidak valid.',
         ]);
 
         MarketingLog::create([
@@ -53,6 +61,9 @@ class MarketingLogController extends Controller
             'log_date' => $request->log_date,
             'activity_title' => $request->activity_title,
             'activity_details' => $request->activity_details,
+            'outlet_id' => $request->outlet_id,
+            'customer_profile_id' => $request->customer_profile_id,
+            'agenda' => $request->agenda,
         ]);
 
         return redirect()->route('admin.my-logs.index')
@@ -69,7 +80,10 @@ class MarketingLogController extends Controller
             abort(403, 'Anda tidak memiliki akses ke log ini.');
         }
 
-        return view('admin.my-logs.edit', compact('log'));
+        $outlets = \App\Models\Outlet::orderBy('name', 'asc')->get();
+        $customers = \App\Models\CustomerProfile::orderBy('nama', 'asc')->get();
+
+        return view('admin.my-logs.edit', compact('log', 'outlets', 'customers'));
     }
 
     /**
@@ -86,16 +100,24 @@ class MarketingLogController extends Controller
             'log_date' => 'required|date|before_or_equal:today',
             'activity_title' => 'required|string|max:255',
             'activity_details' => 'required|string',
+            'outlet_id' => 'nullable|exists:outlets,id',
+            'customer_profile_id' => 'nullable|exists:customer_profiles,id',
+            'agenda' => 'nullable|string',
         ], [
             'log_date.before_or_equal' => 'Tanggal log tidak boleh di masa depan.',
             'activity_title.required' => 'Judul aktivitas wajib diisi.',
             'activity_details.required' => 'Detail aktivitas wajib diisi.',
+            'outlet_id.exists' => 'Outlet/Petshop yang dipilih tidak valid.',
+            'customer_profile_id.exists' => 'Pelanggan yang dipilih tidak valid.',
         ]);
 
         $log->update([
             'log_date' => $request->log_date,
             'activity_title' => $request->activity_title,
             'activity_details' => $request->activity_details,
+            'outlet_id' => $request->outlet_id,
+            'customer_profile_id' => $request->customer_profile_id,
+            'agenda' => $request->agenda,
         ]);
 
         return redirect()->route('admin.my-logs.index')
@@ -107,8 +129,13 @@ class MarketingLogController extends Controller
      */
     public function destroy(MarketingLog $log)
     {
-        // Prevent deleting other users' logs
-        if ($log->user_id !== Auth::id()) {
+        // Deny deletion for marketing role users
+        if (Auth::user()->role === 'marketing') {
+            abort(403, 'Staf marketing tidak diizinkan menghapus log aktivitas harian.');
+        }
+
+        // Prevent non-superadmins from deleting other users' logs
+        if (Auth::user()->role !== 'superadmin' && $log->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke log ini.');
         }
 
@@ -123,7 +150,7 @@ class MarketingLogController extends Controller
      */
     public function adminIndex(Request $request)
     {
-        $query = MarketingLog::with('user');
+        $query = MarketingLog::with(['user', 'outlet', 'customerProfile']);
 
         // Filter by user
         if ($request->filled('user_id')) {
@@ -152,11 +179,38 @@ class MarketingLogController extends Controller
     }
 
     /**
+     * Store rating and notes for marketing log from superadmin.
+     */
+    public function evaluate(Request $request, MarketingLog $log)
+    {
+        if (Auth::user()->role !== 'superadmin') {
+            abort(403, 'Hanya superadmin yang dapat memberikan penilaian kinerja.');
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'notes' => 'nullable|string',
+        ], [
+            'rating.required' => 'Nilai rating wajib diisi.',
+            'rating.integer' => 'Nilai rating harus berupa angka.',
+            'rating.min' => 'Nilai rating minimal adalah 1.',
+            'rating.max' => 'Nilai rating maksimal adalah 5.',
+        ]);
+
+        $log->update([
+            'rating' => $request->rating,
+            'notes' => $request->notes,
+        ]);
+
+        return redirect()->back()->with('success', 'Penilaian kinerja log berhasil disimpan.');
+    }
+
+    /**
      * Export marketing logs to CSV format.
      */
     public function exportCsv(Request $request)
     {
-        $query = MarketingLog::with('user');
+        $query = MarketingLog::with(['user', 'outlet', 'customerProfile']);
 
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
@@ -186,7 +240,7 @@ class MarketingLogController extends Controller
             // Add UTF-8 BOM for Excel compatibility
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             
-            fputcsv($file, ['ID', 'Nama Staff', 'Email Staff', 'Tanggal Kegiatan', 'Judul Aktivitas', 'Detail Aktivitas', 'Dibuat Pada']);
+            fputcsv($file, ['ID', 'Nama Staff', 'Email Staff', 'Tanggal Kegiatan', 'Judul Aktivitas', 'Detail Aktivitas', 'Outlet/Petshop', 'Pelanggan/Customer', 'Agenda Tindak Lanjut', 'Rating Kinerja', 'Catatan Evaluasi', 'Dibuat Pada']);
 
             foreach ($logs as $log) {
                 fputcsv($file, [
@@ -196,6 +250,11 @@ class MarketingLogController extends Controller
                     $log->log_date->format('Y-m-d'),
                     $log->activity_title,
                     $log->activity_details,
+                    $log->outlet->name ?? 'N/A',
+                    $log->customerProfile->nama ?? 'N/A',
+                    $log->agenda ?? '',
+                    $log->rating ?? 'Belum Dinilai',
+                    $log->notes ?? '',
                     $log->created_at->format('Y-m-d H:i:s'),
                 ]);
             }
@@ -211,7 +270,7 @@ class MarketingLogController extends Controller
      */
     private function compileAiPrompt(Request $request)
     {
-        $query = MarketingLog::with('user');
+        $query = MarketingLog::with(['user', 'outlet', 'customerProfile']);
 
         $staffName = "Semua Staff Marketing";
         if ($request->filled('user_id')) {
@@ -248,13 +307,16 @@ class MarketingLogController extends Controller
         foreach ($logs as $index => $log) {
             $dateStr = $log->log_date->format('d M Y');
             $prompt .= ($index + 1) . ". [" . $dateStr . "] - " . $log->activity_title . "\n";
+            $prompt .= "   Outlet / Petshop: " . ($log->outlet->name ?? '-') . "\n";
+            $prompt .= "   Customer: " . ($log->customerProfile->nama ?? '-') . "\n";
+            $prompt .= "   Agenda: " . ($log->agenda ?? '-') . "\n";
             $prompt .= "   Detail: " . str_replace("\n", "\n   ", trim($log->activity_details)) . "\n\n";
         }
 
         $prompt .= "--- INSTRUKSI ANALISIS EVALUASI AI ---\n";
         $prompt .= "Berdasarkan log aktivitas harian di atas, tolong lakukan audit dan evaluasi kinerja komprehensif:\n";
         $prompt .= "1. Analisis Produktivitas & Efisiensi: Apakah aktivitas harian yang dilakukan mencerminkan efisiensi kerja yang tinggi? Apakah ada pola penundaan atau jenis tugas yang kurang produktif?\n";
-        $prompt .= "2. Relevansi Strategis: Seberapa baik aktivitas tersebut menunjang tujuan bisnis BentoCat (misal: akuisisi outlet/petshop baru, penanganan database pelanggan, penulisan artikel SEO blog, optimasi analitik)?\n";
+        $prompt .= "2. Relevansi Strategis: Seberapa baik aktivitas tersebut menunjang tujuan bisnis BentoCat (misal: kunjungan ke outlet/petshop baru, penanganan database pelanggan, penulisan artikel SEO blog, tindak lanjut agenda/rencana ke depan)?\n";
         $prompt .= "3. Identifikasi Masalah & Hambatan: Apakah ada kendala operasional yang berulang dari rincian log mereka?\n";
         $prompt .= "4. Rekomendasi Taktis & Strategis: Tuliskan 3-5 poin rekomendasi tindakan nyata (actionable recommendations) untuk memperbaiki atau melipatgandakan kinerja staf marketing ini pada periode berikutnya.\n\n";
         $prompt .= "Sajikan hasil evaluasi dalam format analisis profesional yang terstruktur, padat, dan objektif.";

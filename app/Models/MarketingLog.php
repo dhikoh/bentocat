@@ -16,6 +16,11 @@ class MarketingLog extends Model
         'log_date',
         'activity_title',
         'activity_details',
+        'outlet_id',
+        'customer_profile_id',
+        'agenda',
+        'rating',
+        'notes',
     ];
 
     protected $casts = [
@@ -28,5 +33,21 @@ class MarketingLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the outlet associated with the log.
+     */
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
+    /**
+     * Get the customer profile associated with the log.
+     */
+    public function customerProfile()
+    {
+        return $this->belongsTo(CustomerProfile::class, 'customer_profile_id');
     }
 }

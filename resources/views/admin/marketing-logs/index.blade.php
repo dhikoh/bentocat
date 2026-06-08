@@ -91,37 +91,125 @@
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider bg-slate-950/40">
                             <th class="px-6 py-4">Nama Staff</th>
-                            <th class="px-6 py-4">Tanggal</th>
-                            <th class="px-6 py-4">Judul Aktivitas</th>
-                            <th class="px-6 py-4">Detail Aktivitas</th>
+                            <th class="px-6 py-4">Tanggal & Aktivitas</th>
+                            <th class="px-6 py-4">Outlet & Customer</th>
+                            <th class="px-6 py-4">Agenda Tindak Lanjut</th>
+                            <th class="px-6 py-4">Evaluasi & Kinerja</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60 text-slate-300 text-sm">
                         @foreach($logs as $log)
                             <tr class="hover:bg-slate-900/20 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4 whitespace-nowrap align-top">
                                     <div class="font-bold text-slate-200">{{ $log->user->name ?? 'N/A' }}</div>
                                     <div class="text-[10px] text-slate-500">{{ $log->user->email ?? '' }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap font-semibold text-amber-400">
-                                    {{ $log->log_date->format('d M Y') }}
-                                </td>
-                                <td class="px-6 py-4 font-bold text-slate-200">
-                                    {{ $log->activity_title }}
-                                </td>
-                                <td class="px-6 py-4 max-w-md">
+                                <td class="px-6 py-4 align-top">
+                                    <div class="font-semibold text-amber-400 mb-1">
+                                        {{ $log->log_date->format('d M Y') }}
+                                    </div>
+                                    <div class="font-bold text-slate-200 mb-2">
+                                        {{ $log->activity_title }}
+                                    </div>
                                     <div class="space-y-1">
-                                        <p class="text-slate-400 line-clamp-2" id="detail-summary-{{ $log->id }}">
+                                        <p class="text-slate-400 text-xs line-clamp-2" id="detail-summary-{{ $log->id }}">
                                             {{ Str::limit($log->activity_details, 150) }}
                                         </p>
                                         @if(strlen($log->activity_details) > 150)
                                             <button type="button" onclick="toggleDetail({{ $log->id }})" id="btn-toggle-{{ $log->id }}" class="text-xs text-amber-500 font-semibold hover:underline focus:outline-none cursor-pointer">
                                                 Selengkapnya ↓
                                             </button>
-                                            <p class="text-slate-400 hidden whitespace-pre-wrap leading-relaxed mt-2 p-3 bg-slate-950/40 rounded-xl border border-slate-800" id="detail-full-{{ $log->id }}">
+                                            <p class="text-slate-400 text-xs hidden whitespace-pre-wrap leading-relaxed mt-2 p-3 bg-slate-950/40 rounded-xl border border-slate-800" id="detail-full-{{ $log->id }}">
                                                 {{ $log->activity_details }}
                                             </p>
                                         @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 align-top whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        @if($log->outlet)
+                                            <div class="flex items-center gap-1.5 text-xs text-emerald-400">
+                                                <span>🏢</span>
+                                                <span class="font-semibold">{{ $log->outlet->name }}</span>
+                                            </div>
+                                        @endif
+                                        @if($log->customerProfile)
+                                            <div class="flex items-center gap-1.5 text-xs text-sky-400">
+                                                <span>👤</span>
+                                                <span class="font-semibold">{{ $log->customerProfile->nama }}</span>
+                                            </div>
+                                        @endif
+                                        @if(!$log->outlet && !$log->customerProfile)
+                                            <span class="text-xs text-slate-500 italic">-</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 align-top max-w-xs">
+                                    @if($log->agenda)
+                                        <p class="text-slate-300 text-xs italic line-clamp-3" title="{{ $log->agenda }}">
+                                            {{ $log->agenda }}
+                                        </p>
+                                    @else
+                                        <span class="text-xs text-slate-500 italic">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 align-top whitespace-nowrap">
+                                    <div class="space-y-2">
+                                        @if($log->rating)
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-0.5 text-amber-400">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <span>{{ $i <= $log->rating ? '★' : '☆' }}</span>
+                                                    @endfor
+                                                </div>
+                                                @if($log->notes)
+                                                    <p class="text-slate-400 text-xs italic max-w-xs whitespace-normal break-words" title="{{ $log->notes }}">
+                                                        "{{ $log->notes }}"
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-400">
+                                                    Belum dinilai
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        <button type="button" onclick="toggleEvaluateForm({{ $log->id }})" class="inline-flex items-center gap-1 text-xs text-amber-500 hover:underline focus:outline-none cursor-pointer font-bold mt-2">
+                                            <span>✏️</span> {{ $log->rating ? 'Ubah Penilaian' : 'Beri Nilai Kinerja' }}
+                                        </button>
+                                        
+                                        <!-- Evaluate Form Container -->
+                                        <div id="evaluate-form-{{ $log->id }}" class="hidden mt-3 p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 whitespace-normal max-w-xs shadow-xl">
+                                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Formulir Penilaian</div>
+                                            <form action="{{ route('admin.marketing-logs.evaluate', $log->id) }}" method="POST" class="space-y-3">
+                                                @csrf
+                                                <div class="space-y-1">
+                                                    <label for="rating_{{ $log->id }}" class="block text-xs font-bold text-slate-400">Rating Kinerja:</label>
+                                                    <select name="rating" id="rating_{{ $log->id }}" required class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                                                        <option value="">-- Pilih Rating --</option>
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            <option value="{{ $i }}" {{ $log->rating == $i ? 'selected' : '' }}>
+                                                                {{ $i }} ★ ({{ ['Sangat Kurang', 'Kurang', 'Cukup', 'Baik', 'Sangat Baik'][$i-1] }})
+                                                            </option>
+                                                        @endfor
+                                                    </select>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <label for="notes_{{ $log->id }}" class="block text-xs font-bold text-slate-400">Umpan Balik / Catatan:</label>
+                                                    <textarea name="notes" id="notes_{{ $log->id }}" rows="2" class="w-full bg-slate-900 border border-slate-800 focus:border-amber-500 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none" placeholder="Tuliskan umpan balik untuk marketing...">{{ $log->notes }}</textarea>
+                                                </div>
+                                                <div class="flex justify-end gap-2 pt-1">
+                                                    <button type="button" onclick="toggleEvaluateForm({{ $log->id }})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">
+                                                        Batal
+                                                    </button>
+                                                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer shadow-lg shadow-amber-500/10">
+                                                        Simpan
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -177,6 +265,15 @@
             summary.classList.remove('hidden');
             full.classList.add('hidden');
             btn.innerText = 'Selengkapnya ↓';
+        }
+    }
+
+    function toggleEvaluateForm(id) {
+        const form = document.getElementById('evaluate-form-' + id);
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+        } else {
+            form.classList.add('hidden');
         }
     }
 </script>

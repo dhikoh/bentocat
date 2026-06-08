@@ -34,8 +34,10 @@
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider bg-slate-950/40">
                             <th class="px-6 py-4">Tanggal</th>
-                            <th class="px-6 py-4">Judul Aktivitas</th>
-                            <th class="px-6 py-4">Rincian Kegiatan</th>
+                            <th class="px-6 py-4">Aktivitas & Rincian</th>
+                            <th class="px-6 py-4">Outlet & Customer</th>
+                            <th class="px-6 py-4">Agenda Tindak Lanjut</th>
+                            <th class="px-6 py-4">Nilai & Evaluasi</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -45,13 +47,59 @@
                                 <td class="px-6 py-4 whitespace-nowrap font-semibold text-amber-400">
                                     {{ $log->log_date->format('d M Y') }}
                                 </td>
-                                <td class="px-6 py-4 font-bold text-slate-200">
-                                    {{ $log->activity_title }}
-                                </td>
-                                <td class="px-6 py-4 max-w-xs md:max-w-md">
-                                    <p class="truncate text-slate-400" title="{{ $log->activity_details }}">
-                                        {{ Str::limit($log->activity_details, 80) }}
+                                <td class="px-6 py-4 max-w-xs">
+                                    <div class="font-bold text-slate-200">{{ $log->activity_title }}</div>
+                                    <p class="text-xs text-slate-400 mt-1 line-clamp-2" title="{{ $log->activity_details }}">
+                                        {{ Str::limit($log->activity_details, 120) }}
                                     </p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        @if($log->outlet)
+                                            <div class="flex items-center gap-1.5 text-xs text-emerald-400">
+                                                <span>🏢</span>
+                                                <span class="font-semibold">{{ $log->outlet->name }}</span>
+                                            </div>
+                                        @endif
+                                        @if($log->customerProfile)
+                                            <div class="flex items-center gap-1.5 text-xs text-sky-400">
+                                                <span>👤</span>
+                                                <span class="font-semibold">{{ $log->customerProfile->nama }}</span>
+                                            </div>
+                                        @endif
+                                        @if(!$log->outlet && !$log->customerProfile)
+                                            <span class="text-xs text-slate-500 italic">-</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 max-w-xs">
+                                    @if($log->agenda)
+                                        <p class="text-slate-300 text-xs italic line-clamp-2" title="{{ $log->agenda }}">
+                                            {{ $log->agenda }}
+                                        </p>
+                                    @else
+                                        <span class="text-xs text-slate-500 italic">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($log->rating)
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-0.5 text-amber-400">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <span>{{ $i <= $log->rating ? '★' : '☆' }}</span>
+                                                @endfor
+                                            </div>
+                                            @if($log->notes)
+                                                <p class="text-slate-400 text-xs line-clamp-1 italic max-w-xs" title="{{ $log->notes }}">
+                                                    "{{ $log->notes }}"
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-400">
+                                            Belum dinilai
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-right whitespace-nowrap">
                                     <div class="inline-flex items-center gap-2">
@@ -59,13 +107,15 @@
                                             ✏️
                                         </a>
                                         
-                                        <form action="{{ route('admin.my-logs.destroy', $log->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus log aktivitas ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-800/80 rounded-xl transition-all cursor-pointer" title="Hapus Log">
-                                                🗑️
-                                            </button>
-                                        </form>
+                                        @if(Auth::user()->role !== 'marketing')
+                                            <form action="{{ route('admin.my-logs.destroy', $log->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus log aktivitas ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-800/80 rounded-xl transition-all cursor-pointer" title="Hapus Log">
+                                                    🗑️
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

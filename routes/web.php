@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\MarketingLogController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ClientController;
 
 // Public client routes (Fase 3 & 4)
@@ -110,10 +111,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
         });
 
-        // Superadmin only (Monitor logs)
+        // Superadmin only (Monitor logs & User accounts)
         Route::middleware('role:superadmin')->group(function () {
             Route::get('/marketing-logs', [MarketingLogController::class, 'adminIndex'])->name('marketing-logs.index');
             Route::get('/marketing-logs/export', [MarketingLogController::class, 'exportCsv'])->name('marketing-logs.export');
+            Route::post('/marketing-logs/{log}/evaluate', [MarketingLogController::class, 'evaluate'])->name('marketing-logs.evaluate');
+
+            // User Management
+            Route::get('/users/{user}/reset-password', [UserController::class, 'showResetPassword'])->name('users.reset-password');
+            Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
+            Route::resource('/users', UserController::class);
         });
 
         // Audit & Business Health Panel (Superadmin / Editor)
