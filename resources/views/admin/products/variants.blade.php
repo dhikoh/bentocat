@@ -11,12 +11,11 @@
     <div>
         <h1 class="text-2xl font-bold text-white">Hierarki Varian: {{ $product->nama }}</h1>
         <p class="text-sm text-slate-400">Kelola variasi produk hingga 3 tingkat kedalaman: {{ $product->label_level_1 }} (Level 1) → {{ $product->label_level_2 }} (Level 2) → {{ $product->label_level_3 }} (Level 3).</p>
-    </div>
-
-    <!-- Main Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    </    <!-- Main Grid -->
+    <div class="grid grid-cols-1 @if(Auth::user() && Auth::user()->role !== 'marketing') lg:grid-cols-3 @endif gap-6">
         
         <!-- Left: Form to Add Root (Level 1) Variant -->
+        @if(Auth::user() && Auth::user()->role !== 'marketing')
         <div class="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl h-fit space-y-4">
             <h2 class="text-lg font-bold text-white">Tambah {{ $product->label_level_1 }}</h2>
             <p class="text-xs text-slate-500">Mulai dengan menambahkan {{ strtolower($product->label_level_1) }} utama (misal: "Premium Series", "Eco Series").</p>
@@ -35,9 +34,10 @@
                 </button>
             </form>
         </div>
+        @endif
 
         <!-- Right: Tree View (Level 1 -> Level 2 -> Level 3) -->
-        <div class="lg:col-span-2 bg-slate-900/20 border border-slate-800/80 p-6 rounded-3xl">
+        <div class="@if(Auth::user() && Auth::user()->role !== 'marketing') lg:col-span-2 @endif bg-slate-900/20 border border-slate-800/80 p-6 rounded-3xl">
             <h2 class="text-lg font-bold text-white mb-6">Pohon Struktur Varian</h2>
 
             <div class="space-y-4">
@@ -50,9 +50,11 @@
                                 <span class="font-bold text-white text-base">{{ $level1->nama }}</span>
                             </div>
                             <div class="flex gap-2">
+                                @if(Auth::user() && Auth::user()->role !== 'marketing')
                                 <button onclick="openAddModal({{ $level1->id }}, '{{ $level1->nama }}', 2)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
                                     + {{ $product->label_level_2 }} (Lvl 2)
                                 </button>
+                                @endif
                                 @if(Auth::user() && Auth::user()->role === 'superadmin')
                                     <form action="{{ route('admin.variants.destroy', $level1->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
                                         @csrf
@@ -75,14 +77,16 @@
                                             <span class="font-semibold text-slate-200 text-sm">{{ $level2->nama }}</span>
                                         </div>
                                         <div class="flex gap-2">
+                                            @if(Auth::user() && Auth::user()->role !== 'marketing')
                                             <button onclick="openAddModal({{ $level2->id }}, '{{ $level2->nama }}', 3)" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
                                                 + {{ $product->label_level_3 }} (Lvl 3)
                                             </button>
+                                            @endif
                                             @if(Auth::user() && Auth::user()->role === 'superadmin')
                                                 <form action="{{ route('admin.variants.destroy', $level2->id) }}" method="POST" onsubmit="return confirm('Menghapus varian ini akan menghapus semua sub-varian di bawahnya. Yakin?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2 py-1 rounded-lg text-xs font-bold transition-all">
+                                                    <button type="submit" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
                                                         Hapus
                                                     </button>
                                                 </form>

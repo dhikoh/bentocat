@@ -15,16 +15,19 @@
                     <span>Kosongkan Data</span> 🗑️
                 </button>
             @endif
+            @if(Auth::user() && Auth::user()->role !== 'marketing')
             <a href="{{ route('admin.customers.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2 text-sm whitespace-nowrap">
                 <span>Tambah Pelanggan</span> ➕
             </a>
             <a href="{{ route('admin.customers.export', ['search' => $search]) }}" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm whitespace-nowrap">
                 <span>Ekspor CSV</span> 📥
             </a>
+            @endif
         </div>
     </div>
 
     <!-- CSV Bulk Import Panel -->
+    @if(Auth::user() && Auth::user()->role !== 'marketing')
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
         <h2 class="text-md font-bold text-white mb-2 flex items-center gap-2">
             <span>Impor Bulk Pelanggan dari CSV</span>
@@ -43,6 +46,7 @@
             Format CSV: <strong>Nama, WhatsApp, Alamat, Latitude, Longitude, Provinsi, Kota</strong> (Mendukung pemetaan kolom otomatis dari data ekspor).
         </p>
     </div>
+    @endif
 
     <!-- Search & Filter -->
     <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl">
@@ -62,7 +66,7 @@
             </button>
             @if($search || $perPage != 15)
                 <a href="{{ route('admin.customers.index') }}" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 px-4 py-2 rounded-xl text-sm flex items-center justify-center transition-all">
-                    Reset
+                     Reset
                 </a>
             @endif
         </form>
@@ -108,9 +112,11 @@
                                 {{ $customer->created_at->format('d M Y, H:i') }}
                             </td>
                             <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                @if(Auth::user() && Auth::user()->role !== 'marketing')
                                 <a href="{{ route('admin.customers.edit', $customer->id) }}" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                     Edit
                                 </a>
+                                @endif
                                 @if(Auth::user() && Auth::user()->role === 'superadmin')
                                     <form action="{{ route('admin.customers.destroy', $customer->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Menghapus data pelanggan ini juga akan menghapus semua data leads dan log aktivitas terkait secara permanen. Lanjutkan?');">
                                         @csrf

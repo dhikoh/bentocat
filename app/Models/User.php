@@ -36,4 +36,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Article::class, 'author_id');
     }
+
+    public function marketingLogs(): HasMany
+    {
+        return $this->hasMany(MarketingLog::class);
+    }
 }

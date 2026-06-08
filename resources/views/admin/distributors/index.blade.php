@@ -9,9 +9,11 @@
             <h1 class="text-2xl font-bold text-white">Kelola Distributor Utama</h1>
             <p class="text-sm text-slate-400">Daftar distributor utama nasional yang menyuplai produk BentoCat ke outlet-outlet wilayah.</p>
         </div>
+        @if(Auth::user() && Auth::user()->role !== 'marketing')
         <a href="{{ route('admin.distributors.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2">
             <span>Tambah Distributor</span> 🐾
         </a>
+        @endif
     </div>
 
     <!-- Filter & Search -->
@@ -70,9 +72,11 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
+                                    @if(Auth::user() && Auth::user()->role !== 'marketing')
                                     <a href="{{ route('admin.distributors.edit', $distributor->id) }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </a>
+                                    @endif
                                     @if(Auth::user() && Auth::user()->role === 'superadmin')
                                         <form action="{{ route('admin.distributors.destroy', $distributor->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus distributor ini?')">
                                             @csrf

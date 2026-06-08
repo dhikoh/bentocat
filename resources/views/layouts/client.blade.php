@@ -3,10 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', \App\Models\Setting::get('site_name', 'BentoCat') . ' - Premium Cat Litter Discovery')</title>
-    <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('site_description', 'Temukan outlet resmi terdekat yang menjual BentoCat Premium Bentonite Cat Litter dengan harga lokal terjangkau.'))">
+    <title>@yield('title', \App\Models\Setting::get('seo_meta_title', \App\Models\Setting::get('site_name', 'BentoCat') . ' - Premium Cat Litter Discovery'))</title>
+    <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_meta_description', \App\Models\Setting::get('site_description', 'Temukan outlet resmi terdekat yang menjual BentoCat Premium Bentonite Cat Litter dengan harga lokal terjangkau.')))">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ asset(\App\Models\Setting::get('site_favicon', 'favicon.ico')) }}">
+
+    @if(\App\Models\Setting::get('meta_verification_id'))
+    <meta name="facebook-domain-verification" content="{{ \App\Models\Setting::get('meta_verification_id') }}" />
+    @endif
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:title" content="@yield('title', \App\Models\Setting::get('seo_meta_title', \App\Models\Setting::get('site_name', 'BentoCat')))" />
+    <meta property="og:description" content="@yield('meta_description', \App\Models\Setting::get('seo_meta_description', \App\Models\Setting::get('site_description', 'BentoCat')))" />
+    @if(\App\Models\Setting::get('seo_og_image'))
+    <meta property="og:image" content="{{ asset(\App\Models\Setting::get('seo_og_image')) }}" />
+    @else
+    <meta property="og:image" content="{{ asset('images/logo.png') }}" />
+    @endif
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="{{ url()->current() }}" />
+    <meta property="twitter:title" content="@yield('title', \App\Models\Setting::get('seo_twitter_title', \App\Models\Setting::get('seo_meta_title', \App\Models\Setting::get('site_name', 'BentoCat'))))" />
+    <meta property="twitter:description" content="@yield('meta_description', \App\Models\Setting::get('seo_twitter_description', \App\Models\Setting::get('seo_meta_description', \App\Models\Setting::get('site_description', 'BentoCat'))))" />
+    @if(\App\Models\Setting::get('seo_og_image'))
+    <meta property="twitter:image" content="{{ asset(\App\Models\Setting::get('seo_og_image')) }}" />
+    @else
+    <meta property="twitter:image" content="{{ asset('images/logo.png') }}" />
+    @endif
+
+    @if(\App\Models\Setting::get('ga_id'))
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ \App\Models\Setting::get('ga_id') }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ \App\Models\Setting::get('ga_id') }}');
+    </script>
+    @endif
+
+    @if(\App\Models\Setting::get('gtm_id'))
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ \App\Models\Setting::get('gtm_id') }}');</script>
+    <!-- End Google Tag Manager -->
+    @endif
+
+    @if(\App\Models\Setting::get('meta_pixel_id'))
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '{{ \App\Models\Setting::get('meta_pixel_id') }}');
+    fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+    @endif
 
     <!-- Google Fonts: Outfit (For Headlines) & Plus Jakarta Sans (For Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -96,6 +160,12 @@
     @stack('styles')
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-amber-100 selection:text-amber-900">
+    @if(\App\Models\Setting::get('gtm_id'))
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ \App\Models\Setting::get('gtm_id') }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    @endif
 
     <!-- Floating Background Blobs & Playful Doodles -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">

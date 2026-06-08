@@ -180,16 +180,32 @@
                 <span class="text-lg">🤝</span> Database Pelanggan
             </a>
             
+            <div class="pt-4 pb-1">
+                <p class="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">Aktivitas Marketing</p>
+            </div>
+            @if(Auth::user() && Auth::user()->role === 'marketing')
+            <a href="{{ route('admin.my-logs.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.my-logs.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                <span class="text-lg">📝</span> Log Kerja Saya
+            </a>
+            @endif
             @if(Auth::user() && Auth::user()->role === 'superadmin')
+            <a href="{{ route('admin.marketing-logs.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.marketing-logs.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                <span class="text-lg">📋</span> Log Kerja Marketing
+            </a>
+            @endif
+
+            @if(Auth::user() && in_array(Auth::user()->role, ['superadmin', 'marketing']))
             <div class="pt-4 pb-1">
                 <p class="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">Sistem</p>
             </div>
             <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.settings.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
                 <span class="text-lg">⚙️</span> Pengaturan Web
             </a>
+            @if(Auth::user()->role === 'superadmin')
             <a href="{{ route('admin.audit.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.audit.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
                 <span class="text-lg">🔍</span> Audit & Kesehatan Bisnis
             </a>
+            @endif
             @endif
         </nav>
 

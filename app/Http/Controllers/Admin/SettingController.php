@@ -11,8 +11,9 @@ class SettingController extends Controller
 {
     public function index()
     {
-        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
-            abort(403, 'Unauthorized action. Hanya Superadmin yang dapat mengakses halaman pengaturan.');
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['superadmin', 'marketing'])) {
+            abort(403, 'Unauthorized action. Hanya Superadmin dan Marketing yang dapat mengakses halaman pengaturan.');
         }
 
         $settings = [
@@ -24,7 +25,7 @@ class SettingController extends Controller
             'site_logo' => Setting::get('site_logo', 'images/logo.png'),
             'site_favicon' => Setting::get('site_favicon', 'favicon.ico'),
             
-            // New fields
+            // Hero Section
             'hero_badge_text' => Setting::get('hero_badge_text', '🐾 BentoCat Premium Bentonite Cat Litter'),
             'hero_title' => Setting::get('hero_title', 'Pasir Kucing Premium, Sahabat Terbaik Kucing Anda!'),
             'hero_subtitle' => Setting::get('hero_subtitle', 'Hemat Ongkir! Cari petshop resmi terdekat di kota Anda dengan harga lokal wajar tanpa markup tinggi marketplace.'),
@@ -50,6 +51,17 @@ class SettingController extends Controller
             'feature_3_icon' => Setting::get('feature_3_icon', '🌸'),
             'feature_3_title' => Setting::get('feature_3_title', 'Odor Encapsulation'),
             'feature_3_desc' => Setting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.'),
+
+            // Tracking & SEO fields
+            'gtm_id' => Setting::get('gtm_id', ''),
+            'ga_id' => Setting::get('ga_id', ''),
+            'meta_pixel_id' => Setting::get('meta_pixel_id', ''),
+            'meta_verification_id' => Setting::get('meta_verification_id', ''),
+            'seo_meta_title' => Setting::get('seo_meta_title', 'BentoCat - Pasir Kucing Bentonite Premium'),
+            'seo_meta_description' => Setting::get('seo_meta_description', 'BentoCat Premium Bentonite Cat Litter - Pasir kucing clumping wangi super dengan kontrol bau amonia 24 jam.'),
+            'seo_og_image' => Setting::get('seo_og_image', ''),
+            'seo_twitter_title' => Setting::get('seo_twitter_title', ''),
+            'seo_twitter_description' => Setting::get('seo_twitter_description', ''),
         ];
 
         return view('admin.settings.index', compact('settings'));
@@ -57,10 +69,44 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
-        if (!auth()->user() || auth()->user()->role !== 'superadmin') {
-            return back()->with('error', 'Hanya Superadmin yang diperbolehkan mengubah pengaturan website.');
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['superadmin', 'marketing'])) {
+            return back()->with('error', 'Hanya Superadmin dan Marketing yang diperbolehkan mengubah pengaturan website.');
         }
 
+        if ($user->role === 'marketing') {
+            // Validate ONLY Tracking & SEO fields
+            $request->validate([
+                'gtm_id' => 'nullable|string|max:50',
+                'ga_id' => 'nullable|string|max:50',
+                'meta_pixel_id' => 'nullable|string|max:50',
+                'meta_verification_id' => 'nullable|string|max:255',
+                'seo_meta_title' => 'required|string|max:255',
+                'seo_meta_description' => 'required|string',
+                'seo_og_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,svg|max:10240', // 10MB
+                'seo_twitter_title' => 'nullable|string|max:255',
+                'seo_twitter_description' => 'nullable|string',
+            ]);
+
+            // Save tracking/SEO settings
+            Setting::set('gtm_id', $request->gtm_id);
+            Setting::set('ga_id', $request->ga_id);
+            Setting::set('meta_pixel_id', $request->meta_pixel_id);
+            Setting::set('meta_verification_id', $request->meta_verification_id);
+            Setting::set('seo_meta_title', $request->seo_meta_title);
+            Setting::set('seo_meta_description', $request->seo_meta_description);
+            Setting::set('seo_twitter_title', $request->seo_twitter_title);
+            Setting::set('seo_twitter_description', $request->seo_twitter_description);
+
+            if ($request->hasFile('seo_og_image')) {
+                $ogPath = $request->file('seo_og_image')->store('seo', 'public');
+                Setting::set('seo_og_image', 'storage/' . $ogPath);
+            }
+
+            return redirect()->back()->with('success', 'Pengaturan Tracking & SEO berhasil diperbarui.');
+        }
+
+        // Superadmin full validation
         $request->validate([
             'site_name' => 'required|string|max:255',
             'site_description' => 'nullable|string',
@@ -70,7 +116,7 @@ class SettingController extends Controller
             'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:20480',
             'site_favicon' => 'nullable|image|mimes:ico,png,jpg,jpeg|max:512',
             
-            // New Hero Section validations
+            // Hero Section
             'hero_badge_text' => 'required|string|max:255',
             'hero_title' => 'required|string|max:255',
             'hero_subtitle' => 'required|string',
@@ -96,6 +142,17 @@ class SettingController extends Controller
             'feature_3_icon' => 'required|string|max:50',
             'feature_3_title' => 'required|string|max:255',
             'feature_3_desc' => 'required|string',
+
+            // Tracking & SEO
+            'gtm_id' => 'nullable|string|max:50',
+            'ga_id' => 'nullable|string|max:50',
+            'meta_pixel_id' => 'nullable|string|max:50',
+            'meta_verification_id' => 'nullable|string|max:255',
+            'seo_meta_title' => 'required|string|max:255',
+            'seo_meta_description' => 'required|string',
+            'seo_og_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,svg|max:10240',
+            'seo_twitter_title' => 'nullable|string|max:255',
+            'seo_twitter_description' => 'nullable|string',
         ]);
 
         Setting::set('site_name', $request->site_name);
@@ -127,6 +184,16 @@ class SettingController extends Controller
         Setting::set('feature_3_title', $request->feature_3_title);
         Setting::set('feature_3_desc', $request->feature_3_desc);
 
+        // Tracking & SEO
+        Setting::set('gtm_id', $request->gtm_id);
+        Setting::set('ga_id', $request->ga_id);
+        Setting::set('meta_pixel_id', $request->meta_pixel_id);
+        Setting::set('meta_verification_id', $request->meta_verification_id);
+        Setting::set('seo_meta_title', $request->seo_meta_title);
+        Setting::set('seo_meta_description', $request->seo_meta_description);
+        Setting::set('seo_twitter_title', $request->seo_twitter_title);
+        Setting::set('seo_twitter_description', $request->seo_twitter_description);
+
         if ($request->hasFile('site_logo')) {
             $logoPath = $request->file('site_logo')->store('branding', 'public');
             Setting::set('site_logo', 'storage/' . $logoPath);
@@ -145,6 +212,11 @@ class SettingController extends Controller
         if ($request->hasFile('hero_product_image')) {
             $productImg = $request->file('hero_product_image')->store('hero', 'public');
             Setting::set('hero_product_image', 'storage/' . $productImg);
+        }
+
+        if ($request->hasFile('seo_og_image')) {
+            $ogPath = $request->file('seo_og_image')->store('seo', 'public');
+            Setting::set('seo_og_image', 'storage/' . $ogPath);
         }
 
         return redirect()->back()->with('success', 'Pengaturan website berhasil diperbarui.');

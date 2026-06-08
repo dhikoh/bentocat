@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BentoCat - Premium Cat Litter</title>
+    <style>
+        /* === RESET & BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            /* Warna latar belakang gelap untuk memunculkan kontras, bisa diubah transparan jika dipasang di web Anda */
+            background-color: #0b1120; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* === MAIN CONTAINER === */
+        .showcase-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* === PRODUCT IMAGE === */
+        .product-image {
+            width: 100%;
+            max-width: 320px;
+            z-index: 2;
+            position: relative;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* === BADGES (FLOATING LABELS) === */
+        .badge {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            z-index: 5;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .badge-icon {
+            background: rgba(56, 189, 248, 0.15);
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #38bdf8;
+        }
+
+        .badge-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Posisi Badges - Desktop */
+        .badge.top-left { top: 10%; left: -5%; animation-delay: 0s; }
+        .badge.top-right { top: 5%; right: -5%; animation-delay: 1s; }
+        .badge.bottom-left { bottom: 25%; left: -10%; animation-delay: 2s; }
+        .badge.bottom-right { top: 35%; right: -15%; animation-delay: 1.5s; }
+
+        /* === AROMA DISPLAY TEXT === */
+        .aroma-display {
+            position: absolute;
+            top: 45%;
+            right: -10%;
+            z-index: 10;
+            text-align: center;
+            background: rgba(10, 15, 30, 0.4);
+            padding: 20px 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.05);
+            /* Bayangan halus pada container */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .aroma-subtitle {
+            font-size: 14px;
+            color: #e2e8f0;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .aroma-title {
+            font-size: 42px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+            /* Warna default lemon */
+            color: #FDE047; 
+            text-shadow: 0 5px 25px rgba(253, 224, 71, 0.5);
+            /* Transisi efek liquid */
+            transition: color 0.5s ease, text-shadow 0.5s ease, filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), letter-spacing 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            letter-spacing: 2px;
+            filter: blur(0px);
+            opacity: 1;
+        }
+
+        /* Class untuk efek teks melebur (liquid) */
+        .aroma-title.liquid-hidden {
+            filter: blur(12px);
+            opacity: 0;
+            letter-spacing: -15px; /* Membuat huruf saling menyatu seperti cairan */
+            transform: scale(0.8) translateY(10px);
+        }
+
+        /* === AROMA SELECTOR (DOTS) === */
+        .aroma-selector {
+            position: absolute;
+            bottom: 10%;
+            right: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 10px 15px;
+            display: flex;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .dot:hover {
+            transform: scale(1.2);
+        }
+
+        .dot.active {
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transform: scale(1.2);
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* === RESPONSIVE (MOBILE) === */
+        @media (max-width: 768px) {
+            .badge {
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+            .badge-icon { padding: 5px; }
+            .badge-icon svg { width: 14px; height: 14px; }
+            
+            /* Penyesuaian posisi agar tidak keluar layar di HP */
+            .badge.top-left { top: 5%; left: 0%; }
+            .badge.top-right { top: 0%; right: 0%; }
+            .badge.bottom-left { bottom: 20%; left: 0%; }
+            .badge.bottom-right { top: 25%; right: 0%; }
+
+            .aroma-display {
+                right: 50%;
+                top: 50%;
+                transform: translateX(50%);
+                background: rgba(10, 15, 30, 0.7); /* Lebih tebal agar terbaca di atas gambar */
+            }
+            
+            .aroma-title { font-size: 32px; }
+
+            .aroma-selector {
+                bottom: -20px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="showcase-container">
+        
+        <!-- Badges -->
+        <div class="badge top-left">
+            <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            </div>
+            Daya Serap<br>Maximal
+        </div>
+
+        <div class="badge top-right">
+            <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+            </div>
+            Anti<br>Bakteri
+        </div>
+
+        <div class="badge bottom-left">
+            <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg>
+            </div>
+            Bebas<br>Debu
+        </div>
+
+        <div class="badge bottom-right">
+            <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13v-5h5a7 7 0 0 1 7 7v5h-5z"></path></svg>
+            </div>
+            100%<br>Natural
+        </div>
+
+        <!-- Product Image -->
+        <img src="http://modula.click/images/product-5.5l-raw.png" alt="BentoCat Premium" class="product-image">
+
+        <!-- Aroma Text Display (Replaces the Diamond Shape) -->
+        <div class="aroma-display" id="aroma-display">
+            <div class="aroma-subtitle">AROMA</div>
+            <div class="aroma-title" id="aroma-text">LEMON</div>
+        </div>
+
+        <!-- Aroma Selector Dots -->
+        <div class="aroma-selector" id="aroma-selector">
+            <!-- Lemon (Kuning) -->
+            <button class="dot active" style="background-color: #FDE047;" data-aroma="LEMON" data-color="#FDE047"></button>
+            <!-- Strawberry (Merah Muda/Merah) -->
+            <button class="dot" style="background-color: #F87171;" data-aroma="STRAWBERRY" data-color="#F87171"></button>
+            <!-- Melon (Hijau Muda) -->
+            <button class="dot" style="background-color: #4ADE80;" data-aroma="MELON" data-color="#4ADE80"></button>
+            <!-- Lavender (Ungu) -->
+            <button class="dot" style="background-color: #A78BFA;" data-aroma="LAVENDER" data-color="#A78BFA"></button>
+            <!-- Apple (Hijau/Merah) -->
+            <button class="dot" style="background-color: #FB7185;" data-aroma="APPLE" data-color="#FB7185"></button>
+        </div>
+
+    </div>
+
+    <!-- JavaScript for Smooth Aroma Transition -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dots = document.querySelectorAll('.dot');
+            const aromaDisplay = document.getElementById('aroma-display');
+            const aromaText = document.getElementById('aroma-text');
+
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    // Hapus class active dari semua dot
+                    dots.forEach(d => d.classList.remove('active'));
+                    
+                    // Tambahkan active ke dot yang di klik
+                    this.classList.add('active');
+
+                    const newAroma = this.getAttribute('data-aroma');
+                    const newColor = this.getAttribute('data-color');
+
+                    // Cegah animasi ulang jika mengklik aroma yang sama
+                    if(aromaText.innerText === newAroma) return;
+
+                    // 1. Mulai transisi efek liquid (huruf melebur, blur, dan menyusut)
+                    aromaText.classList.add('liquid-hidden');
+
+                    // 2. Tunggu saat teks sudah melebur sempurna, lalu ubah isinya
+                    setTimeout(() => {
+                        aromaText.innerText = newAroma;
+                        aromaText.style.color = newColor;
+                        aromaText.style.textShadow = `0 5px 25px ${newColor}80`;
+
+                        // 3. Munculkan kembali cairan membentuk teks baru
+                        aromaText.classList.remove('liquid-hidden');
+                    }, 400); // 400ms menyesuaikan durasi animasi CSS
+                });
+            });
+        });
+    </script>
+</body>
+</html>

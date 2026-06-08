@@ -9,9 +9,11 @@
             <h1 class="text-2xl font-bold text-white">Kelola Wilayah & Provinsi</h1>
             <p class="text-sm text-slate-400">Daftar provinsi di Indonesia untuk merelasikan kota-kota sebaran outlet BentoCat.</p>
         </div>
+        @if(Auth::user() && Auth::user()->role !== 'marketing')
         <button onclick="toggleModal('add-province-modal')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2">
             <span>Tambah Provinsi</span> 🐾
         </button>
+        @endif
     </div>
 
     <!-- Filter & Search -->
@@ -62,9 +64,11 @@
                                     <a href="{{ route('admin.regions.cities', $province->id) }}" class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Kelola Kota
                                     </a>
+                                    @if(Auth::user() && Auth::user()->role !== 'marketing')
                                     <button onclick="editProvince({{ $province->id }}, '{{ $province->nama }}', {{ $province->is_hidden ? 'true' : 'false' }})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </button>
+                                    @endif
                                     @if(Auth::user() && Auth::user()->role === 'superadmin')
                                         <form action="{{ route('admin.regions.province.destroy', $province->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus provinsi ini? Semua data kota di dalamnya harus kosong.')">
                                             @csrf

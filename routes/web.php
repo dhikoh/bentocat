@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\MarketingLogController;
 use App\Http\Controllers\ClientController;
 
 // Public client routes (Fase 3 & 4)
@@ -40,7 +41,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // Authenticated Routes
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', 'restrict.marketing'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -95,13 +96,31 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/customers/clear', [CustomerController::class, 'clearCustomers'])->name('customers.clear');
         Route::resource('/customers', CustomerController::class);
 
-        // Website Settings (Superadmin only)
-        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+        // Marketing Logs (Submit daily logs)
+        Route::get('/my-logs', [MarketingLogController::class, 'index'])->name('my-logs.index');
+        Route::get('/my-logs/create', [MarketingLogController::class, 'create'])->name('my-logs.create');
+        Route::post('/my-logs', [MarketingLogController::class, 'store'])->name('my-logs.store');
+        Route::get('/my-logs/{log}/edit', [MarketingLogController::class, 'edit'])->name('my-logs.edit');
+        Route::put('/my-logs/{log}', [MarketingLogController::class, 'update'])->name('my-logs.update');
+        Route::delete('/my-logs/{log}', [MarketingLogController::class, 'destroy'])->name('my-logs.destroy');
+
+        // Superadmin and Marketing (SEO / Pixel Settings)
+        Route::middleware('role:superadmin,marketing')->group(function () {
+            Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+        });
+
+        // Superadmin only (Monitor logs)
+        Route::middleware('role:superadmin')->group(function () {
+            Route::get('/marketing-logs', [MarketingLogController::class, 'adminIndex'])->name('marketing-logs.index');
+            Route::get('/marketing-logs/export', [MarketingLogController::class, 'exportCsv'])->name('marketing-logs.export');
+        });
 
         // Audit & Business Health Panel (Superadmin / Editor)
-        Route::get('/audit', [\App\Http\Controllers\Admin\AuditController::class, 'index'])->name('audit.index');
-        Route::post('/audit/merge', [\App\Http\Controllers\Admin\AuditController::class, 'merge'])->name('audit.merge');
+        Route::middleware('role:superadmin,editor')->group(function () {
+            Route::get('/audit', [\App\Http\Controllers\Admin\AuditController::class, 'index'])->name('audit.index');
+            Route::post('/audit/merge', [\App\Http\Controllers\Admin\AuditController::class, 'merge'])->name('audit.merge');
+        });
     });
 });
 

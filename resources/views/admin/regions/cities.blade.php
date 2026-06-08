@@ -14,9 +14,11 @@
             <h1 class="text-2xl font-bold text-white mt-1">Kota di Provinsi: {{ $province->nama }}</h1>
             <p class="text-sm text-slate-400">Kelola daftar kota di bawah {{ $province->nama }} untuk titik jangkauan distributor dan outlet.</p>
         </div>
+        @if(Auth::user() && Auth::user()->role !== 'marketing')
         <button onclick="toggleModal('add-city-modal')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2">
             <span>Tambah Kota</span> 🐾
         </button>
+        @endif
     </div>
 
     <!-- Filter & Search -->
@@ -60,9 +62,11 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
+                                    @if(Auth::user() && Auth::user()->role !== 'marketing')
                                     <button onclick="editCity({{ $city->id }}, '{{ $city->nama }}', {{ $city->is_hidden ? 'true' : 'false' }})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </button>
+                                    @endif
                                     @if(Auth::user() && Auth::user()->role === 'superadmin')
                                         <form action="{{ route('admin.regions.city.destroy', $city->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kota ini?')">
                                             @csrf

@@ -28,8 +28,9 @@
 
     <!-- Tab Navigation -->
     <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-px">
+        @if(Auth::user() && Auth::user()->role === 'superadmin')
         <button type="button" onclick="switchTab('branding')" id="tab-btn-branding" class="tab-btn px-5 py-3 text-sm font-bold rounded-t-2xl border-b-2 transition-all cursor-pointer text-amber-500 border-amber-500">
-            🎨 Branding & SEO
+            🎨 Branding & Logo
         </button>
         <button type="button" onclick="switchTab('hero-text')" id="tab-btn-hero-text" class="tab-btn px-5 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer">
             📝 Teks Hero
@@ -46,12 +47,17 @@
         <button type="button" onclick="switchTab('features')" id="tab-btn-features" class="tab-btn px-5 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer">
             ⭐ Fitur Keunggulan
         </button>
+        @endif
+        <button type="button" onclick="switchTab('tracking-seo')" id="tab-btn-tracking-seo" class="tab-btn px-5 py-3 text-sm font-bold rounded-t-2xl border-b-2 {{ Auth::user() && Auth::user()->role === 'marketing' ? 'text-amber-500 border-amber-500' : 'border-transparent text-slate-400 hover:text-slate-200' }} transition-all cursor-pointer">
+            🚀 Tracking & SEO
+        </button>
     </div>
 
     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
-        <!-- Tab 1: Branding & SEO -->
+        @if(Auth::user() && Auth::user()->role === 'superadmin')
+        <!-- Tab 1: Branding -->
         <div id="tab-pane-branding" class="tab-pane space-y-6">
             <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6">
                 <h2 class="text-xl font-bold text-amber-400 pb-1 flex items-center gap-2">
@@ -64,7 +70,7 @@
                                class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label for="site_description" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi SEO (Meta Description)</label>
+                        <label for="site_description" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Website (Default)</label>
                         <textarea name="site_description" id="site_description" rows="3"
                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('site_description', $settings['site_description']) }}</textarea>
                     </div>
@@ -277,7 +283,7 @@
                 
                 <!-- Fitur 1 -->
                 <div class="border-b border-slate-800/80 pb-6 space-y-4">
-                    <h3 class="text-sm font-bold text-slate-300">⚡ Fitur 1 (Molecular Bonding)</h3>
+                    <h3 class="text-sm font-bold text-slate-300">⚡ Fitur 1</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label for="feature_1_icon" class="block text-xs font-bold text-slate-400 uppercase">Ikon / Emoji</label>
@@ -290,7 +296,7 @@
                                    class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
                         </div>
                         <div class="space-y-2 md:col-span-3">
-                            <label for="feature_1_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur (Mendukung HTML seperti &lt;strong&gt; atau &lt;b&gt;)</label>
+                            <label for="feature_1_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur</label>
                             <textarea name="feature_1_desc" id="feature_1_desc" rows="2" required
                                       class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('feature_1_desc', $settings['feature_1_desc']) }}</textarea>
                         </div>
@@ -299,7 +305,7 @@
 
                 <!-- Fitur 2 -->
                 <div class="border-b border-slate-800/80 pb-6 space-y-4">
-                    <h3 class="text-sm font-bold text-slate-300">🌸 Fitur 2 (Zero-Dust Tech)</h3>
+                    <h3 class="text-sm font-bold text-slate-300">🌸 Fitur 2</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label for="feature_2_icon" class="block text-xs font-bold text-slate-400 uppercase">Ikon / Emoji</label>
@@ -312,7 +318,7 @@
                                    class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
                         </div>
                         <div class="space-y-2 md:col-span-3">
-                            <label for="feature_2_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur (Mendukung HTML seperti &lt;strong&gt; atau &lt;b&gt;)</label>
+                            <label for="feature_2_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur</label>
                             <textarea name="feature_2_desc" id="feature_2_desc" rows="2" required
                                       class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('feature_2_desc', $settings['feature_2_desc']) }}</textarea>
                         </div>
@@ -321,7 +327,7 @@
 
                 <!-- Fitur 3 -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-bold text-slate-300">🍃 Fitur 3 (Odor Encapsulation)</h3>
+                    <h3 class="text-sm font-bold text-slate-300">🍃 Fitur 3</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label for="feature_3_icon" class="block text-xs font-bold text-slate-400 uppercase">Ikon / Emoji</label>
@@ -334,9 +340,88 @@
                                    class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
                         </div>
                         <div class="space-y-2 md:col-span-3">
-                            <label for="feature_3_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur (Mendukung HTML seperti &lt;strong&gt; atau &lt;b&gt;)</label>
+                            <label for="feature_3_desc" class="block text-xs font-bold text-slate-400 uppercase">Deskripsi Fitur</label>
                             <textarea name="feature_3_desc" id="feature_3_desc" rows="2" required
                                       class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('feature_3_desc', $settings['feature_3_desc']) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Tab: Tracking & SEO -->
+        <div id="tab-pane-tracking-seo" class="tab-pane {{ Auth::user() && Auth::user()->role === 'marketing' ? '' : 'hidden' }} space-y-6">
+            <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6">
+                <h2 class="text-xl font-bold text-amber-400 pb-1 flex items-center gap-2">
+                    <span>🚀</span> Script Integrasi Tracking & Custom SEO
+                </h2>
+                
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300">📊 Penanda Pelacakan & Skrip Analisis</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="gtm_id" class="block text-xs font-bold text-slate-400 uppercase">Google Tag Manager (GTM) ID</label>
+                            <input type="text" name="gtm_id" id="gtm_id" placeholder="GTM-XXXXXXX" value="{{ old('gtm_id', $settings['gtm_id'] ?? '') }}"
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="ga_id" class="block text-xs font-bold text-slate-400 uppercase">Google Analytics (GA4) ID</label>
+                            <input type="text" name="ga_id" id="ga_id" placeholder="G-XXXXXXX" value="{{ old('ga_id', $settings['ga_id'] ?? '') }}"
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="meta_pixel_id" class="block text-xs font-bold text-slate-400 uppercase">Meta Pixel ID (Facebook Pixel)</label>
+                            <input type="text" name="meta_pixel_id" id="meta_pixel_id" placeholder="123456789012345" value="{{ old('meta_pixel_id', $settings['meta_pixel_id'] ?? '') }}"
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="meta_verification_id" class="block text-xs font-bold text-slate-400 uppercase">Meta Domain Verification ID</label>
+                            <input type="text" name="meta_verification_id" id="meta_verification_id" placeholder="verification_code_here" value="{{ old('meta_verification_id', $settings['meta_verification_id'] ?? '') }}"
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-slate-800" />
+
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-300">🔍 Search Engine Optimization (SEO) & Open Graph</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="seo_meta_title" class="block text-xs font-bold text-slate-400 uppercase">Judul Halaman Utama (SEO Meta Title)</label>
+                            <input type="text" name="seo_meta_title" id="seo_meta_title" value="{{ old('seo_meta_title', $settings['seo_meta_title'] ?? '') }}" required
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="seo_meta_description" class="block text-xs font-bold text-slate-400 uppercase">Meta Deskripsi (SEO Meta Description)</label>
+                            <textarea name="seo_meta_description" id="seo_meta_description" rows="3" required
+                                      class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">{{ old('seo_meta_description', $settings['seo_meta_description'] ?? '') }}</textarea>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label for="seo_twitter_title" class="block text-xs font-bold text-slate-400 uppercase">Twitter Title (Opsional)</label>
+                            <input type="text" name="seo_twitter_title" id="seo_twitter_title" value="{{ old('seo_twitter_title', $settings['seo_twitter_title'] ?? '') }}"
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="seo_twitter_description" class="block text-xs font-bold text-slate-400 uppercase">Twitter Description (Opsional)</label>
+                            <input type="text" name="seo_twitter_description" id="seo_twitter_description" value="{{ old('seo_twitter_description', $settings['seo_twitter_description'] ?? '') }}"
+                                   class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none transition-all">
+                        </div>
+
+                        <div class="space-y-4 md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase">Gambar Sosial Media (Open Graph Image / OG:Image)</label>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-2xl bg-white border border-slate-800 flex items-center justify-center p-2 overflow-hidden shrink-0">
+                                    <img id="seo_og_image_preview" src="{{ $settings['seo_og_image'] ? asset($settings['seo_og_image']) : asset('images/logo.png') }}" alt="OG Preview" class="w-full h-full object-contain">
+                                </div>
+                                <div class="flex-1">
+                                    <input type="file" name="seo_og_image" id="seo_og_image" accept="image/*" onchange="previewImage(this, 'seo_og_image_preview')"
+                                           class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 file:cursor-pointer">
+                                    <p class="text-[10px] text-slate-500 mt-1">Format: PNG, JPG, JPEG, GIF. Maks 10MB.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

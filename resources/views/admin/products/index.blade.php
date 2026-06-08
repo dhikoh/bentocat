@@ -9,9 +9,11 @@
             <h1 class="text-2xl font-bold text-white">Kelola Katalog Produk</h1>
             <p class="text-sm text-slate-400">Daftar produk BentoCat beserta status publikasi dan pengelolaan varian bertingkat.</p>
         </div>
+        @if(Auth::user() && Auth::user()->role !== 'marketing')
         <a href="{{ route('admin.products.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2">
             <span>Tambah Produk</span> 🐾
         </a>
+        @endif
     </div>
 
     <!-- Filter & Search -->
@@ -82,9 +84,11 @@
                                     <a href="{{ route('admin.products.variants', $product->id) }}" class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Kelola Varian
                                     </a>
+                                    @if(Auth::user() && Auth::user()->role !== 'marketing')
                                     <a href="{{ route('admin.products.edit', $product->id) }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </a>
+                                    @endif
                                     @if(Auth::user() && Auth::user()->role === 'superadmin')
                                         <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                                             @csrf

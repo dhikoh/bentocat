@@ -15,13 +15,16 @@
                     <span>Kosongkan Data</span> 🗑️
                 </button>
             @endif
+            @if(Auth::user() && Auth::user()->role !== 'marketing')
             <a href="{{ route('admin.leads.export', request()->query()) }}" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/10 transition-all flex items-center gap-2">
                 <span>Ekspor CSV (Excel)</span> 📊
             </a>
+            @endif
         </div>
     </div>
 
     <!-- CSV Bulk Import Panel -->
+    @if(Auth::user() && Auth::user()->role !== 'marketing')
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
         <h2 class="text-md font-bold text-white mb-2 flex items-center gap-2">
             <span>Impor Bulk Leads & Calon Pembeli dari CSV</span>
@@ -40,6 +43,7 @@
             Format CSV: <strong>Tanggal, Nama Customer, WhatsApp Customer, Alamat Customer, Provinsi Customer (GPS), Kota Customer (GPS), Produk Pilihan, Varian 1 (Kategori), Varian 2 (Aroma), Varian 3 (Ukuran), Kota Outlet, Nama Outlet, Nama Distributor</strong>.
         </p>
     </div>
+    @endif
 
     <!-- Filters & Search -->
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">

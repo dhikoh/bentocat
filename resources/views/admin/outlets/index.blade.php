@@ -15,12 +15,14 @@
                     <span>Kosongkan Data</span> 🗑️
                 </button>
             @endif
+            @if(Auth::user() && Auth::user()->role !== 'marketing')
             <a href="{{ route('admin.outlets.export') }}" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm">
                 <span>Ekspor CSV</span> 📥
             </a>
             <a href="{{ route('admin.outlets.create') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/10 transition-all flex items-center gap-2 text-sm">
                 <span>Tambah Outlet</span> 🐾
             </a>
+            @endif
         </div>
     </div>
  
@@ -52,6 +54,7 @@
     </div>
 
     <!-- CSV Bulk Import Panel -->
+    @if(Auth::user() && Auth::user()->role !== 'marketing')
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
         <h2 class="text-md font-bold text-white mb-2 flex items-center gap-2">
             <span>Impor Bulk Petshop dari CSV</span>
@@ -70,6 +73,7 @@
             Format CSV: <strong>Nama Petshop, Alamat, No WA, Mitra, Kota, Distributor, Kurir</strong> (Pisahkan kurir dengan koma, contoh: <code>Kurir A (0812345678)</code>).
         </p>
     </div>
+    @endif
 
     <!-- Filter & Search -->
     <div class="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
@@ -247,9 +251,11 @@
             <table class="w-full text-left text-sm text-slate-300">
                 <thead class="text-xs text-slate-500 uppercase bg-slate-900/40 border-b border-slate-800">
                     <tr>
+                        @if(Auth::user() && Auth::user()->role !== 'marketing')
                         <th class="px-6 py-4 w-10">
                             <input type="checkbox" id="select-all-outlets" class="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-amber-500">
                         </th>
+                        @endif
                         <th class="px-6 py-4">Outlet / Kota</th>
                         <th class="px-6 py-4 text-center">Status Mitra</th>
                         <th class="px-6 py-4">Distributor Penyuplai</th>
@@ -262,9 +268,11 @@
                 <tbody class="divide-y divide-slate-850">
                     @forelse($outlets as $outlet)
                         <tr class="hover:bg-slate-900/20">
+                            @if(Auth::user() && Auth::user()->role !== 'marketing')
                             <td class="px-6 py-4 w-10">
                                 <input type="checkbox" name="outlet_ids[]" value="{{ $outlet->id }}" data-nama="{{ $outlet->nama_outlet }}" data-kota="{{ $outlet->city->nama }}" class="outlet-checkbox rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-amber-500">
                             </td>
+                            @endif
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-semibold text-white">{{ $outlet->nama_outlet }}</span>
@@ -322,9 +330,11 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
+                                    @if(Auth::user() && Auth::user()->role !== 'marketing')
                                     <a href="{{ route('admin.outlets.edit', $outlet->id) }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                                         Edit
                                     </a>
+                                    @endif
                                     @if(Auth::user() && Auth::user()->role === 'superadmin')
                                         <form action="{{ route('admin.outlets.destroy', $outlet->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus outlet ini?')">
                                             @csrf
@@ -339,7 +349,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan outlet/petshop terdaftar.</td>
+                            <td colspan="@if(Auth::user() && Auth::user()->role === 'marketing') 7 @else 8 @endif" class="px-6 py-8 text-center text-slate-500 italic">Tidak ditemukan outlet/petshop terdaftar.</td>
                         </tr>
                     @endforelse
                 </tbody>
