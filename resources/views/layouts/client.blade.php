@@ -100,8 +100,8 @@
     <!-- Floating Background Blobs & Playful Doodles -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
         <!-- Core soft blobs -->
-        <div class="absolute top-1/4 -left-12 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl animate-blob"></div>
-        <div class="absolute bottom-1/4 -right-12 w-96 h-96 bg-teal-500/4 rounded-full blur-3xl animate-blob" style="animation-delay: 4s;"></div>
+        <div class="absolute top-1/4 -left-12 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl animate-blob hidden md:block"></div>
+        <div class="absolute bottom-1/4 -right-12 w-96 h-96 bg-teal-500/4 rounded-full blur-3xl animate-blob hidden md:block" style="animation-delay: 4s;"></div>
 
         <!-- Left Side Floating Doodles (Desktop Only) -->
         <div class="hidden lg:block">

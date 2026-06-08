@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero-Dust Tech Illustration</title>
+    <style>
+        /* Container Setup - Rasio 1:1 */
+        .illustration-wrapper {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+            /* Menggunakan warna solid gelap sesuai gambar yang diunggah */
+            background: #121318; 
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ambient Lighting */
+        .ambient-light {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.15) 0%, transparent 60%);
+            top: 10%;
+            left: 10%;
+            pointer-events: none;
+        }
+
+        /* Central Glass Tube (Mesin Utama) */
+        .glass-tube {
+            position: absolute;
+            width: 32%;
+            height: 100%;
+            left: 34%;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0.02) 0%, 
+                rgba(255,255,255,0.1) 10%, 
+                rgba(255,255,255,0.01) 50%, 
+                rgba(255,255,255,0.08) 90%, 
+                rgba(255,255,255,0.02) 100%);
+            border-left: 2px solid rgba(255,255,255,0.15);
+            border-right: 2px solid rgba(255,255,255,0.25);
+            box-shadow: inset 10px 0 20px rgba(0,0,0,0.3), inset -10px 0 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(2px);
+            z-index: 10;
+        }
+
+        /* Filter 1: Saringan Fisik (Top Mesh) */
+        .filter-mesh {
+            position: absolute;
+            top: 40%;
+            width: 100%;
+            height: 12px;
+            background: repeating-linear-gradient(
+                45deg,
+                #444 0px,
+                #444 2px,
+                transparent 2px,
+                transparent 6px
+            );
+            border-top: 2px solid #777;
+            border-bottom: 2px solid #555;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+            z-index: 15;
+        }
+
+        /* Filter 2: Sistem Suction / Vakum Debu (Side Vacuum) */
+        .vacuum-system {
+            position: absolute;
+            top: 50%;
+            left: 66%;
+            width: 25%;
+            height: 20%;
+            background: linear-gradient(to right, rgba(30,32,40,0.9), #1a1c23);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.8);
+            z-index: 5;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Efek Angin Vakum */
+        .vacuum-air {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 10px,
+                rgba(74, 144, 226, 0.1) 15px,
+                transparent 20px
+            );
+            animation: suckAir 1s linear infinite;
+        }
+
+        @keyframes suckAir {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(20px); }
+        }
+
+        /* Lampu Indikator Vakum */
+        .vacuum-light {
+            position: absolute;
+            right: 10%;
+            width: 6px;
+            height: 40%;
+            background: #4a90e2;
+            border-radius: 4px;
+            box-shadow: 0 0 10px #4a90e2, 0 0 20px #4a90e2;
+        }
+
+        /* Wadah Partikel */
+        .particle-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 12;
+            pointer-events: none;
+        }
+
+        /* --- Styling Partikel Pasir --- */
+        .sand {
+            position: absolute;
+            width: clamp(8px, 2.5%, 16px);
+            aspect-ratio: 1/1;
+            background: radial-gradient(circle at 30% 30%, #e2d1bc, #b39f88, #7a6b58);
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.5), inset 1px 1px 3px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.3);
+            top: -10%;
+            animation: dropSand var(--duration) linear infinite;
+            animation-delay: var(--delay);
+        }
+
+        /* --- Styling Partikel Debu --- */
+        .dust {
+            position: absolute;
+            width: clamp(3px, 1%, 6px);
+            aspect-ratio: 1/1;
+            background: #eef1f5;
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0;
+            box-shadow: 0 0 3px rgba(255,255,255,0.8);
+            mix-blend-mode: screen;
+            top: -10%;
+            animation: dropDust var(--duration) ease-in infinite;
+            animation-delay: var(--delay);
+        }
+
+        /* --- Keyframes Animasi Pasir --- */
+        /* Pasir jatuh lurus ke bawah karena massanya berat */
+        @keyframes dropSand {
+            0% {
+                top: -5%;
+                left: calc(50% + var(--startX));
+                transform: rotate(0deg);
+            }
+            100% {
+                top: 105%;
+                left: calc(50% + var(--startX));
+                transform: rotate(var(--rot));
+            }
+        }
+
+        /* --- Keyframes Animasi Debu --- */
+        /* Debu jatuh, saat mencapai area vakum, tersedot ke kanan */
+        @keyframes dropDust {
+            0% {
+                top: -5%;
+                left: calc(50% + var(--startX));
+                opacity: 0;
+                transform: scale(1);
+            }
+            10% {
+                opacity: 0.7;
+            }
+            45% {
+                /* Mencapai area vakum */
+                top: 48%;
+                left: calc(50% + var(--startX));
+                opacity: 0.7;
+            }
+            70% {
+                /* Tersedot tajam ke arah kanan (vakum) */
+                top: 55%;
+                left: calc(50% + var(--startX) + 20%);
+                opacity: 0.3;
+                transform: scale(0.6);
+            }
+            100% {
+                /* Menghilang ke dalam mesin */
+                top: 60%;
+                left: calc(50% + var(--startX) + 35%);
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Container Utama Ilustrasi -->
+    <div class="illustration-wrapper">
+        <div class="ambient-light"></div>
+        
+        <!-- Tabung Mesin Tengah -->
+        <div class="glass-tube">
+            <div class="filter-mesh"></div>
+        </div>
+
+        <!-- Vakum Penyedot Debu -->
+        <div class="vacuum-system">
+            <div class="vacuum-air"></div>
+            <div class="vacuum-light"></div>
+        </div>
+
+        <!-- Wadah Injeksi Partikel -->
+        <div class="particle-container" id="particle-system"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('particle-system');
+            
+            // Dikurangi 50% dari sebelumnya
+            const totalSand = 22; 
+            const totalDust = 60; 
+
+            // 1. Generate Butiran Pasir (Bentonite)
+            for(let i = 0; i < totalSand; i++) {
+                let sand = document.createElement('div');
+                sand.className = 'sand';
+                
+                // Randomisasi posisi awal horizontal (di dalam tabung)
+                // Tabung selebar 32%, jadi dari -14% ke 14% dari tengah
+                let startX = (Math.random() * 28 - 14).toFixed(2);
+                
+                // Randomisasi delay, durasi jatuh, dan rotasi
+                let delay = (Math.random() * 4).toFixed(2);
+                let duration = (2 + Math.random() * 1.5).toFixed(2);
+                let rotation = Math.floor(Math.random() * 360);
+                
+                // Membuat bentuk butiran pasir tidak beraturan agar realistis (CSS Border Radius)
+                let br1 = Math.floor(30 + Math.random() * 40);
+                let br2 = Math.floor(30 + Math.random() * 40);
+                let br3 = Math.floor(30 + Math.random() * 40);
+                let br4 = Math.floor(30 + Math.random() * 40);
+                
+                sand.style.setProperty('--startX', `${startX}%`);
+                sand.style.setProperty('--delay', `${delay}s`);
+                sand.style.setProperty('--duration', `${duration}s`);
+                sand.style.setProperty('--rot', `${rotation}deg`);
+                sand.style.borderRadius = `${br1}% ${100-br1}% ${br2}% ${100-br2}% / ${br3}% ${br4}% ${100-br4}% ${100-br3}%`;
+                
+                container.appendChild(sand);
+            }
+
+            // 2. Generate Partikel Debu Mikro
+            for(let i = 0; i < totalDust; i++) {
+                let dust = document.createElement('div');
+                dust.className = 'dust';
+                
+                // Randomisasi posisi awal
+                let startX = (Math.random() * 28 - 14).toFixed(2);
+                
+                // Debu jatuh sedikit lebih lambat dari pasir
+                let delay = (Math.random() * 4).toFixed(2);
+                let duration = (2.5 + Math.random() * 2).toFixed(2);
+                
+                dust.style.setProperty('--startX', `${startX}%`);
+                dust.style.setProperty('--delay', `${delay}s`);
+                dust.style.setProperty('--duration', `${duration}s`);
+                
+                container.appendChild(dust);
+            }
+        });
+    </script>
+</body>
+</html>

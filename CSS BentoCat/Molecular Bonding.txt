@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molecular Bonding - BentoCat</title>
+<style>
+    /* Wrapper Container untuk menjaga rasio 1:1 */
+    .bentocat-illustration-wrapper {
+        width: 100%;
+        max-width: 500px; /* Anda bisa menyesuaikan ukuran maksimal di sini */
+        aspect-ratio: 1 / 1;
+        margin: 0 auto;
+        background: radial-gradient(circle at 50% 50%, #242436 0%, #0d0d16 100%);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Sistem Animasi Molekul */
+    .molecular-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    /* Rotasi pelan pada seluruh sistem molekul agar terasa hidup */
+    .lattice-system {
+        transform-origin: 250px 250px;
+        animation: slowRotate 24s infinite linear;
+    }
+
+    /* Animasi merapatnya molekul (Clumping) */
+    .lattice-group {
+        transform-origin: 250px 250px;
+        animation: latticeCompact 5s infinite ease-in-out;
+    }
+
+    /* Tampilan Garis Ikatan */
+    .bond {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        animation: bondGlow 5s infinite ease-in-out;
+    }
+
+    /* Tampilan Pasir Bentonite */
+    .granule {
+        animation: granuleAnim 5s infinite ease-in-out;
+    }
+
+    /* Menentukan titik pusat rotasi/skala untuk masing-masing butiran */
+    .g-top { transform-origin: 250px 110px; }
+    .g-top-right { transform-origin: 371px 180px; }
+    .g-bottom-right { transform-origin: 371px 320px; }
+    .g-bottom { transform-origin: 250px 390px; }
+    .g-bottom-left { transform-origin: 129px 320px; }
+    .g-top-left { transform-origin: 129px 180px; }
+    .g-center { transform-origin: 250px 250px; }
+
+    /* Tetesan Cairan */
+    .droplet {
+        fill: #00d4ff;
+        filter: drop-shadow(0 0 8px #00d4ff);
+        animation: dropFall 5s infinite ease-in;
+    }
+
+    /* Efek Gelombang Kejut (Shockwave) */
+    .shockwave {
+        fill: none;
+        stroke: #00d4ff;
+        animation: ripple 5s infinite ease-out;
+    }
+
+    /* Efek Perisai Kekuatan (Tidak mudah pecah) */
+    .shield-layer {
+        transform-origin: 250px 250px;
+        animation: shieldAppear 5s infinite ease-in-out;
+    }
+
+    /* Keyframes */
+    @keyframes slowRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes dropFall {
+        0% { transform: translateY(-150px) scale(1); opacity: 0; }
+        2% { opacity: 1; }
+        10% { transform: translateY(180px) scale(0.9); opacity: 1; }
+        11%, 100% { opacity: 0; transform: translateY(180px) scale(0); }
+    }
+
+    @keyframes ripple {
+        0%, 10% { r: 0; opacity: 1; stroke-width: 12; }
+        18% { r: 160; opacity: 0; stroke-width: 1; }
+        100% { r: 160; opacity: 0; stroke-width: 0; }
+    }
+
+    @keyframes latticeCompact {
+        0%, 10% { transform: scale(1); }
+        14%, 80% { transform: scale(0.38); } /* Tarik koordinat pusat secara ekstrim */
+        85%, 100% { transform: scale(1); }
+    }
+
+    @keyframes bondGlow {
+        0%, 10% { stroke: #3a3a4c; stroke-width: 4px; filter: none; }
+        14%, 80% { stroke: #00d4ff; stroke-width: 15px; filter: drop-shadow(0 0 10px #00d4ff); }
+        85%, 100% { stroke: #3a3a4c; stroke-width: 4px; filter: none; }
+    }
+
+    @keyframes shieldAppear {
+        0%, 10% { opacity: 0; transform: scale(1); fill: rgba(0, 212, 255, 0); stroke: rgba(0, 212, 255, 0); }
+        14%, 80% { opacity: 1; transform: scale(2.5); fill: rgba(0, 212, 255, 0.15); stroke: rgba(0, 212, 255, 0.8); stroke-width: 2px; }
+        85%, 100% { opacity: 0; transform: scale(1); fill: rgba(0, 212, 255, 0); stroke: rgba(0, 212, 255, 0); }
+    }
+
+    /* Counter-scale: Membesarkan butiran agar ukurannya tidak ikut mengecil saat ditarik ke tengah */
+    @keyframes granuleAnim {
+        0%, 10% { transform: scale(1); filter: url(#rocky) brightness(1); }
+        14%, 80% { transform: scale(2.5); filter: url(#rocky) brightness(1.2); }
+        85%, 100% { transform: scale(1); filter: url(#rocky) brightness(1); }
+    }
+</style>
+</head>
+<body>
+
+<div class="bentocat-illustration-wrapper">
+    <svg class="molecular-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <!-- Filter untuk menciptakan tekstur realistis batu/pasir bentonite -->
+            <filter id="rocky" x="-30%" y="-30%" width="160%" height="160%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+                <feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.6" />
+            </filter>
+
+            <!-- Gradien warna untuk pasir (Natural Clay) -->
+            <radialGradient id="sand-gradient" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#e3cdb5" />
+                <stop offset="60%" stop-color="#ab937d" />
+                <stop offset="100%" stop-color="#695543" />
+            </radialGradient>
+        </defs>
+
+        <!-- Sistem Molekul Utama yang berputar perlahan -->
+        <g class="lattice-system">
+            <g class="lattice-group">
+                <!-- Lapisan Perisai Ikatan (Muncul saat cairan menyentuh) -->
+                <polygon class="shield-layer" points="250,110 371,180 371,320 250,390 129,320 129,180" />
+
+                <!-- Garis-garis Ikatan Molekul (Bonds) -->
+                <g class="bonds-group">
+                    <!-- Garis Lingkar Luar -->
+                    <line x1="250" y1="110" x2="371" y2="180" class="bond" />
+                    <line x1="371" y1="180" x2="371" y2="320" class="bond" />
+                    <line x1="371" y1="320" x2="250" y2="390" class="bond" />
+                    <line x1="250" y1="390" x2="129" y2="320" class="bond" />
+                    <line x1="129" y1="320" x2="129" y2="180" class="bond" />
+                    <line x1="129" y1="180" x2="250" y2="110" class="bond" />
+                    <!-- Garis Menuju Pusat -->
+                    <line x1="250" y1="250" x2="250" y2="110" class="bond" />
+                    <line x1="250" y1="250" x2="371" y2="180" class="bond" />
+                    <line x1="250" y1="250" x2="371" y2="320" class="bond" />
+                    <line x1="250" y1="250" x2="250" y2="390" class="bond" />
+                    <line x1="250" y1="250" x2="129" y2="320" class="bond" />
+                    <line x1="250" y1="250" x2="129" y2="180" class="bond" />
+                </g>
+
+                <!-- Butiran Pasir Realistis -->
+                <g class="granules-group">
+                    <circle cx="250" cy="110" r="28" fill="url(#sand-gradient)" class="granule g-top" />
+                    <circle cx="371" cy="180" r="28" fill="url(#sand-gradient)" class="granule g-top-right" />
+                    <circle cx="371" cy="320" r="28" fill="url(#sand-gradient)" class="granule g-bottom-right" />
+                    <circle cx="250" cy="390" r="28" fill="url(#sand-gradient)" class="granule g-bottom" />
+                    <circle cx="129" cy="320" r="28" fill="url(#sand-gradient)" class="granule g-bottom-left" />
+                    <circle cx="129" cy="180" r="28" fill="url(#sand-gradient)" class="granule g-top-left" />
+                    <!-- Butiran Pusat (Utama) -->
+                    <circle cx="250" cy="250" r="38" fill="url(#sand-gradient)" class="granule g-center" />
+                </g>
+            </g>
+        </g>
+
+        <!-- Overlay Efek Cairan (Terpisah dari rotasi agar jatuhnya tetap lurus dari atas) -->
+        <g class="effects-overlay">
+            <circle class="shockwave" cx="250" cy="250" r="0" />
+            <!-- Bentuk Tetesan Air -->
+            <path class="droplet" d="M250,45 C265,70 265,95 250,95 C235,95 235,70 250,45 Z" />
+        </g>
+
+    </svg>
+</div>
+
+</body>
+</html>

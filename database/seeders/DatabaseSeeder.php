@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             DistributorSeeder::class,
             OutletSeeder::class,
+            CsvOutletSeeder::class,
             ShippingContactSeeder::class,
             ArticleSeeder::class,
             SettingSeeder::class,

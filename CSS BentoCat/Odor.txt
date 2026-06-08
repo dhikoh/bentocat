@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odor Encapsulation Illustration</title>
+    <style>
+        /* Container Setup - Rasio 1:1 */
+        .illustration-wrapper {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+            /* Latar belakang senada dengan ilustrasi Zero-Dust */
+            background: #121318; 
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: none; /* Mencegah layar scroll saat digeser di HP */
+            --mouseX: 50%;
+            --mouseY: 50%;
+        }
+
+        /* Ambient Lighting - Cahaya temaram */
+        .ambient-light {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Gelombang Medan Pengurung (Encapsulation Forcefield) */
+        .encapsulation-shield {
+            position: absolute;
+            width: 35%;
+            aspect-ratio: 1;
+            border: 2px solid rgba(74, 144, 226, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.2), inset 0 0 20px rgba(74, 144, 226, 0.2);
+            z-index: 5;
+            animation: pulseShield 4s ease-out infinite;
+        }
+
+        .encapsulation-shield.delay {
+            animation-delay: 2s;
+        }
+
+        @keyframes pulseShield {
+            0% { transform: scale(0.8); opacity: 0; border-width: 1px; }
+            40% { opacity: 1; border-color: rgba(74, 144, 226, 0.8); }
+            100% { transform: scale(1.8); opacity: 0; border-width: 4px; }
+        }
+
+        /* Wrapper untuk Inti Tengah agar bergerak bersamaan */
+        .center-core {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            transform-style: preserve-3d;
+            /* Mengikuti posisi cursor dari variabel JS */
+            transform: translate(calc(var(--mouseX) - 50%), calc(var(--mouseY) - 50%));
+        }
+
+        /* Animasi mengambang dipisah agar tidak bertabrakan dengan pergerakan kursor */
+        .floating-core {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            animation: floatCarbon 6s ease-in-out infinite;
+        }
+
+        /* Cincin Orbital (Atom) */
+        .atom-ring {
+            position: absolute;
+            width: 55%;
+            aspect-ratio: 1;
+            border: 2px solid rgba(74, 144, 226, 0.25);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.15), inset 0 0 15px rgba(74, 144, 226, 0.15);
+        }
+
+        /* Partikel Elektron pada Cincin */
+        .atom-ring::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #89c4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #4a90e2, 0 0 20px #4a90e2, 0 0 30px #fff;
+            top: -5px;
+            left: calc(50% - 4px);
+        }
+
+        /* Variasi Putaran Cincin 3D */
+        .ring-1 { animation: spinRing1 6s linear infinite; }
+        .ring-2 { animation: spinRing2 8s linear infinite; }
+        .ring-3 { animation: spinRing3 10s linear infinite; }
+
+        @keyframes spinRing1 {
+            0% { transform: rotateX(65deg) rotateY(45deg) rotateZ(0deg); }
+            100% { transform: rotateX(65deg) rotateY(45deg) rotateZ(360deg); }
+        }
+        @keyframes spinRing2 {
+            0% { transform: rotateX(65deg) rotateY(-45deg) rotateZ(0deg); }
+            100% { transform: rotateX(65deg) rotateY(-45deg) rotateZ(360deg); }
+        }
+        @keyframes spinRing3 {
+            0% { transform: rotateX(75deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(75deg) rotateY(0deg) rotateZ(360deg); }
+        }
+
+        /* Granul Karbon Aktif (Pusat) - Dibuat lebih modern & tidak organik */
+        .carbon-granule {
+            position: relative;
+            width: 30%;
+            aspect-ratio: 1;
+            /* Desain bulat mulus seperti inti teknologi penyaring */
+            background: linear-gradient(135deg, #3a3d45 0%, #1a1c23 50%, #0a0b0e 100%);
+            border-radius: 50%;
+            border: 2px solid #2a2d35;
+            box-shadow: 
+                inset 10px 10px 20px rgba(255,255,255,0.05), 
+                inset -10px -10px 20px rgba(0,0,0,0.8), 
+                0 10px 30px rgba(0,0,0,0.5),
+                0 0 30px rgba(74, 144, 226, 0.15);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateZ(0); /* Menyesuaikan dengan dimensi 3D cincin */
+        }
+
+        /* Aksen garis teknologi di dalam karbon agar terlihat canggih */
+        .carbon-granule::after {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            border: 2px dashed rgba(74, 144, 226, 0.4);
+            border-radius: 50%;
+            animation: spinTech 15s linear infinite;
+        }
+
+        /* Membuat pergerakan mengambang halus */
+        @keyframes floatCarbon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes spinTech {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Wadah Molekul Bau */
+        .molecule-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 8;
+            pointer-events: none;
+        }
+
+        /* --- Styling Partikel Bau (Gas Amonia) --- */
+        .odor-molecule {
+            position: absolute;
+            width: var(--size);
+            aspect-ratio: 1/1;
+            /* Warna awal: Bau tidak sedap (Kecoklatan/Muted Orange) bukan hijau beracun */
+            background: radial-gradient(circle, #d4a373, #a98467);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(212, 163, 115, 0.6);
+            filter: blur(1px);
+            opacity: 0;
+            animation: encapsulateOdor var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+            pointer-events: none;
+        }
+
+        /* --- Keyframes Proses Pengurungan (Encapsulation) --- */
+        @keyframes encapsulateOdor {
+            0% {
+                /* Muncul dari luar area (segala arah) */
+                top: var(--startY);
+                left: var(--startX);
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            15% {
+                opacity: 0.8;
+                transform: scale(1.2);
+            }
+            50% {
+                /* Mulai melayang mendekat secara natural */
+                top: var(--midY);
+                left: var(--midX);
+                opacity: 0.9;
+                transform: scale(1);
+                background: radial-gradient(circle, #d4a373, #a98467);
+                box-shadow: 0 0 10px rgba(212, 163, 115, 0.6);
+            }
+            75% {
+                /* Mulai tersedot secara dinamis ke arah kursor/pusat karbon */
+                top: calc(var(--midY) * 0.3 + var(--mouseY) * 0.7);
+                left: calc(var(--midX) * 0.3 + var(--mouseX) * 0.7);
+                opacity: 0.8;
+                transform: scale(0.6);
+                background: radial-gradient(circle, #89c4ff, #4a90e2);
+                box-shadow: 0 0 20px #4a90e2;
+                filter: blur(1.5px);
+            }
+            90% {
+                /* Tersedot sepenuhnya ke pusat (cursor) */
+                top: var(--mouseY);
+                left: var(--mouseX);
+                opacity: 0.4;
+                transform: scale(0.2);
+            }
+            100% {
+                /* Lenyap (Terkurung penuh) */
+                top: var(--mouseY);
+                left: var(--mouseX);
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Container Utama Ilustrasi -->
+    <div class="illustration-wrapper">
+        <div class="ambient-light"></div>
+        
+        <!-- Inti Pusat (Karbon dan Cincin Atom 3D) -->
+        <div class="center-core">
+            <div class="floating-core">
+                <!-- Medan Gaya Pengurung (Efek Visual) -->
+                <div class="encapsulation-shield"></div>
+                <div class="encapsulation-shield delay"></div>
+
+                <div class="atom-ring ring-1"></div>
+                <div class="atom-ring ring-2"></div>
+                <div class="atom-ring ring-3"></div>
+                <!-- Karbon Aktif -->
+                <div class="carbon-granule"></div>
+            </div>
+        </div>
+
+        <!-- Wadah Injeksi Partikel Gas Amonia -->
+        <div class="molecule-container" id="molecule-system"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('molecule-system');
+            const totalMolecules = 40; // Jumlah molekul bau
+
+            for(let i = 0; i < totalMolecules; i++) {
+                let molecule = document.createElement('div');
+                molecule.className = 'odor-molecule';
+                
+                // Ukuran random (antara 6px - 14px)
+                let size = (Math.random() * 8 + 6).toFixed(1) + 'px';
+                
+                // --- Kalkulasi Arah 360 Derajat ---
+                // Sudut acak dari 0 hingga 360 derajat (dalam radian)
+                let angle = Math.random() * Math.PI * 2;
+                
+                // Jarak awal dari pusat (Radius 60% - 80% memastikan muncul dari luar tengah)
+                let startRadius = 60 + Math.random() * 20; 
+                let startX = 50 + startRadius * Math.cos(angle);
+                let startY = 50 + startRadius * Math.sin(angle);
+                
+                // Posisi tengah (mengayun natural sebelum ditarik paksa ke tengah)
+                // Radius mengecil (30% - 40%), sudut bergeser sedikit agar gerakannya melengkung/swirl
+                let midAngle = angle + (Math.random() * 0.8 - 0.4);
+                let midRadius = 30 + Math.random() * 10;
+                let midX = 50 + midRadius * Math.cos(midAngle);
+                let midY = 50 + midRadius * Math.sin(midAngle);
+
+                // Randomisasi timing animasi agar organik
+                let delay = (Math.random() * 5).toFixed(2); // Delay 0 - 5 detik
+                let duration = (4 + Math.random() * 3).toFixed(2); // Durasi 4 - 7 detik
+                
+                // Terapkan variabel CSS
+                molecule.style.setProperty('--size', size);
+                molecule.style.setProperty('--startX', `${startX.toFixed(2)}%`);
+                molecule.style.setProperty('--startY', `${startY.toFixed(2)}%`);
+                molecule.style.setProperty('--midX', `${midX.toFixed(2)}%`);
+                molecule.style.setProperty('--midY', `${midY.toFixed(2)}%`);
+                // --pullX dan --pullY dihapus karena kini menggunakan kursor (--mouseX/Y)
+                molecule.style.setProperty('--delay', `${delay}s`);
+                molecule.style.setProperty('--duration', `${duration}s`);
+                
+                container.appendChild(molecule);
+            }
+
+            // --- Logika Interaksi Kursor & Sentuhan (Sistem Sedot) ---
+            const wrapper = document.querySelector('.illustration-wrapper');
+            let targetX = 50, targetY = 50;
+            let currentX = 50, currentY = 50;
+
+            const updateMousePosition = (e) => {
+                let clientX, clientY;
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                const rect = wrapper.getBoundingClientRect();
+                targetX = ((clientX - rect.left) / rect.width) * 100;
+                targetY = ((clientY - rect.top) / rect.height) * 100;
+
+                // Membatasi agar inti karbon tidak keluar dari kotak terlalu jauh
+                targetX = Math.max(10, Math.min(90, targetX));
+                targetY = Math.max(10, Math.min(90, targetY));
+            };
+
+            const resetMousePosition = () => {
+                targetX = 50;
+                targetY = 50;
+            };
+
+            // Event Listeners
+            wrapper.addEventListener('mousemove', updateMousePosition);
+            wrapper.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Mencegah layar ter-scroll saat menggeser di dalam canvas
+                updateMousePosition(e);
+            }, { passive: false });
+            
+            wrapper.addEventListener('mouseleave', resetMousePosition);
+            wrapper.addEventListener('touchend', resetMousePosition);
+
+            // Animasi Lerp (Pergerakan Halus) menggunakan RequestAnimationFrame
+            function animateInteraction() {
+                // Mendekatkan posisi saat ini ke posisi target secara bertahap
+                currentX += (targetX - currentX) * 0.08; 
+                currentY += (targetY - currentY) * 0.08;
+                
+                // Meneruskan posisi ke CSS Variables secara realtime
+                wrapper.style.setProperty('--mouseX', `${currentX.toFixed(2)}%`);
+                wrapper.style.setProperty('--mouseY', `${currentY.toFixed(2)}%`);
+                
+                requestAnimationFrame(animateInteraction);
+            }
+            
+            // Mulai loop animasi interaktif
+            animateInteraction();
+        });
+    </script>
+</body>
+</html>

@@ -94,7 +94,7 @@
         <style>
             /* --- GENERAL UTILITIES --- */
             .glow-effect {
-                filter: url(#glow);
+                filter: var(--glow-filter, url(#glow));
             }
 
             /* --- 1. MOLECULAR BONDING (SCOPED) --- */
@@ -110,6 +110,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                --rocky-filter: url(#rocky);
+                --glow-filter: url(#glow);
             }
             .molecular-svg {
                 width: 100%;
@@ -191,9 +193,9 @@
                 85%, 100% { opacity: 0; transform: scale(1); fill: rgba(0, 212, 255, 0); stroke: rgba(0, 212, 255, 0); }
             }
             @keyframes mb-granuleAnim {
-                0%, 10% { transform: scale(1); filter: url(#rocky) brightness(1); }
-                14%, 80% { transform: scale(2.5); filter: url(#rocky) brightness(1.2); }
-                85%, 100% { transform: scale(1); filter: url(#rocky) brightness(1); }
+                0%, 10% { transform: scale(1); filter: var(--rocky-filter, url(#rocky)) brightness(1); }
+                14%, 80% { transform: scale(2.5); filter: var(--rocky-filter, url(#rocky)) brightness(1.2); }
+                85%, 100% { transform: scale(1); filter: var(--rocky-filter, url(#rocky)) brightness(1); }
             }
 
             /* --- 2. ZERO-DUST TECH (SCOPED) --- */
@@ -548,6 +550,37 @@
                 100% {
                     transform: translate3d(var(--oe-mouseX), var(--oe-mouseY), 0) scale(0);
                     opacity: 0;
+                }
+            }
+
+            /* --- LAZY ANIMATION PLAY STATES --- */
+            .mb-wrapper *,
+            .zd-wrapper *,
+            .oe-wrapper * {
+                animation-play-state: paused !important;
+            }
+
+            .mb-wrapper.in-view *,
+            .zd-wrapper.in-view *,
+            .oe-wrapper.in-view * {
+                animation-play-state: running !important;
+            }
+
+            /* --- MOBILE PERFORMANCE OPTIMIZATIONS --- */
+            @media (max-width: 768px) {
+                .mb-wrapper *,
+                .zd-wrapper *,
+                .oe-wrapper * {
+                    animation: none !important;
+                    transition: none !important;
+                }
+                .mb-wrapper {
+                    --rocky-filter: none !important;
+                    --glow-filter: none !important;
+                }
+                .zd-dust, .oe-odor-molecule {
+                    filter: none !important;
+                    box-shadow: none !important;
                 }
             }
         </style>
@@ -1039,6 +1072,32 @@
             openSearchModal();
         @endif
 
+        // Intersection Observer for Lazy Animations
+        const wrappers = document.querySelectorAll('.mb-wrapper, .zd-wrapper, .oe-wrapper');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    if (entry.target.classList.contains('oe-wrapper')) {
+                        window.oeInView = true;
+                        if (typeof window.startOeAnimation === 'function') {
+                            window.startOeAnimation();
+                        }
+                    }
+                } else {
+                    entry.target.classList.remove('in-view');
+                    if (entry.target.classList.contains('oe-wrapper')) {
+                        window.oeInView = false;
+                    }
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0.1
+        });
+        wrappers.forEach(w => observer.observe(w));
+
         // Intercept clicks on links pointing to #cari-outlet to open modal instantly
         document.querySelectorAll('a[href*="#cari-outlet"]').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -1052,8 +1111,9 @@
         // Zero-Dust Tech Particle System Initializer
         const zdContainer = document.getElementById('zd-particle-system');
         if (zdContainer) {
-            const totalSand = 22; 
-            const totalDust = 60; 
+            const isMobile = window.innerWidth < 768;
+            const totalSand = isMobile ? 0 : 22; 
+            const totalDust = isMobile ? 0 : 60; 
 
             for(let i = 0; i < totalSand; i++) {
                 let sand = document.createElement('div');
@@ -1095,7 +1155,8 @@
         const oeContainer = document.getElementById('oe-molecule-system');
         const oeWrapper = document.querySelector('.oe-wrapper');
         if (oeContainer && oeWrapper) {
-            const totalMolecules = 40;
+            const isMobile = window.innerWidth < 768;
+            const totalMolecules = isMobile ? 0 : 40;
 
             for(let i = 0; i < totalMolecules; i++) {
                 let molecule = document.createElement('div');
@@ -1125,6 +1186,41 @@
 
             let targetX = 50, targetY = 50;
             let currentX = 50, currentY = 50;
+            let isAnimating = false;
+            window.oeInView = false;
+
+            function animateInteraction() {
+                if (!window.oeInView) {
+                    isAnimating = false;
+                    return;
+                }
+                
+                const dx = targetX - currentX;
+                const dy = targetY - currentY;
+                
+                // Stop loop if it has converged to target (idle)
+                if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) {
+                    currentX = targetX;
+                    currentY = targetY;
+                    oeWrapper.style.setProperty('--oe-mouseX', `${currentX.toFixed(2)}cqw`);
+                    oeWrapper.style.setProperty('--oe-mouseY', `${currentY.toFixed(2)}cqh`);
+                    isAnimating = false;
+                    return;
+                }
+
+                currentX += dx * 0.08; 
+                currentY += dy * 0.08;
+                oeWrapper.style.setProperty('--oe-mouseX', `${currentX.toFixed(2)}cqw`);
+                oeWrapper.style.setProperty('--oe-mouseY', `${currentY.toFixed(2)}cqh`);
+                requestAnimationFrame(animateInteraction);
+            }
+
+            window.startOeAnimation = function() {
+                if (!isAnimating && window.oeInView) {
+                    isAnimating = true;
+                    requestAnimationFrame(animateInteraction);
+                }
+            };
 
             const updateMousePosition = (e) => {
                 let clientX, clientY;
@@ -1141,32 +1237,23 @@
                 targetY = ((clientY - rect.top) / rect.height) * 100;
                 targetX = Math.max(10, Math.min(90, targetX));
                 targetY = Math.max(10, Math.min(90, targetY));
+                
+                window.startOeAnimation();
             };
 
             const resetMousePosition = () => {
                 targetX = 50;
                 targetY = 50;
+                window.startOeAnimation();
             };
 
-            oeWrapper.addEventListener('mousemove', updateMousePosition);
-            oeWrapper.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                updateMousePosition(e);
-            }, { passive: false });
-            
-            oeWrapper.addEventListener('mouseleave', resetMousePosition);
-            oeWrapper.addEventListener('touchend', resetMousePosition);
-
-            function animateInteraction() {
-                currentX += (targetX - currentX) * 0.08; 
-                currentY += (targetY - currentY) * 0.08;
-                oeWrapper.style.setProperty('--oe-mouseX', `${currentX.toFixed(2)}cqw`);
-                oeWrapper.style.setProperty('--oe-mouseY', `${currentY.toFixed(2)}cqh`);
-                requestAnimationFrame(animateInteraction);
+            if (!isMobile) {
+                oeWrapper.addEventListener('mousemove', updateMousePosition);
+                oeWrapper.addEventListener('mouseleave', resetMousePosition);
             }
             
             oeWrapper.className = 'oe-wrapper'; // Ensure class does not change
-            animateInteraction();
+            window.startOeAnimation();
         }
     });
 
