@@ -97,27 +97,33 @@
                 filter: url(#glow);
             }
 
-            /* --- 1. MOLECULAR BONDING ANIMATIONS --- */
+            /* --- 1. MOLECULAR BONDING (BENTONITE CLUMPING) --- */
             .droplet {
                 animation: dropletFall 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
             .ripple-ring {
                 animation: rippleWave 5s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
+                transform-origin: 100px 95px;
             }
-            .bond-line {
-                stroke-dasharray: 80;
-                stroke-dashoffset: 80;
-                animation: bondActivate 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            .clump-grain {
+                transition: transform 0.5s ease, fill 0.5s ease;
+                animation: grainClump 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .clay-platelet {
-                transform-origin: center;
-                animation: nodeActivate 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            .grain-a { transform-origin: 85px 95px; --target-x: 10px; --target-y: 5px; }
+            .grain-b { transform-origin: 93px 110px; --target-x: 4px; --target-y: -8px; }
+            .grain-c { transform-origin: 100px 90px; --target-x: 0px; --target-y: 9px; }
+            .grain-d { transform-origin: 107px 108px; --target-x: -5px; --target-y: -6px; }
+            .grain-e { transform-origin: 115px 96px; --target-x: -11px; --target-y: 4px; }
+            .grain-f { transform-origin: 100px 115px; --target-x: 0px; --target-y: -11px; }
+
+            .bond-mesh {
+                stroke-dasharray: 40;
+                stroke-dashoffset: 40;
+                animation: meshActivate 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .charge-plus {
-                animation: chargePopPlus 5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
-            }
-            .charge-minus {
-                animation: chargePopMinus 5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+            .clump-glow {
+                transform-origin: 100px 102px;
+                animation: glowActivate 5s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
             }
             .status-text-inactive {
                 animation: textInactive 5s infinite steps(1);
@@ -129,9 +135,9 @@
             @keyframes dropletFall {
                 0% { transform: translateY(-30px) scaleY(1.3); opacity: 0; }
                 5% { opacity: 0.8; }
-                18% { transform: translateY(70px) scaleY(1); opacity: 1; }
-                20% { transform: translateY(85px) scaleY(0.7); opacity: 1; }
-                22%, 100% { transform: translateY(85px) scaleY(0); opacity: 0; }
+                18% { transform: translateY(80px) scaleY(1); opacity: 1; }
+                20% { transform: translateY(95px) scaleY(0.7); opacity: 1; }
+                22%, 100% { transform: translateY(95px) scaleY(0); opacity: 0; }
             }
             @keyframes rippleWave {
                 0%, 20% { transform: scale(0); opacity: 0; }
@@ -139,25 +145,33 @@
                 40% { transform: scale(3.5); opacity: 0; stroke-width: 0.5; }
                 100% { transform: scale(3.5); opacity: 0; }
             }
-            @keyframes bondActivate {
-                0%, 20% { stroke-dashoffset: 80; opacity: 0.15; stroke: #e2e8f0; }
-                30%, 80% { stroke-dashoffset: 0; opacity: 1; stroke: #3b82f6; }
-                88%, 100% { stroke-dashoffset: 80; opacity: 0.15; stroke: #e2e8f0; }
+            @keyframes grainClump {
+                0%, 20% {
+                    transform: translate(0, 0) scale(1);
+                    fill: url(#dryGrainGrad);
+                    stroke: #cbd5e1;
+                }
+                30%, 80% {
+                    transform: translate(var(--target-x), var(--target-y)) scale(1.2);
+                    fill: url(#wetGrainGrad);
+                    stroke: #3b82f6;
+                    filter: drop-shadow(0 2px 4px rgba(59,130,246,0.3));
+                }
+                88%, 100% {
+                    transform: translate(0, 0) scale(1);
+                    fill: url(#dryGrainGrad);
+                    stroke: #cbd5e1;
+                }
             }
-            @keyframes nodeActivate {
-                0%, 20% { fill: url(#plateletInactiveGrad); stroke: #cbd5e1; transform: scale(1); filter: none; }
-                30%, 80% { fill: url(#plateletActiveGrad); stroke: #3b82f6; transform: scale(1.08); filter: drop-shadow(0 2px 8px rgba(59,130,246,0.3)); }
-                88%, 100% { fill: url(#plateletInactiveGrad); stroke: #cbd5e1; transform: scale(1); filter: none; }
+            @keyframes meshActivate {
+                0%, 20% { stroke-dashoffset: 40; opacity: 0; }
+                30%, 80% { stroke-dashoffset: 0; opacity: 0.8; }
+                88%, 100% { stroke-dashoffset: 40; opacity: 0; }
             }
-            @keyframes chargePopPlus {
-                0%, 22% { opacity: 0; transform: scale(0) translateY(0); }
-                30%, 80% { opacity: 1; transform: scale(1) translateY(-14px); }
-                88%, 100% { opacity: 0; transform: scale(0) translateY(0); }
-            }
-            @keyframes chargePopMinus {
-                0%, 22% { opacity: 0; transform: scale(0) translateY(0); }
-                30%, 80% { opacity: 1; transform: scale(1) translateY(14px); }
-                88%, 100% { opacity: 0; transform: scale(0) translateY(0); }
+            @keyframes glowActivate {
+                0%, 20% { transform: scale(0.6); opacity: 0; }
+                30%, 80% { transform: scale(1.15); opacity: 0.18; }
+                88%, 100% { transform: scale(0.6); opacity: 0; }
             }
             @keyframes textInactive {
                 0%, 19% { opacity: 1; }
@@ -404,69 +418,82 @@
                                         <stop offset="50%" stop-color="#3b82f6" />
                                         <stop offset="100%" stop-color="#1d4ed8" />
                                     </radialGradient>
-                                    <linearGradient id="plateletInactiveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#f8fafc" />
-                                        <stop offset="100%" stop-color="#cbd5e1" />
+                                    <!-- Bentonite Clay Grain Gradients -->
+                                    <linearGradient id="dryGrainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#f1f5f9" />
+                                        <stop offset="50%" stop-color="#cbd5e1" />
+                                        <stop offset="100%" stop-color="#94a3b8" />
                                     </linearGradient>
-                                    <linearGradient id="plateletActiveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#60a5fa" />
-                                        <stop offset="100%" stop-color="#1e40af" />
+                                    <linearGradient id="wetGrainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#64748b" />
+                                        <stop offset="50%" stop-color="#475569" />
+                                        <stop offset="100%" stop-color="#334155" />
                                     </linearGradient>
-                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                                        <feGaussianBlur stdDeviation="2.5" result="blur" />
-                                        <feMerge>
-                                            <feMergeNode in="blur" />
-                                            <feMergeNode in="SourceGraphic" />
-                                        </feMerge>
-                                    </filter>
+                                    <!-- Organic Sand Grain Templates -->
+                                    <path id="sand1" d="M -4 -3 C -2 -5, 2 -5, 4 -3 C 5 -1, 3 3, 0 4 C -3 4, -5 2, -5 -1 Z" />
+                                    <path id="sand2" d="M -3 -4 C 1 -5, 4 -3, 3 1 C 2 4, -2 5, -4 2 C -5 -1, -4 -3, -3 -4 Z" />
+                                    <path id="sand3" d="M -4 -2 C -3 -4, 2 -4, 3 -1 C 4 2, 1 4, -2 4 C -4 3, -5 1, -4 -2 Z" />
                                 </defs>
 
                                 <rect width="100%" height="100%" fill="url(#subtleGrid)" />
 
-                                <g>
-                                    <line x1="100" y1="75" x2="100" y2="35" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
-                                    <line x1="100" y1="75" x2="60" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
-                                    <line x1="100" y1="75" x2="140" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
-                                    <line x1="100" y1="75" x2="55" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
-                                    <line x1="100" y1="75" x2="145" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
+                                <!-- Clump Glow Shield -->
+                                <ellipse cx="100" cy="102" rx="22" ry="15" fill="#3b82f6" opacity="0" class="clump-glow" style="filter: blur(4px);" />
 
-                                    <line x1="100" y1="35" x2="55" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
-                                    <line x1="100" y1="35" x2="145" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
-                                    <line x1="55" y1="55" x2="60" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
-                                    <line x1="145" y1="55" x2="140" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
-                                </g>
-
-                                <g transform="translate(100, 75)">
-                                    <polygon points="-12,-7 -12,7 0,14 12,7 12,-7 0,-14" class="clay-platelet" stroke-width="1" />
-                                </g>
-                                <g transform="translate(100, 35)">
-                                    <polygon points="-10,-6 -10,6 0,12 10,6 10,-6 0,-12" class="clay-platelet" stroke-width="1" />
-                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="bold" fill="white" class="charge-plus">+</text>
-                                </g>
-                                <g transform="translate(60, 105)">
-                                    <polygon points="-10,-6 -10,6 0,12 10,6 10,-6 0,-12" class="clay-platelet" stroke-width="1" />
-                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="bold" fill="white" class="charge-minus">-</text>
-                                </g>
-                                <g transform="translate(140, 105)">
-                                    <polygon points="-10,-6 -10,6 0,12 10,6 10,-6 0,-12" class="clay-platelet" stroke-width="1" />
-                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="bold" fill="white" class="charge-minus">-</text>
-                                </g>
-                                <g transform="translate(55, 55)">
-                                    <polygon points="-9,-5 -9,5 0,10 9,5 9,-5 0,-10" class="clay-platelet" stroke-width="1" />
-                                    <text x="0" y="3" text-anchor="middle" font-size="8" font-weight="bold" fill="white" class="charge-plus">+</text>
-                                </g>
-                                <g transform="translate(145, 55)">
-                                    <polygon points="-9,-5 -9,5 0,10 9,5 9,-5 0,-10" class="clay-platelet" stroke-width="1" />
-                                    <text x="0" y="3" text-anchor="middle" font-size="8" font-weight="bold" fill="white" class="charge-plus">+</text>
+                                <!-- Molecular grid lines (kisi molekul) active when clumped -->
+                                <g stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" opacity="0">
+                                    <line x1="95" y1="100" x2="100" y2="99" class="bond-mesh" />
+                                    <line x1="100" y1="99" x2="104" y2="100" class="bond-mesh" />
+                                    <line x1="104" y1="100" x2="102" y2="102" class="bond-mesh" />
+                                    <line x1="102" y1="102" x2="100" y2="104" class="bond-mesh" />
+                                    <line x1="100" y1="104" x2="97" y2="102" class="bond-mesh" />
+                                    <line x1="97" y1="102" x2="95" y2="100" class="bond-mesh" />
+                                    <!-- Inner bonds -->
+                                    <line x1="100" y1="99" x2="100" y2="104" class="bond-mesh" />
+                                    <line x1="95" y1="100" x2="102" y2="102" class="bond-mesh" />
+                                    <line x1="97" y1="102" x2="104" y2="100" class="bond-mesh" />
                                 </g>
 
+                                <!-- Dry background/surrounding granules -->
+                                <use href="#sand1" x="70" y="90" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand2" x="75" y="115" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand3" x="80" y="125" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand1" x="122" y="115" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand2" x="128" y="95" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand3" x="118" y="125" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand1" x="90" y="83" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+                                <use href="#sand2" x="110" y="83" fill="url(#dryGrainGrad)" stroke="#cbd5e1" stroke-width="0.5" />
+
+                                <!-- Active clumping granules -->
+                                <g class="clump-grain grain-a">
+                                    <use href="#sand1" x="85" y="95" stroke-width="0.75" />
+                                </g>
+                                <g class="clump-grain grain-b">
+                                    <use href="#sand2" x="93" y="110" stroke-width="0.75" />
+                                </g>
+                                <g class="clump-grain grain-c">
+                                    <use href="#sand3" x="100" y="90" stroke-width="0.75" />
+                                </g>
+                                <g class="clump-grain grain-d">
+                                    <use href="#sand1" x="107" y="108" stroke-width="0.75" />
+                                </g>
+                                <g class="clump-grain grain-e">
+                                    <use href="#sand2" x="115" y="96" stroke-width="0.75" />
+                                </g>
+                                <g class="clump-grain grain-f">
+                                    <use href="#sand3" x="100" y="115" stroke-width="0.75" />
+                                </g>
+
+                                <!-- Falling liquid droplet -->
                                 <path d="M 0 0 C -3 -5, -3 -10, 0 -12 C 3 -10, 3 -5, 0 0 Z" fill="url(#dropletGrad)" class="droplet" transform="translate(100, 0)" />
 
-                                <ellipse cx="100" cy="85" rx="6" ry="3" fill="none" stroke="#60a5fa" stroke-width="2" class="ripple-ring" />
-                                <ellipse cx="100" cy="85" rx="10" ry="5" fill="none" stroke="#3b82f6" stroke-width="1.5" class="ripple-ring" style="animation-delay: 0.15s;" />
+                                <!-- Ripple wave on impact -->
+                                <ellipse cx="100" cy="95" rx="6" ry="3" fill="none" stroke="#60a5fa" stroke-width="2" class="ripple-ring" />
+                                <ellipse cx="100" cy="95" rx="10" ry="5" fill="none" stroke="#3b82f6" stroke-width="1.5" class="ripple-ring" style="animation-delay: 0.15s;" />
 
-                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#94a3b8" font-weight="black" letter-spacing="1.2" class="status-text-inactive">BONDING INACTIVE</text>
-                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#2563eb" font-weight="black" letter-spacing="1.2" class="status-text-locked" opacity="0">LATTICE LOCKED</text>
+                                <!-- Status texts -->
+                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#94a3b8" font-weight="black" letter-spacing="1.2" class="status-text-inactive">PASIR TERURAI</text>
+                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#2563eb" font-weight="black" letter-spacing="1.2" class="status-text-locked" opacity="0">GUMPALAN KUAT</text>
                             </svg>
                         </div>
 
