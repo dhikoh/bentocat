@@ -178,7 +178,7 @@
             Dapatkan keuntungan suplai produk langsung, promosi gratis di website nasional kami, serta prioritas rujukan konsumen dengan mendaftarkan petshop Anda sebagai Mitra Resmi BentoCat.
         </p>
         <div class="pt-4 relative z-10">
-            <a href="https://wa.me/{{ App\Models\Setting::get('contact_whatsapp', '6287777717300') }}?text=Halo%20BentoCat,%20saya%2520tertarik%2520untuk%2520mendaftarkan%2520petshop%2520saya%2520sebagai%2520mitra%2520resmi." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-8 py-4 rounded-2xl text-xs uppercase tracking-wider transition-premium shadow-lg">
+            <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '6287777717300') }}?text=Halo%20BentoCat,%20saya%2520tertarik%2520untuk%2520mendaftarkan%2520petshop%2520saya%2520sebagai%2520mitra%2520resmi." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-8 py-4 rounded-2xl text-xs uppercase tracking-wider transition-premium shadow-lg">
                 <span>Daftar Mitra via WhatsApp</span>
                 <span>&rarr;</span>
             </a>

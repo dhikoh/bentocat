@@ -71,7 +71,7 @@
                     <div class="space-y-4">
                         <label class="block text-xs font-bold text-slate-400 uppercase">Upload Logo Website</label>
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center p-2 overflow-hidden shrink-0">
+                            <div class="w-16 h-16 rounded-2xl bg-white border border-slate-800 flex items-center justify-center p-2 overflow-hidden shrink-0">
                                 <img id="site_logo_preview" src="{{ asset($settings['site_logo']) }}" alt="Logo Preview" class="w-full h-full object-contain">
                             </div>
                             <div class="flex-1">
@@ -84,7 +84,7 @@
                     <div class="space-y-4">
                         <label class="block text-xs font-bold text-slate-400 uppercase">Upload Favicon / Icon</label>
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center p-4 overflow-hidden shrink-0">
+                            <div class="w-16 h-16 rounded-2xl bg-white border border-slate-800 flex items-center justify-center p-4 overflow-hidden shrink-0">
                                 <img id="site_favicon_preview" src="{{ asset($settings['site_favicon']) }}" alt="Favicon Preview" class="w-full h-full object-contain">
                             </div>
                             <div class="flex-1">
@@ -150,7 +150,7 @@
                     <!-- Media Preview Box -->
                     <div class="md:col-span-2 space-y-2">
                         <span class="block text-xs font-bold text-slate-400 uppercase">Preview Media Aktif</span>
-                        <div class="w-full max-w-md h-60 rounded-3xl bg-slate-950 border border-slate-800 flex items-center justify-center p-2 overflow-hidden relative">
+                        <div class="w-full max-w-md h-60 rounded-3xl bg-white border border-slate-800 flex items-center justify-center p-2 overflow-hidden relative">
                             <img id="media_image_preview" src="{{ asset($settings['hero_media_path']) }}" class="w-full h-full object-cover rounded-2xl {{ $settings['hero_media_type'] === 'video' ? 'hidden' : '' }}">
                             <video id="media_video_preview" src="{{ asset($settings['hero_media_path']) }}" muted loop autoplay playsinline class="w-full h-full object-cover rounded-2xl {{ $settings['hero_media_type'] === 'image' ? 'hidden' : '' }}"></video>
                         </div>
@@ -194,7 +194,7 @@
                         <div class="space-y-4 md:col-span-2">
                             <label class="block text-xs font-bold text-slate-400 uppercase">Upload Gambar Kemasan Produk</label>
                             <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center p-2 overflow-hidden shrink-0">
+                                <div class="w-16 h-16 rounded-2xl bg-white border border-slate-800 flex items-center justify-center p-2 overflow-hidden shrink-0">
                                     <img id="hero_product_image_preview" src="{{ asset($settings['hero_product_image']) }}" alt="Product Preview" class="w-full h-full object-contain">
                                 </div>
                                 <div class="flex-1">
