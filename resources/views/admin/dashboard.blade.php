@@ -65,18 +65,43 @@
         
     </div>
 
-    <!-- Peta Heatmap Demand -->
-    <div class="bg-slate-900/20 border border-slate-800/80 p-6 rounded-3xl backdrop-blur-md">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <!-- Analytics Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Peta Heatmap Demand -->
+        <div class="bg-slate-900/20 border border-slate-800/80 p-6 rounded-3xl backdrop-blur-md flex flex-col justify-between">
             <div>
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">📍 Peta Heatmap Demand Indonesia</h2>
-                <p class="text-slate-400 text-xs mt-1">Konsentrasi pencarian produk BentoCat berdasarkan koordinat lokasi pencari terdekat.</p>
-            </div>
-            <div class="text-[10px] bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-400">
-                Data berbasis GPS Browser dari Leads
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">📍 Peta Heatmap Demand</h2>
+                        <p class="text-slate-400 text-xs mt-1">Konsentrasi pencarian BentoCat terdekat.</p>
+                    </div>
+                    <div class="text-[10px] bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-450 self-start sm:self-auto font-semibold">
+                        Data GPS Leads
+                    </div>
+                </div>
+                <div id="heatmap" class="border border-slate-800/60 shadow-inner rounded-2xl"></div>
             </div>
         </div>
-        <div id="heatmap" class="border border-slate-800/60 shadow-inner"></div>
+
+        <!-- Tren Leads Harian (Chart.js) -->
+        <div class="bg-slate-900/20 border border-slate-800/80 p-6 rounded-3xl backdrop-blur-md flex flex-col justify-between">
+            <div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">📈 Tren Leads (30 Hari Terakhir)</h2>
+                        <p class="text-slate-400 text-xs mt-1">Grafik pertumbuhan calon pembeli secara harian.</p>
+                    </div>
+                    <div class="text-[10px] bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-450 self-start sm:self-auto font-semibold">
+                        Real-time Data
+                    </div>
+                </div>
+                <div class="relative w-full h-[400px] flex items-center justify-center">
+                    <canvas id="leadsTrendChart" class="w-full h-full"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Row Data Grid 1: Demand & Products -->
@@ -222,9 +247,10 @@
 @section('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Default center: Indonesia
+            // 1. Leaflet Heatmap Initialization
             const map = L.map('heatmap').setView([-2.548926, 118.0148634], 5);
 
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -261,6 +287,87 @@
                 const bounds = L.latLngBounds(pointsData.map(p => [p.lat, p.lng]));
                 map.fitBounds(bounds, { padding: [50, 50] });
             }
+
+            // 2. Chart.js Leads Trend Initialization
+            const trendData = @json($leadsTrendData);
+            const dates = Object.keys(trendData).map(dateStr => {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            });
+            const counts = Object.values(trendData);
+
+            const ctx = document.getElementById('leadsTrendChart').getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
+            gradient.addColorStop(1, 'rgba(245, 158, 11, 0.00)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Calon Pembeli (Leads)',
+                        data: counts,
+                        borderColor: '#f59e0b',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#f59e0b',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: gradient
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                            bodyFont: { family: 'Instrument Sans', size: 12 },
+                            padding: 10,
+                            borderRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { family: 'Instrument Sans', size: 10 },
+                                color: '#64748b',
+                                maxRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(226, 232, 240, 0.8)'
+                            },
+                            ticks: {
+                                font: { family: 'Instrument Sans', size: 10 },
+                                color: '#64748b',
+                                stepSize: 1,
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                }
+            });
         });
     </script>
 @endsection

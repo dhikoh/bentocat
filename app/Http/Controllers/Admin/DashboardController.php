@@ -84,10 +84,27 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // 5. Leads Trend (Last 30 Days)
+        $leadsTrendData = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $leadsTrendData[$date] = 0;
+        }
+
+        $leadsTrend = LeadRequest::select(DB::raw('DATE(created_at) as date'), DB::raw('count(id) as total'))
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->get();
+
+        foreach ($leadsTrend as $trend) {
+            $leadsTrendData[$trend->date] = $trend->total;
+        }
+
         return view('admin.dashboard', compact(
             'totalLeads', 'totalOutlets', 'totalDistributors', 'totalProducts',
             'citiesDemand', 'heatmapPoints', 'productStats', 'totalWaClicks',
-            'conversionRate', 'aromaStats', 'sizeStats', 'nonMitraProspects'
+            'conversionRate', 'aromaStats', 'sizeStats', 'nonMitraProspects',
+            'leadsTrendData'
         ));
     }
 }
