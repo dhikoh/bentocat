@@ -90,255 +90,597 @@
     </section>
 
     <!-- 2. Keunggulan Section -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <style>
+            /* --- GENERAL UTILITIES --- */
+            .glow-effect {
+                filter: url(#glow);
+            }
+
             /* --- 1. MOLECULAR BONDING ANIMATIONS --- */
-            .water-trigger {
-                animation: waterHit 4s infinite linear;
+            .droplet {
+                animation: dropletFall 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .p-top { animation: snapTop 4s infinite cubic-bezier(0.16, 1, 0.3, 1); }
-            .p-left { animation: snapLeft 4s infinite cubic-bezier(0.16, 1, 0.3, 1); }
-            .p-right { animation: snapRight 4s infinite cubic-bezier(0.16, 1, 0.3, 1); }
-            .bond-line { animation: bondFlash 4s infinite linear; }
-            .charge-plus { animation: chargePop 4s infinite ease-out; }
-            
-            @keyframes waterHit {
-                0% { transform: translateY(0); opacity: 0; }
-                10% { transform: translateY(0); opacity: 1; }
-                30% { transform: translateY(70px); opacity: 1; }
-                31% { transform: translateY(70px); opacity: 0; }
-                100% { transform: translateY(70px); opacity: 0; }
+            .ripple-ring {
+                animation: rippleWave 5s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
             }
-            @keyframes snapTop {
-                0%, 30% { transform: translateY(0); fill: #cbd5e1; }
-                40%, 80% { transform: translateY(40px); fill: #1e293b; }
-                100% { transform: translateY(0); fill: #cbd5e1; }
+            .bond-line {
+                stroke-dasharray: 80;
+                stroke-dashoffset: 80;
+                animation: bondActivate 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
-            @keyframes snapLeft {
-                0%, 30% { transform: translate(0,0); fill: #cbd5e1; }
-                40%, 80% { transform: translate(20px, -40px); fill: #1e293b; }
-                100% { transform: translate(0,0); fill: #cbd5e1; }
+            .clay-platelet {
+                transform-origin: center;
+                animation: nodeActivate 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             }
-            @keyframes snapRight {
-                0%, 30% { transform: translate(0,0); fill: #cbd5e1; }
-                40%, 80% { transform: translate(-20px, -40px); fill: #1e293b; }
-                100% { transform: translate(0,0); fill: #cbd5e1; }
+            .charge-plus {
+                animation: chargePopPlus 5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
             }
-            @keyframes bondFlash {
-                0%, 35% { opacity: 0; }
-                40%, 80% { opacity: 1; }
-                100% { opacity: 0; }
+            .charge-minus {
+                animation: chargePopMinus 5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
             }
-            @keyframes chargePop {
-                0%, 40% { opacity: 0; transform: scale(0); }
-                45%, 75% { opacity: 1; transform: scale(1); }
-                100% { opacity: 0; transform: scale(0); }
+            .status-text-inactive {
+                animation: textInactive 5s infinite steps(1);
+            }
+            .status-text-locked {
+                animation: textLocked 5s infinite steps(1);
+            }
+
+            @keyframes dropletFall {
+                0% { transform: translateY(-30px) scaleY(1.3); opacity: 0; }
+                5% { opacity: 0.8; }
+                18% { transform: translateY(70px) scaleY(1); opacity: 1; }
+                20% { transform: translateY(85px) scaleY(0.7); opacity: 1; }
+                22%, 100% { transform: translateY(85px) scaleY(0); opacity: 0; }
+            }
+            @keyframes rippleWave {
+                0%, 20% { transform: scale(0); opacity: 0; }
+                21% { transform: scale(0); opacity: 1; stroke-width: 3; }
+                40% { transform: scale(3.5); opacity: 0; stroke-width: 0.5; }
+                100% { transform: scale(3.5); opacity: 0; }
+            }
+            @keyframes bondActivate {
+                0%, 20% { stroke-dashoffset: 80; opacity: 0.15; stroke: #e2e8f0; }
+                30%, 80% { stroke-dashoffset: 0; opacity: 1; stroke: #3b82f6; }
+                88%, 100% { stroke-dashoffset: 80; opacity: 0.15; stroke: #e2e8f0; }
+            }
+            @keyframes nodeActivate {
+                0%, 20% { fill: url(#plateletInactiveGrad); stroke: #cbd5e1; transform: scale(1); filter: none; }
+                30%, 80% { fill: url(#plateletActiveGrad); stroke: #3b82f6; transform: scale(1.08); filter: drop-shadow(0 2px 8px rgba(59,130,246,0.3)); }
+                88%, 100% { fill: url(#plateletInactiveGrad); stroke: #cbd5e1; transform: scale(1); filter: none; }
+            }
+            @keyframes chargePopPlus {
+                0%, 22% { opacity: 0; transform: scale(0) translateY(0); }
+                30%, 80% { opacity: 1; transform: scale(1) translateY(-14px); }
+                88%, 100% { opacity: 0; transform: scale(0) translateY(0); }
+            }
+            @keyframes chargePopMinus {
+                0%, 22% { opacity: 0; transform: scale(0) translateY(0); }
+                30%, 80% { opacity: 1; transform: scale(1) translateY(14px); }
+                88%, 100% { opacity: 0; transform: scale(0) translateY(0); }
             }
             @keyframes textInactive {
-                0%, 39% { opacity: 0.5; }
-                40%, 100% { opacity: 0; }
+                0%, 19% { opacity: 1; }
+                20%, 87% { opacity: 0; }
+                88%, 100% { opacity: 1; }
             }
             @keyframes textLocked {
-                0%, 39% { opacity: 0; }
-                40%, 80% { opacity: 1; }
-                100% { opacity: 0; }
+                0%, 19% { opacity: 0; }
+                20%, 87% { opacity: 1; }
+                88%, 100% { opacity: 0; }
             }
-            .status-text-inactive { animation: textInactive 4s infinite steps(1); }
-            .status-text-locked { animation: textLocked 4s infinite steps(1); }
 
             /* --- 2. DUSTING ANIMATIONS --- */
-            .sand-particle { animation: fallThrough 3s infinite linear; }
-            .dust-particle { animation: fallBlock 3s infinite ease-in; transform-origin: center; }
-            .p1 { animation-delay: 0s; } .p2 { animation-delay: 1s; } .p3 { animation-delay: 0.5s; }
-            .d1 { animation-delay: 0.2s; } .d2 { animation-delay: 1.2s; } .d3 { animation-delay: 0.7s; }
-
-            @keyframes fallThrough {
-                0% { transform: translateY(0); opacity: 1; }
-                100% { transform: translateY(150px); opacity: 1; }
+            .sieve-plate {
+                animation: sieveVibrate 0.15s infinite linear;
             }
-            @keyframes fallBlock {
-                0% { transform: translateY(0); opacity: 1; }
-                40% { transform: translateY(50px); opacity: 1; }
-                50% { transform: translateY(45px) translateX(10px); opacity: 0.5; }
-                60% { transform: translateY(40px) translateX(15px) scale(0); opacity: 0; }
+            .granule {
+                transform-origin: center;
+                opacity: 0;
+            }
+            .granule-1 {
+                animation: granulePath1 4s infinite cubic-bezier(0.25, 1, 0.5, 1);
+            }
+            .granule-2 {
+                animation: granulePath2 4s infinite cubic-bezier(0.25, 1, 0.5, 1);
+                animation-delay: 0.8s;
+            }
+            .granule-3 {
+                animation: granulePath3 4s infinite cubic-bezier(0.25, 1, 0.5, 1);
+                animation-delay: 1.6s;
+            }
+            .dust-particle {
+                transform-origin: center;
+                opacity: 0;
+            }
+            .dust-1 {
+                animation: dustPath1 4s infinite ease-in;
+            }
+            .dust-2 {
+                animation: dustPath2 4s infinite ease-in;
+                animation-delay: 0.6s;
+            }
+            .dust-3 {
+                animation: dustPath3 4s infinite ease-in;
+                animation-delay: 1.2s;
+            }
+            .suction-current {
+                stroke-dasharray: 6 3;
+                animation: suctionDash 1s infinite linear;
+            }
+
+            @keyframes sieveVibrate {
+                0%, 100% { transform: translateY(0) translateX(0); }
+                25% { transform: translateY(0.5px) translateX(-0.5px); }
+                75% { transform: translateY(-0.5px) translateX(0.5px); }
+            }
+            @keyframes granulePath1 {
+                0% { transform: translate(45px, -15px) scale(0.6); opacity: 0; }
+                5% { opacity: 1; transform: translate(45px, -15px) scale(1); }
+                18% { transform: translate(48px, 48px) rotate(15deg); }
+                22% { transform: translate(50px, 58px) scale(0.95); } /* hits sieve 1 */
+                35% { transform: translate(54px, 88px) rotate(45deg); }
+                38% { transform: translate(56px, 94px) scale(0.9); } /* hits sieve 2 */
+                55% { transform: translate(58px, 126px) rotate(90deg); opacity: 1; } /* lands */
+                85% { opacity: 1; transform: translate(58px, 126px) rotate(90deg); }
+                95%, 100% { opacity: 0; transform: translate(58px, 126px) rotate(90deg); }
+            }
+            @keyframes granulePath2 {
+                0% { transform: translate(85px, -15px) scale(0.6); opacity: 0; }
+                5% { opacity: 1; transform: translate(85px, -15px) scale(1); }
+                20% { transform: translate(88px, 48px) rotate(-10deg); }
+                24% { transform: translate(90px, 58px) scale(0.95); }
+                38% { transform: translate(92px, 88px) rotate(-30deg); }
+                41% { transform: translate(94px, 94px) scale(0.9); }
+                60% { transform: translate(98px, 128px) rotate(-60deg); opacity: 1; }
+                85% { opacity: 1; transform: translate(98px, 128px) rotate(-60deg); }
+                95%, 100% { opacity: 0; transform: translate(98px, 128px) rotate(-60deg); }
+            }
+            @keyframes granulePath3 {
+                0% { transform: translate(125px, -15px) scale(0.6); opacity: 0; }
+                5% { opacity: 1; transform: translate(125px, -15px) scale(1); }
+                22% { transform: translate(122px, 48px) rotate(20deg); }
+                26% { transform: translate(120px, 58px) scale(0.95); }
+                40% { transform: translate(116px, 88px) rotate(40deg); }
+                43% { transform: translate(114px, 94px) scale(0.9); }
+                62% { transform: translate(110px, 127px) rotate(80deg); opacity: 1; }
+                85% { opacity: 1; transform: translate(110px, 127px) rotate(80deg); }
+                95%, 100% { opacity: 0; transform: translate(110px, 127px) rotate(80deg); }
+            }
+            @keyframes dustPath1 {
+                0% { transform: translate(55px, 10px) scale(0.5); opacity: 0; }
+                10% { opacity: 1; transform: translate(58px, 25px) scale(1); }
+                30% { transform: translate(65px, 45px); opacity: 1; }
+                45% { transform: translate(110px, 20px) scale(0.6); opacity: 0.8; }
+                55% { transform: translate(165px, 15px) scale(0.2); opacity: 0; }
                 100% { opacity: 0; }
+            }
+            @keyframes dustPath2 {
+                0% { transform: translate(95px, 5px) scale(0.5); opacity: 0; }
+                10% { opacity: 1; transform: translate(98px, 20px) scale(1); }
+                28% { transform: translate(105px, 40px); opacity: 1; }
+                43% { transform: translate(130px, 22px) scale(0.6); opacity: 0.8; }
+                53% { transform: translate(168px, 18px) scale(0.2); opacity: 0; }
+                100% { opacity: 0; }
+            }
+            @keyframes dustPath3 {
+                0% { transform: translate(135px, 12px) scale(0.5); opacity: 0; }
+                10% { opacity: 1; transform: translate(132px, 28px) scale(1); }
+                32% { transform: translate(122px, 48px); opacity: 1; }
+                47% { transform: translate(145px, 24px) scale(0.6); opacity: 0.8; }
+                57% { transform: translate(170px, 20px) scale(0.2); opacity: 0; }
+                100% { opacity: 0; }
+            }
+            @keyframes suctionDash {
+                to { stroke-dashoffset: -18; }
             }
 
             /* --- 3. ODOR ANIMATIONS --- */
-            .bad-molecule { animation: badRise 5s infinite linear; transform-origin: center; }
-            .bad-aura { animation: pulseAura 1s infinite alternate; }
-            .hero-carbon { animation: carbonAttack 5s infinite cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center; }
-            .trap-ring { animation: trapLock 5s infinite; transform-origin: 100px 110px; }
-            .fresh-bloom { animation: freshExplode 5s infinite; transform-origin: 100px 110px; }
+            .carbon-orbit {
+                transform-origin: 100px 70px;
+                animation: orbitRotate 15s infinite linear;
+            }
+            .odor-molecule {
+                transform-origin: center;
+                opacity: 0;
+            }
+            .odor-1 {
+                animation: odorSuck1 5s infinite cubic-bezier(0.25, 1, 0.5, 1);
+            }
+            .odor-2 {
+                animation: odorSuck2 5s infinite cubic-bezier(0.25, 1, 0.5, 1);
+                animation-delay: 1.2s;
+            }
+            .odor-3 {
+                animation: odorSuck3 5s infinite cubic-bezier(0.25, 1, 0.5, 1);
+                animation-delay: 2.4s;
+            }
+            .trap-pulse {
+                transform-origin: center;
+                animation: trapLock1 5s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            .trap-pulse-1 { transform-origin: 75px 55px; }
+            .trap-pulse-2 { transform-origin: 125px 55px; }
+            .trap-pulse-3 { transform-origin: 100px 95px; }
+            .trap-pulse-2-delay {
+                animation-delay: 1.2s;
+            }
+            .trap-pulse-3-delay {
+                animation-delay: 2.4s;
+            }
+            .scent-sparkle {
+                transform-origin: center;
+                opacity: 0;
+            }
+            .scent-1 {
+                animation: scentFloat1 5s infinite ease-out;
+                animation-delay: 0.8s;
+            }
+            .scent-2 {
+                animation: scentFloat2 5s infinite ease-out;
+                animation-delay: 2.0s;
+            }
+            .scent-3 {
+                animation: scentFloat1 5s infinite ease-out;
+                animation-delay: 3.2s;
+            }
 
-            @keyframes badRise {
-                0% { opacity: 0; transform: scale(0) translateY(20px); }
-                20% { opacity: 1; transform: scale(1) translateY(0); }
-                40% { opacity: 1; transform: scale(1) translateY(-10px); }
-                45% { opacity: 0; transform: scale(0); }
+            @keyframes orbitRotate {
+                100% { transform: rotate(360deg); }
+            }
+            @keyframes odorSuck1 {
+                0% { transform: translate(25px, 110px) scale(0); opacity: 0; }
+                10% { opacity: 0.9; transform: translate(30px, 95px) scale(1); }
+                30% { transform: translate(65px, 60px) scale(0.8); opacity: 0.9; }
+                36%, 100% { transform: translate(75px, 55px) scale(0); opacity: 0; }
+            }
+            @keyframes odorSuck2 {
+                0% { transform: translate(145px, 110px) scale(0); opacity: 0; }
+                10% { opacity: 0.9; transform: translate(140px, 95px) scale(1); }
+                30% { transform: translate(130px, 60px) scale(0.8); opacity: 0.9; }
+                36%, 100% { transform: translate(125px, 55px) scale(0); opacity: 0; }
+            }
+            @keyframes odorSuck3 {
+                0% { transform: translate(85px, 125px) scale(0); opacity: 0; }
+                10% { opacity: 0.9; transform: translate(88px, 115px) scale(1); }
+                30% { transform: translate(95px, 100px) scale(0.8); opacity: 0.9; }
+                36%, 100% { transform: translate(100px, 95px) scale(0); opacity: 0; }
+            }
+            @keyframes trapLock1 {
+                0%, 28% { transform: scale(1.6); opacity: 0; stroke: #a855f7; }
+                34% { transform: scale(1); opacity: 1; stroke: #a855f7; stroke-width: 2.5; }
+                45% { transform: scale(1); opacity: 0.4; stroke: #3b82f6; stroke-width: 1.5; }
+                80% { opacity: 0.4; }
+                88%, 100% { opacity: 0; transform: scale(1.6); }
+            }
+            @keyframes scentFloat1 {
+                0%, 35% { transform: translate(100px, 70px) scale(0); opacity: 0; }
+                42% { opacity: 1; transform: translate(80px, 35px) scale(1.2); }
+                70% { opacity: 1; transform: translate(65px, 10px) scale(1); }
+                85% { opacity: 0; transform: translate(55px, -15px) scale(0.8); }
                 100% { opacity: 0; }
             }
-            @keyframes pulseAura { from { opacity: 0.2; transform: scale(1); } to { opacity: 0.5; transform: scale(1.2); } }
-            @keyframes carbonAttack {
-                0% { transform: translateY(0); opacity: 0; }
-                20% { opacity: 1; }
-                40% { transform: translateY(90px) scale(1.2); }
-                45% { transform: translateY(90px) scale(1); }
-                50% { opacity: 1; transform: translateY(90px); }
-                60% { opacity: 0; transform: translateY(90px) scale(1.5); }
-                100% { opacity: 0; }
-            }
-            @keyframes trapLock {
-                0%, 40% { transform: scale(1.5); opacity: 0; }
-                45% { transform: scale(1); opacity: 1; stroke: #3b82f6; }
-                55% { transform: scale(0.8); opacity: 0; }
-                100% { opacity: 0; }
-            }
-            @keyframes freshExplode {
-                0%, 55% { transform: scale(0); opacity: 0; }
-                60% { transform: scale(1.2); opacity: 1; }
-                70% { transform: scale(1); opacity: 1; }
-                90% { transform: scale(1.5) rotate(45deg); opacity: 0; }
+            @keyframes scentFloat2 {
+                0%, 38% { transform: translate(100px, 70px) scale(0); opacity: 0; }
+                45% { opacity: 1; transform: translate(120px, 32px) scale(1.2); }
+                72% { opacity: 1; transform: translate(135px, 8px) scale(1); }
+                87% { opacity: 0; transform: translate(145px, -18px) scale(0.8); }
                 100% { opacity: 0; }
             }
         </style>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Feature 1: Molecular Bonding -->
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-blue-500/30 transition-premium space-y-6 flex flex-col justify-between group">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 w-8 h-8"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.29-2.29 3.21S3 10.79 3 11.95c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.5c1.37 0 2.5-1.14 2.5-2.53 0-.72-.35-1.41-1.07-2S17.18 12.53 17 11.62c-.18.91-.71 1.77-1.43 2.35s-1.07 1.12-1.07 1.84c0 1.39 1.13 2.53 2.5 2.53z"/></svg>
+            <div class="bg-slate-100/50 border border-slate-200/60 p-2 rounded-[2.5rem] transition-premium hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/5 group">
+                <div class="bg-white border border-[#e5e0d8]/40 p-8 rounded-[calc(2.5rem-0.5rem)] flex flex-col justify-between h-full space-y-6 shadow-[0_4px_12px_rgba(0,0,0,0.01)] group-hover:border-blue-500/30 transition-premium">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 w-7 h-7"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.29-2.29 3.21S3 10.79 3 11.95c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.5c1.37 0 2.5-1.14 2.5-2.53 0-.72-.35-1.41-1.07-2S17.18 12.53 17 11.62c-.18.91-.71 1.77-1.43 2.35s-1.07 1.12-1.07 1.84c0 1.39 1.13 2.53 2.5 2.53z"/></svg>
+                            </div>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-bold">Instan & Padat</span>
                         </div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-bold">Instan & Padat</span>
-                    </div>
-                    
-                    <!-- Diagram Schematic: Molecular Grid Lattice (taken from C://Users//Dhiko Herlambang//Downloads//bentocat_refined_v20) -->
-                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-blue-50/30 transition-all duration-500">
-                        <svg viewBox="0 0 200 150" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
-                            <defs>
-                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5" />
-                                </pattern>
-                            </defs>
-                            <rect width="100%" height="100%" fill="url(#grid)" />
-                            <g class="bonding-group">
-                                <line x1="100" y1="90" x2="70" y2="120" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
-                                <line x1="100" y1="90" x2="130" y2="120" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
-                                <line x1="70" y1="120" x2="130" y2="120" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
-                                <line x1="100" y1="90" x2="100" y2="50" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
-                                <circle cx="100" cy="50" r="12" fill="#cbd5e1" class="particle p-top" />
-                                <circle cx="50" cy="130" r="12" fill="#cbd5e1" class="particle p-left" />
-                                <circle cx="150" cy="130" r="12" fill="#cbd5e1" class="particle p-right" />
-                                <circle cx="100" cy="90" r="10" fill="#94a3b8" class="particle p-center" opacity="0.5" />
-                                <text x="100" y="54" text-anchor="middle" font-size="10" fill="white" class="charge-plus" opacity="0">+</text>
-                                <text x="70" y="124" text-anchor="middle" font-size="10" fill="white" class="charge-plus" opacity="0">+</text>
-                                <text x="130" y="124" text-anchor="middle" font-size="10" fill="white" class="charge-plus" opacity="0">+</text>
-                            </g>
-                            <circle cx="100" cy="20" r="5" fill="#3b82f6" class="water-trigger" />
-                            <text x="100" y="140" text-anchor="middle" font-size="8" fill="#3b82f6" font-weight="bold" letter-spacing="1" class="status-text-inactive">BONDING INACTIVE</text>
-                            <text x="100" y="140" text-anchor="middle" font-size="8" fill="#1e293b" font-weight="bold" letter-spacing="1" class="status-text-locked" opacity="0">LATTICE LOCKED</text>
-                        </svg>
-                    </div>
+                        
+                        <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-blue-50/30 transition-all duration-500">
+                            <svg viewBox="0 0 200 150" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <pattern id="subtleGrid" width="16" height="16" patternUnits="userSpaceOnUse">
+                                        <path d="M 16 0 L 0 0 0 16" fill="none" stroke="#f1f5f9" stroke-width="0.75" />
+                                    </pattern>
+                                    <radialGradient id="dropletGrad" cx="30%" cy="30%" r="70%">
+                                        <stop offset="0%" stop-color="#93c5fd" />
+                                        <stop offset="50%" stop-color="#3b82f6" />
+                                        <stop offset="100%" stop-color="#1d4ed8" />
+                                    </radialGradient>
+                                    <linearGradient id="plateletInactiveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#f8fafc" />
+                                        <stop offset="100%" stop-color="#cbd5e1" />
+                                    </linearGradient>
+                                    <linearGradient id="plateletActiveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#60a5fa" />
+                                        <stop offset="100%" stop-color="#1e40af" />
+                                    </linearGradient>
+                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feGaussianBlur stdDeviation="2.5" result="blur" />
+                                        <feMerge>
+                                            <feMergeNode in="blur" />
+                                            <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                    </filter>
+                                </defs>
 
-                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-blue-600 transition-premium">
-                        {{ \App\Models\Setting::get('feature_1_title', 'Molecular Bonding') }}
-                    </h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        {!! \App\Models\Setting::get('feature_1_desc', 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.') !!}
-                    </p>
+                                <rect width="100%" height="100%" fill="url(#subtleGrid)" />
+
+                                <g>
+                                    <line x1="100" y1="75" x2="100" y2="35" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
+                                    <line x1="100" y1="75" x2="60" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
+                                    <line x1="100" y1="75" x2="140" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
+                                    <line x1="100" y1="75" x2="55" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
+                                    <line x1="100" y1="75" x2="145" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="2" />
+
+                                    <line x1="100" y1="35" x2="55" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
+                                    <line x1="100" y1="35" x2="145" y2="55" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
+                                    <line x1="55" y1="55" x2="60" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
+                                    <line x1="145" y1="55" x2="140" y2="105" class="bond-line" stroke="#e2e8f0" stroke-width="1.5" />
+                                </g>
+
+                                <g transform="translate(100, 75)">
+                                    <polygon points="-12,-7 -12,7 0,14 12,7 12,-7 0,-14" class="clay-platelet" stroke-width="1" />
+                                </g>
+                                <g transform="translate(100, 35)">
+                                    <polygon points="-10,-6 -10,6 0,12 10,6 10,-6 0,-12" class="clay-platelet" stroke-width="1" />
+                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="bold" fill="white" class="charge-plus">+</text>
+                                </g>
+                                <g transform="translate(60, 105)">
+                                    <polygon points="-10,-6 -10,6 0,12 10,6 10,-6 0,-12" class="clay-platelet" stroke-width="1" />
+                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="bold" fill="white" class="charge-minus">-</text>
+                                </g>
+                                <g transform="translate(140, 105)">
+                                    <polygon points="-10,-6 -10,6 0,12 10,6 10,-6 0,-12" class="clay-platelet" stroke-width="1" />
+                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="bold" fill="white" class="charge-minus">-</text>
+                                </g>
+                                <g transform="translate(55, 55)">
+                                    <polygon points="-9,-5 -9,5 0,10 9,5 9,-5 0,-10" class="clay-platelet" stroke-width="1" />
+                                    <text x="0" y="3" text-anchor="middle" font-size="8" font-weight="bold" fill="white" class="charge-plus">+</text>
+                                </g>
+                                <g transform="translate(145, 55)">
+                                    <polygon points="-9,-5 -9,5 0,10 9,5 9,-5 0,-10" class="clay-platelet" stroke-width="1" />
+                                    <text x="0" y="3" text-anchor="middle" font-size="8" font-weight="bold" fill="white" class="charge-plus">+</text>
+                                </g>
+
+                                <path d="M 0 0 C -3 -5, -3 -10, 0 -12 C 3 -10, 3 -5, 0 0 Z" fill="url(#dropletGrad)" class="droplet" transform="translate(100, 0)" />
+
+                                <ellipse cx="100" cy="85" rx="6" ry="3" fill="none" stroke="#60a5fa" stroke-width="2" class="ripple-ring" />
+                                <ellipse cx="100" cy="85" rx="10" ry="5" fill="none" stroke="#3b82f6" stroke-width="1.5" class="ripple-ring" style="animation-delay: 0.15s;" />
+
+                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#94a3b8" font-weight="black" letter-spacing="1.2" class="status-text-inactive">BONDING INACTIVE</text>
+                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#2563eb" font-weight="black" letter-spacing="1.2" class="status-text-locked" opacity="0">LATTICE LOCKED</text>
+                            </svg>
+                        </div>
+
+                        <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-blue-600 transition-premium">
+                            {{ AppModelsSetting::get('feature_1_title', 'Molecular Bonding') }}
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-outfit">
+                            {!! AppModelsSetting::get('feature_1_desc', 'Butiran pasir membentuk <strong>ikatan kisi molekul</strong> yang kuat saat bereaksi dengan cairan. Tidak mudah pecah.') !!}
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <!-- Feature 2: Zero-Dust Tech -->
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-cyan-500/30 transition-premium space-y-6 flex flex-col justify-between group">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-500 w-8 h-8"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg>
+            <div class="bg-slate-100/50 border border-slate-200/60 p-2 rounded-[2.5rem] transition-premium hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/5 group">
+                <div class="bg-white border border-[#e5e0d8]/40 p-8 rounded-[calc(2.5rem-0.5rem)] flex flex-col justify-between h-full space-y-6 shadow-[0_4px_12px_rgba(0,0,0,0.01)] group-hover:border-cyan-500/30 transition-premium">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-500 w-7 h-7"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg>
+                            </div>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-cyan-600 bg-cyan-50 px-2.5 py-1 rounded-full font-bold">99.9% Bebas Debu</span>
                         </div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-cyan-600 bg-cyan-50 px-2.5 py-1 rounded-full font-bold">99.9% Bebas Debu</span>
-                    </div>
 
-                    <!-- Diagram Schematic: Zero-Dust Fall & Filter -->
-                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-cyan-50/30 transition-all duration-500">
-                        <svg viewBox="0 0 200 150" class="w-full h-full">
-                            <defs>
-                                <linearGradient id="cleanZone" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="#06b6d4" />
-                                    <stop offset="100%" stop-color="#fff" />
-                                </linearGradient>
-                            </defs>
-                            <line x1="0" y1="75" x2="200" y2="75" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4 2" opacity="0.6" />
-                            <rect x="0" y="75" width="200" height="75" fill="url(#cleanZone)" opacity="0.1" />
-                            <g class="sand-fall-group">
-                                <circle cx="60" cy="20" r="6" fill="#64748b" class="sand-particle p1" />
-                                <circle cx="100" cy="0" r="7" fill="#64748b" class="sand-particle p2" />
-                                <circle cx="140" cy="30" r="6" fill="#64748b" class="sand-particle p3" />
-                            </g>
-                            <g class="dust-block-group">
-                                <circle cx="75" cy="25" r="2" fill="#ef4444" class="dust-particle d1" />
-                                <circle cx="90" cy="15" r="2" fill="#ef4444" class="dust-particle d2" />
-                                <circle cx="125" cy="35" r="2" fill="#ef4444" class="dust-particle d3" />
-                            </g>
-                            <text x="180" y="70" text-anchor="end" font-size="10" fill="#ef4444" opacity="0.8">FILTERED</text>
-                            <text x="180" y="140" text-anchor="end" font-size="10" fill="#06b6d4" font-weight="bold">CLEAN</text>
-                        </svg>
-                    </div>
+                        <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-cyan-50/30 transition-all duration-500">
+                            <svg viewBox="0 0 200 150" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="sieveGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#e2e8f0" />
+                                        <stop offset="100%" stop-color="#94a3b8" />
+                                    </linearGradient>
+                                    <linearGradient id="cleanZoneGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.25" />
+                                        <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+                                    </linearGradient>
+                                    <radialGradient id="granuleGrad" cx="30%" cy="30%" r="70%">
+                                        <stop offset="0%" stop-color="#cbd5e1" />
+                                        <stop offset="60%" stop-color="#94a3b8" />
+                                        <stop offset="100%" stop-color="#475569" />
+                                    </radialGradient>
+                                    <radialGradient id="dustGrad" cx="30%" cy="30%" r="70%">
+                                        <stop offset="0%" stop-color="#fda4af" />
+                                        <stop offset="100%" stop-color="#e11d48" />
+                                    </radialGradient>
+                                </defs>
 
-                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-cyan-600 transition-premium">
-                        {{ \App\Models\Setting::get('feature_2_title', 'Zero-Dust Tech') }}
-                    </h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        {!! \App\Models\Setting::get('feature_2_desc', 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.') !!}
-                    </p>
+                                <path d="M 160 10 C 170 15, 175 25, 185 25 L 205 25 L 205 0 L 160 0 Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+                                <circle cx="180" cy="12" r="15" fill="#e2e8f0" opacity="0.4" />
+                                <path d="M 60 25 C 90 28, 130 18, 170 12" fill="none" stroke="#a5f3fc" stroke-width="1.5" class="suction-current" />
+                                <path d="M 90 35 C 115 32, 140 22, 172 14" fill="none" stroke="#a5f3fc" stroke-width="1.5" class="suction-current" style="animation-delay: 0.3s;" />
+                                <path d="M 120 50 C 135 42, 150 26, 174 16" fill="none" stroke="#a5f3fc" stroke-width="1" class="suction-current" style="animation-delay: 0.6s;" />
+
+                                <rect x="15" y="95" width="170" height="40" fill="url(#cleanZoneGrad)" rx="8" />
+
+                                <g class="sieve-plate">
+                                    <rect x="15" y="55" width="170" height="6" fill="url(#sieveGrad)" rx="2" />
+                                    <circle cx="35" cy="58" r="2" fill="#334155" />
+                                    <circle cx="55" cy="58" r="2.5" fill="#334155" />
+                                    <circle cx="75" cy="58" r="2.5" fill="#334155" />
+                                    <circle cx="95" cy="58" r="2.5" fill="#334155" />
+                                    <circle cx="115" cy="58" r="2.5" fill="#334155" />
+                                    <circle cx="135" cy="58" r="2.5" fill="#334155" />
+                                    <circle cx="155" cy="58" r="2.5" fill="#334155" />
+                                    <circle cx="175" cy="58" r="2" fill="#334155" />
+                                </g>
+
+                                <g class="sieve-plate" style="animation-delay: 0.07s;">
+                                    <rect x="15" y="95" width="170" height="4" fill="url(#sieveGrad)" rx="1.5" />
+                                    <circle cx="25" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="35" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="45" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="55" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="65" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="75" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="85" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="95" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="105" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="115" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="125" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="135" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="145" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="155" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="165" cy="97" r="1.2" fill="#334155" />
+                                    <circle cx="175" cy="97" r="1.2" fill="#334155" />
+                                </g>
+
+                                <text x="155" y="42" text-anchor="end" font-size="8" fill="#e11d48" font-weight="black" letter-spacing="0.5">EXHAUST VACUUM</text>
+                                <text x="180" y="132" text-anchor="end" font-size="8" fill="#0891b2" font-weight="black" letter-spacing="1">CLEAN ZONE</text>
+
+                                <g class="granule granule-1">
+                                    <circle cx="0" cy="0" r="4.5" fill="url(#granuleGrad)" />
+                                    <path d="M -2.5 -1.5 A 1.5 1.5 0 0 1 1 -1.5" fill="none" stroke="#fff" stroke-width="0.5" opacity="0.4" />
+                                </g>
+                                <g class="granule granule-2">
+                                    <circle cx="0" cy="0" r="5.5" fill="url(#granuleGrad)" />
+                                    <path d="M -3 -2 A 2 2 0 0 1 1.5 -2" fill="none" stroke="#fff" stroke-width="0.5" opacity="0.4" />
+                                </g>
+                                <g class="granule granule-3">
+                                    <circle cx="0" cy="0" r="4" fill="url(#granuleGrad)" />
+                                    <path d="M -2 -1 A 1 1 0 0 1 1 -1" fill="none" stroke="#fff" stroke-width="0.5" opacity="0.4" />
+                                </g>
+
+                                <circle cx="0" cy="0" r="1.8" fill="url(#dustGrad)" class="dust-particle dust-1" />
+                                <circle cx="0" cy="0" r="2.2" fill="url(#dustGrad)" class="dust-particle dust-2" />
+                                <circle cx="0" cy="0" r="1.5" fill="url(#dustGrad)" class="dust-particle dust-3" />
+
+                                <g transform="translate(100, 135)" opacity="0.85">
+                                    <path d="M -50 0 C -40 -6, -20 -10, 0 -10 C 20 -10, 40 -6, 50 0 Z" fill="#64748b" />
+                                    <circle cx="-25" cy="-3" r="3.5" fill="#475569" />
+                                    <circle cx="-10" cy="-6" r="4.5" fill="#334155" />
+                                    <circle cx="10" cy="-7" r="4" fill="#475569" />
+                                    <circle cx="28" cy="-4" r="3.5" fill="#334155" />
+                                </g>
+                            </svg>
+                        </div>
+
+                        <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-cyan-600 transition-premium">
+                            {{ AppModelsSetting::get('feature_2_title', 'Zero-Dust Tech') }}
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-outfit">
+                            {!! AppModelsSetting::get('feature_2_desc', 'Sistem filtrasi ganda memisahkan butiran pasir dari <strong>mikro-partikel debu</strong> berbahaya.') !!}
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <!-- Feature 3: Odor Encapsulation -->
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-purple-500/30 transition-premium space-y-6 flex flex-col justify-between group">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-500 w-8 h-8"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 5.5-2a1 1 0 0 1 1 0c1 .8 3.5 2 5.5 2a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div class="bg-slate-100/50 border border-slate-200/60 p-2 rounded-[2.5rem] transition-premium hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/5 group">
+                <div class="bg-white border border-[#e5e0d8]/40 p-8 rounded-[calc(2.5rem-0.5rem)] flex flex-col justify-between h-full space-y-6 shadow-[0_4px_12px_rgba(0,0,0,0.01)] group-hover:border-purple-500/30 transition-premium">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-purple-500 w-7 h-7"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 5.5-2a1 1 0 0 1 1 0c1 .8 3.5 2 5.5 2a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                            </div>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full font-bold">Kontrol Bau Maksimal</span>
                         </div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full font-bold">Kontrol Bau Maksimal</span>
-                    </div>
 
-                    <!-- Diagram Schematic: Active Carbon Encapsulation -->
-                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-purple-50/30 transition-all duration-500">
-                        <svg viewBox="0 0 200 150" class="w-full h-full overflow-visible">
-                            <!-- Odor ammonia gas molecules -->
-                            <path d="M90 120 L110 120 L100 100 Z" fill="#22c55e" class="bad-molecule" />
-                            <circle cx="100" cy="115" r="15" fill="#22c55e" opacity="0.3" class="bad-aura" />
-                            <!-- Active Carbon (Grouped with text C to animate together) -->
-                            <g class="hero-carbon">
-                                <circle cx="100" cy="20" r="25" fill="#3b82f6" />
-                                <text x="100" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="white">C</text>
-                            </g>
-                            <!-- Encapsulating rings -->
-                            <circle cx="100" cy="110" r="28" fill="none" stroke="#3b82f6" stroke-width="3" class="trap-ring" opacity="0" />
-                            <!-- Fresh smell emitting bloom -->
-                            <g class="fresh-bloom" opacity="0">
-                                <circle cx="100" cy="110" r="8" fill="#f472b6" />
-                                <path d="M100 100 L100 90 M100 120 L100 130 M90 110 L80 110 M110 110 L120 110" stroke="#f472b6" stroke-width="2" />
-                                <circle cx="80" cy="90" r="3" fill="#f472b6" />
-                                <circle cx="120" cy="90" r="3" fill="#f472b6" />
-                            </g>
-                        </svg>
-                    </div>
+                        <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-purple-50/30 transition-all duration-500">
+                            <svg viewBox="0 0 200 150" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="carbonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#475569" />
+                                        <stop offset="40%" stop-color="#1e293b" />
+                                        <stop offset="100%" stop-color="#0f172a" />
+                                    </linearGradient>
+                                    <radialGradient id="odorGrad" cx="30%" cy="30%" r="70%">
+                                        <stop offset="0%" stop-color="#86efac" />
+                                        <stop offset="60%" stop-color="#22c55e" />
+                                        <stop offset="100%" stop-color="#14532d" />
+                                    </radialGradient>
+                                    <radialGradient id="odorGlow" cx="50%" cy="50%" r="50%">
+                                        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.4" />
+                                        <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
+                                    </radialGradient>
+                                    <linearGradient id="scentGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#a855f7" />
+                                        <stop offset="50%" stop-color="#ec4899" />
+                                        <stop offset="100%" stop-color="#f472b6" />
+                                    </linearGradient>
+                                </defs>
 
-                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-purple-600 transition-premium">
-                        {{ \App\Models\Setting::get('feature_3_title', 'Odor Encapsulation') }}
-                    </h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        {!! \App\Models\Setting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.') !!}
-                    </p>
+                                <g class="carbon-orbit" opacity="0.25">
+                                    <ellipse cx="100" cy="70" rx="42" ry="16" fill="none" stroke="#64748b" stroke-width="0.75" stroke-dasharray="4 2" transform="rotate(30 100 70)" />
+                                    <ellipse cx="100" cy="70" rx="42" ry="16" fill="none" stroke="#64748b" stroke-width="0.75" stroke-dasharray="4 2" transform="rotate(-30 100 70)" />
+                                    <circle cx="65" cy="50" r="2" fill="#3b82f6" />
+                                    <circle cx="135" cy="90" r="2" fill="#3b82f6" />
+                                    <circle cx="65" cy="90" r="2" fill="#10b981" />
+                                    <circle cx="135" cy="50" r="2" fill="#10b981" />
+                                </g>
+
+                                <g class="odor-molecule odor-1">
+                                    <circle cx="0" cy="0" r="12" fill="url(#odorGlow)" />
+                                    <circle cx="-4" cy="2" r="3.5" fill="url(#odorGrad)" />
+                                    <circle cx="3" cy="-3" r="3" fill="url(#odorGrad)" />
+                                    <circle cx="4" cy="4" r="2.5" fill="url(#odorGrad)" />
+                                </g>
+                                <g class="odor-molecule odor-2">
+                                    <circle cx="0" cy="0" r="14" fill="url(#odorGlow)" />
+                                    <circle cx="-3" cy="-3" r="4" fill="url(#odorGrad)" />
+                                    <circle cx="3" cy="2" r="3" fill="url(#odorGrad)" />
+                                    <circle cx="-2" cy="4" r="2" fill="url(#odorGrad)" />
+                                </g>
+                                <g class="odor-molecule odor-3">
+                                    <circle cx="0" cy="0" r="12" fill="url(#odorGlow)" />
+                                    <circle cx="3" cy="3" r="3.5" fill="url(#odorGrad)" />
+                                    <circle cx="-3" cy="-2" r="3" fill="url(#odorGrad)" />
+                                </g>
+
+                                <g transform="translate(100, 70)">
+                                    <circle cx="0" cy="0" r="26" fill="url(#carbonGrad)" stroke="#475569" stroke-width="1.5" />
+                                    <circle cx="-14" cy="-10" r="6" fill="#090d16" />
+                                    <circle cx="14" cy="-10" r="6" fill="#090d16" />
+                                    <circle cx="0" cy="16" r="6" fill="#090d16" />
+                                    <text x="0" y="4" text-anchor="middle" font-size="10" font-weight="black" fill="#334155" letter-spacing="1">C</text>
+                                </g>
+
+                                <circle cx="86" cy="60" r="8" fill="none" stroke="#a855f7" stroke-width="2.5" class="trap-pulse trap-pulse-1" opacity="0" />
+                                <circle cx="114" cy="60" r="8" fill="none" stroke="#a855f7" stroke-width="2.5" class="trap-pulse trap-pulse-2 trap-pulse-2-delay" opacity="0" />
+                                <circle cx="100" cy="86" r="8" fill="none" stroke="#a855f7" stroke-width="2.5" class="trap-pulse trap-pulse-3 trap-pulse-3-delay" opacity="0" />
+
+                                <g class="scent-sparkle scent-1">
+                                    <path d="M 0 -6 L 1 -2 L 5 -1 L 1 0 L 0 4 L -1 0 L -5 -1 L -1 -2 Z" fill="url(#scentGrad)" />
+                                </g>
+                                <g class="scent-sparkle scent-2">
+                                    <path d="M 0 -5 L 1 -1.5 L 4 -1 L 1 0 L 0 3.5 L -1 0 L -4 -1 L -1 -1.5 Z" fill="url(#scentGrad)" />
+                                </g>
+                                <g class="scent-sparkle scent-3">
+                                    <path d="M 0 -4 L 0.8 -1.2 L 3 -0.8 L 0.8 0 L 0 2.8 L -0.8 0 L -3 -0.8 L -0.8 -1.2 Z" fill="url(#scentGrad)" />
+                                </g>
+
+                                <text x="100" y="142" text-anchor="middle" font-size="8" fill="#a855f7" font-weight="black" letter-spacing="1.2">ENCAPSULATION ACTIVE</text>
+                            </svg>
+                        </div>
+
+                        <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-purple-600 transition-premium">
+                            {{ AppModelsSetting::get('feature_3_title', 'Odor Encapsulation') }}
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-outfit">
+                            {!! AppModelsSetting::get('feature_3_desc', 'Molekul bau (amonia) <strong>dikurung aktif</strong> oleh karbon aktif, bukan sekedar ditutupi parfum.') !!}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    </section><!-- 3. Katalog Section -->
+    </section>
+<!-- 3. Katalog Section -->
     <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-28 space-y-12">
         <div class="text-center space-y-3">
             <h2 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Katalog BentoCat Premium</h2>
