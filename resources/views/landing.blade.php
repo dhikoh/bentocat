@@ -1,5 +1,183 @@
 @extends('layouts.client')
 
+@push('styles')
+<style>
+/* Scoped Bento Variant Showcase Styles */
+.bento-badge {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(251, 191, 36, 0.3); /* Soft Amber border */
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    z-index: 20;
+    animation: bento-float 4s ease-in-out infinite;
+}
+
+.bento-badge-icon {
+    background: rgba(251, 191, 36, 0.15);
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fbbf24;
+}
+
+.bento-badge-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Float Animation */
+@keyframes bento-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Badge Desktop Positions */
+.bento-badge.top-left { top: 10%; left: 6%; animation-delay: 0s; }
+.bento-badge.top-right { top: 8%; right: 6%; animation-delay: 1s; }
+.bento-badge.bottom-left { bottom: 20%; left: 4%; animation-delay: 2s; }
+.bento-badge.bottom-right { top: 38%; right: 4%; animation-delay: 1.5s; }
+
+/* Product Image Showcase */
+.product-image {
+    width: 100%;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.12));
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-image:hover {
+    transform: scale(1.03) rotate(1.5deg);
+}
+
+/* Aroma Text Display */
+.bento-aroma-display {
+    position: absolute;
+    top: 45%;
+    right: 6%;
+    z-index: 30;
+    text-align: center;
+    background: rgba(250, 248, 245, 0.85);
+    padding: 12px 18px;
+    border-radius: 18px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(229, 224, 216, 0.6);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.bento-aroma-display .aroma-subtitle {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+
+.bento-aroma-display .aroma-title {
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 1px;
+    display: inline-block;
+    filter: blur(0px);
+    opacity: 1;
+    transition: color 0.5s ease, text-shadow 0.5s ease, filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), letter-spacing 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bento-aroma-display .aroma-title.liquid-hidden {
+    filter: blur(8px);
+    opacity: 0;
+    letter-spacing: -6px;
+    transform: scale(0.8) translateY(6px);
+}
+
+/* Aroma Selector Dots */
+.bento-aroma-selector {
+    position: absolute;
+    bottom: 8%;
+    right: 6%;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(229, 224, 216, 0.8);
+    border-radius: 50px;
+    padding: 8px 12px;
+    display: flex;
+    gap: 10px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.bento-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+}
+
+.bento-dot:hover {
+    transform: scale(1.25);
+}
+
+.bento-dot.active {
+    border-color: #64748b;
+    box-shadow: 0 0 8px rgba(0,0,0,0.15);
+    transform: scale(1.2);
+}
+
+/* Responsive Mobile Adjustments */
+@media (max-width: 768px) {
+    .bento-badge {
+        padding: 5px 8px;
+        font-size: 8px;
+        border-radius: 8px;
+    }
+    .bento-badge-icon { padding: 4px; }
+    .bento-badge-icon svg { width: 10px; height: 10px; }
+    
+    .bento-badge.top-left { top: 4%; left: 4%; }
+    .bento-badge.top-right { top: 4%; right: 4%; }
+    .bento-badge.bottom-left { bottom: 18%; left: 4%; }
+    .bento-badge.bottom-right { top: 28%; right: 4%; }
+
+    .bento-aroma-display {
+        right: 50%;
+        top: 50%;
+        transform: translate(50%, -50%);
+        background: rgba(250, 248, 245, 0.95);
+        border: 1px solid rgba(229, 224, 216, 0.8);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .bento-aroma-display .aroma-title { font-size: 20px; }
+
+    .bento-aroma-selector {
+        bottom: 4%;
+        right: 50%;
+        transform: translateX(50%);
+    }
+}
+</style>
+@endpush
+
 @section('title', \App\Models\Setting::get('site_name', 'BentoCat') . ' - Pasir Kucing Bentonit Premium')
 
 @section('content')
@@ -187,13 +365,80 @@
             @php $product = $products->first(); @endphp
             <div class="max-w-4xl mx-auto bg-white border border-[#e5e0d8]/80 rounded-[2.5rem] overflow-hidden group hover:border-amber-500/50 hover:shadow-xl transition-premium p-6 md:p-8">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                    <!-- Left: Large Image Container -->
-                    <div class="md:col-span-5 aspect-square bg-white rounded-3xl overflow-hidden border border-slate-100 flex items-center justify-center p-6 relative">
+                    <!-- Left: Large Image Showcase with Interactive Aromas -->
+                    <div class="md:col-span-5 aspect-square bg-[#FAF8F5]/50 rounded-[2.5rem] border border-[#e5e0d8] flex items-center justify-center p-6 relative overflow-hidden group">
+                        <!-- Dynamic Background Glow -->
+                        <div id="showcase-glow" class="absolute inset-0 bg-radial from-yellow-400/20 via-transparent to-transparent opacity-60 transition-all duration-700"></div>
+
+                        <!-- Floating Badges -->
+                        <div class="bento-badge top-left select-none pointer-events-none">
+                            <div class="bento-badge-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                            </div>
+                            Daya Serap<br>Maksimal
+                        </div>
+
+                        <div class="bento-badge top-right select-none pointer-events-none">
+                            <div class="bento-badge-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                            </div>
+                            Anti<br>Bakteri
+                        </div>
+
+                        <div class="bento-badge bottom-left select-none pointer-events-none">
+                            <div class="bento-badge-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg>
+                            </div>
+                            Bebas<br>Debu
+                        </div>
+
+                        <div class="bento-badge bottom-right select-none pointer-events-none">
+                            <div class="bento-badge-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13v-5h5a7 7 0 0 1 7 7v5h-5z"></path></svg>
+                            </div>
+                            100%<br>Natural
+                        </div>
+
+                        <!-- Product Image -->
                         @if($product->thumbnail)
-                            <img src="{{ asset($product->thumbnail) }}" alt="{{ $product->nama }}" class="w-full h-full object-contain group-hover:scale-[1.03] transition-premium">
+                            <img id="showcase-image" src="{{ asset($product->thumbnail) }}" alt="{{ $product->nama }}" class="product-image z-10 transition-premium max-w-[260px] md:max-w-[300px] object-contain">
                         @else
-                            <span class="text-6xl">🐈</span>
+                            <span class="text-6xl z-10">🐈</span>
                         @endif
+
+                        <!-- Aroma Text Display -->
+                        <div class="bento-aroma-display z-20">
+                            <div class="aroma-subtitle">Aroma</div>
+                            <div class="aroma-title text-yellow-400" id="showcase-aroma-text">LEMON</div>
+                        </div>
+
+                        <!-- Aroma Selector Dots (Generated dynamically based on Level 2 variants) -->
+                        <div class="bento-aroma-selector z-20">
+                            @php
+                                $lvl1 = $product->variants->whereNull('parent_id')->first();
+                                $aromas = $lvl1 ? $product->variants->where('parent_id', $lvl1->id)->where('level', 2) : collect();
+                                
+                                $colorMap = [
+                                    'lemon' => '#FDE047',
+                                    'strawberry' => '#F87171',
+                                    'melon' => '#4ADE80',
+                                    'lavender' => '#A78BFA',
+                                    'apple' => '#FB7185'
+                                ];
+                            @endphp
+                            @foreach($aromas as $index => $aroma)
+                                @php
+                                    $key = strtolower($aroma->nama);
+                                    $color = $colorMap[$key] ?? '#CBD5E1';
+                                    $isActive = $index === 0;
+                                @endphp
+                                <button class="bento-dot {{ $isActive ? 'active' : '' }}" 
+                                        style="background-color: {{ $color }};" 
+                                        data-aroma="{{ strtoupper($aroma->nama) }}" 
+                                        data-color="{{ $color }}"
+                                        title="{{ $aroma->nama }}"></button>
+                            @endforeach
+                        </div>
                     </div>
                     
                     <!-- Right: Product Information & CTAs -->
@@ -212,7 +457,7 @@
                         </div>
                         
                         <div class="pt-4 border-t border-slate-100">
-                            <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Varian Tersedia:</span>
+                            <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Seri Produk:</span>
                             <div class="flex flex-wrap gap-2">
                                 @forelse($product->variants->whereNull('parent_id') as $v1)
                                     <span class="bg-[#FAF8F5] hover:bg-amber-50 hover:text-amber-700 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-200/50 transition-premium cursor-default">{{ $v1->nama }}</span>
@@ -223,7 +468,7 @@
                         </div>
 
                         <div class="pt-4">
-                            <button onclick="openSearchModal()" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-md shadow-amber-500/10 transition-premium text-xs uppercase tracking-wider cursor-pointer">
+                            <button onclick="openSearchModalWithVariant({{ $product->id }}, '{{ $lvl1 ? $lvl1->nama : '' }}')" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-md shadow-amber-500/10 transition-premium text-xs uppercase tracking-wider cursor-pointer">
                                 <span>📍</span> Cari Toko Terdekat
                             </button>
                         </div>
@@ -488,6 +733,84 @@
             document.body.classList.add('overflow-hidden');
         }
     }
+
+    // Interactive Showcase & Variant Pre-selection Helpers
+    function openSearchModalWithVariant(productId, lvl1Name) {
+        const activeDot = document.querySelector('.bento-dot.active');
+        let aromaName = '';
+        if (activeDot) {
+            const rawAroma = activeDot.getAttribute('data-aroma');
+            // Casing match: Lemon, Strawberry, Melon, Lavender, Apple
+            aromaName = rawAroma.charAt(0).toUpperCase() + rawAroma.slice(1).toLowerCase();
+        }
+        
+        openSearchModal();
+        preselectProductAndVariant(productId, lvl1Name, aromaName);
+    }
+
+    function preselectProductAndVariant(productId, level1Name, level2Name) {
+        const prodSelect = document.getElementById('produk_id');
+        if (!prodSelect) return;
+        
+        prodSelect.value = productId;
+        // Trigger manual change event
+        onProductChange(productId);
+        
+        // Level 1 variant selection
+        setTimeout(() => {
+            const lvl1Select = document.getElementById('varian_level_1');
+            if (lvl1Select && level1Name) {
+                lvl1Select.value = level1Name;
+                onLevel1Change(level1Name);
+            }
+            
+            // Level 2 variant (Aroma) selection
+            setTimeout(() => {
+                const lvl2Select = document.getElementById('varian_level_2');
+                if (lvl2Select && level2Name) {
+                    lvl2Select.value = level2Name;
+                    onLevel2Change(level2Name);
+                }
+            }, 150);
+        }, 150);
+    }
+
+    // Initialize Bento Showcase Dot click handlers
+    document.addEventListener('DOMContentLoaded', () => {
+        const dots = document.querySelectorAll('.bento-dot');
+        const glow = document.getElementById('showcase-glow');
+        const aromaText = document.getElementById('showcase-aroma-text');
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                if (dot.classList.contains('active')) return;
+
+                // Toggle active state
+                dots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+
+                const aroma = dot.getAttribute('data-aroma');
+                const color = dot.getAttribute('data-color');
+
+                // 1. Update background glow with smooth transition
+                if (glow) {
+                    glow.style.backgroundImage = `radial-gradient(circle, ${color}33 0%, transparent 70%)`;
+                }
+
+                // 2. Liquid text transition (blur -> change text -> clear blur)
+                if (aromaText) {
+                    aromaText.classList.add('liquid-hidden');
+                    
+                    setTimeout(() => {
+                        aromaText.innerText = aroma;
+                        aromaText.style.color = color;
+                        aromaText.style.textShadow = `0 0 15px ${color}40`;
+                        aromaText.classList.remove('liquid-hidden');
+                    }, 400);
+                }
+            });
+        });
+    });
 
     function closeSearchModal() {
         const modal = document.getElementById('search-modal');
