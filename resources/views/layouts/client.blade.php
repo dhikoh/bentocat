@@ -22,8 +22,9 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #FAF8F5; /* Warm Ivory/Cream */
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
-                radial-gradient(circle at 90% 80%, rgba(13, 148, 136, 0.03) 0%, transparent 45%);
+                radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(13, 148, 136, 0.04) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23d97706' fill-opacity='0.025'%3E%3Cpath d='M15 15c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm4-4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 8c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1zm-16 0c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1zm6 3c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zM55 55c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm4-4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 8c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1zm-16 0c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1zm6 3c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z'/%3E%3C/g%3E%3C/svg%3E");
             background-attachment: fixed;
         }
 
@@ -67,16 +68,104 @@
         .animate-blob {
             animation: float-blob 8s ease-in-out infinite;
         }
+
+        /* Playful Floating Animations */
+        @keyframes float-gentle-1 {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-20px) rotate(8deg) scale(1.05); }
+        }
+        @keyframes float-gentle-2 {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1.02); }
+            50% { transform: translateY(-15px) rotate(-12deg) scale(0.98); }
+        }
+        @keyframes float-gentle-3 {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(0.95); }
+            50% { transform: translateY(-25px) rotate(15deg) scale(1.03); }
+        }
+        .animate-float-1 {
+            animation: float-gentle-1 10s ease-in-out infinite;
+        }
+        .animate-float-2 {
+            animation: float-gentle-2 12s ease-in-out infinite;
+        }
+        .animate-float-3 {
+            animation: float-gentle-3 14s ease-in-out infinite;
+        }
     </style>
     @yield('head')
     @stack('styles')
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-amber-100 selection:text-amber-900">
 
-    <!-- Floating Background Blobs -->
+    <!-- Floating Background Blobs & Playful Doodles -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <!-- Core soft blobs -->
         <div class="absolute top-1/4 -left-12 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl animate-blob"></div>
         <div class="absolute bottom-1/4 -right-12 w-96 h-96 bg-teal-500/4 rounded-full blur-3xl animate-blob" style="animation-delay: 4s;"></div>
+
+        <!-- Left Side Floating Doodles (Desktop Only) -->
+        <div class="hidden lg:block">
+            <!-- Playful Cat Head -->
+            <div class="absolute left-8 top-[18%] animate-float-1 opacity-20">
+                <svg class="w-14 h-14 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5c.67 0 1.35.09 2 .26L18.5 2 20 7.5c1.24 1.3 2 3.05 2 5 0 4.97-4.03 9-9 9s-9-4.03-9-9c0-1.95.76-3.7 2-5L5.5 2l4.5 3.26c.65-.17 1.33-.26 2-.26z" />
+                    <circle cx="9" cy="13" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="13" r="1" fill="currentColor"/>
+                    <path d="M12 15.5c-.5 0-.75-.25-.75-.5 0-.5.5-.75.75-.75s.75.25.75.75c0 .25-.25.5-.75.5z" fill="currentColor"/>
+                </svg>
+            </div>
+            <!-- Paw Print Left -->
+            <div class="absolute left-16 top-[48%] animate-float-2 opacity-15">
+                <svg class="w-10 h-10 text-teal-600" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="16" r="4" />
+                    <circle cx="7" cy="10" r="2" />
+                    <circle cx="11" cy="7" r="2" />
+                    <circle cx="16" cy="8" r="2" />
+                    <circle cx="20" cy="12" r="1.8" />
+                </svg>
+            </div>
+            <!-- Fish Skeleton Left -->
+            <div class="absolute left-10 top-[76%] animate-float-3 opacity-15">
+                <svg class="w-12 h-12 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12c4 4 14 4 18 0-4-4-14-4-18 0z" />
+                    <path d="M18 12l2.5 2.5M18 12l2.5-2.5" />
+                    <path d="M14 8v8M10 8v8M6 9v6" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Right Side Floating Doodles (Desktop Only) -->
+        <div class="hidden lg:block">
+            <!-- Yarn Ball Right -->
+            <div class="absolute right-10 top-[22%] animate-float-3 opacity-15">
+                <svg class="w-12 h-12 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 3a9 9 0 0 1 0 18" />
+                    <path d="M3 12a9 9 0 0 1 18 0" />
+                    <path d="M5.5 5.5c2.5 2.5 2.5 10.5 0 13" />
+                    <path d="M18.5 5.5c-2.5 2.5-2.5 10.5 0 13" />
+                </svg>
+            </div>
+            <!-- Playful Cat Sitting Right -->
+            <div class="absolute right-16 top-[52%] animate-float-1 opacity-20">
+                <svg class="w-14 h-14 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 18a4 4 0 0 0-8 0v2h8v-2z" />
+                    <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                    <path d="M9.5 4.5l-1-2 2 .5zM14.5 4.5l1-2-2 .5z" />
+                    <path d="M20 14c0-2-1.5-4-3.5-4h-9C5.5 10 4 12 4 14" />
+                </svg>
+            </div>
+            <!-- Paw Print Right -->
+            <div class="absolute right-8 top-[82%] animate-float-2 opacity-15">
+                <svg class="w-10 h-10 text-teal-600" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="16" r="4" />
+                    <circle cx="7" cy="10" r="2" />
+                    <circle cx="11" cy="7" r="2" />
+                    <circle cx="16" cy="8" r="2" />
+                    <circle cx="20" cy="12" r="1.8" />
+                </svg>
+            </div>
+        </div>
     </div>
 
     <!-- Header Navbar: Floating Pill Design -->
