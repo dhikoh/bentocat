@@ -10,32 +10,40 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Superadmin BentoCat',
-            'email' => 'admin@bentocat.id',
-            'password' => Hash::make('Bismillah@bentocat'),
-            'role' => 'superadmin'
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@bentocat.id'],
+            [
+                'name' => 'Superadmin BentoCat',
+                'password' => Hash::make('Bismillah@bentocat'),
+                'role' => 'superadmin'
+            ]
+        );
 
-        User::create([
-            'name' => 'Editor BentoCat',
-            'email' => 'editor@bentocat.id',
-            'password' => Hash::make('Bismillah@bentocat'),
-            'role' => 'editor'
-        ]);
+        User::updateOrCreate(
+            ['email' => 'editor@bentocat.id'],
+            [
+                'name' => 'Editor BentoCat',
+                'password' => Hash::make('Bismillah@bentocat'),
+                'role' => 'editor'
+            ]
+        );
 
-        User::create([
-            'name' => 'Contributor BentoCat',
-            'email' => 'contributor@bentocat.id',
-            'password' => Hash::make('Bismillah@bentocat'),
-            'role' => 'contributor'
-        ]);
+        User::updateOrCreate(
+            ['email' => 'contributor@bentocat.id'],
+            [
+                'name' => 'Contributor BentoCat',
+                'password' => Hash::make('Bismillah@bentocat'),
+                'role' => 'contributor'
+            ]
+        );
 
-        User::create([
-            'name' => 'Marketing BentoCat',
-            'email' => 'marketing@bentocat.id',
-            'password' => Hash::make('Bismillah@bentocat'),
-            'role' => 'marketing'
-        ]);
+        User::updateOrCreate(
+            ['email' => 'marketing@bentocat.id'],
+            [
+                'name' => 'Marketing BentoCat',
+                'password' => Hash::make('Bismillah@bentocat'),
+                'role' => 'marketing'
+            ]
+        );
     }
 }
