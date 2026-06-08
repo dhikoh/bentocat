@@ -9,6 +9,7 @@
     <link rel="canonical" href="{{ url()->current() }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ asset(\App\Models\Setting::get('site_favicon', 'favicon.ico')) }}">
+    <meta name="google-site-verification" content="vLLQmai7HLqZV9XOOBwgGMfep1huomQ9gXdsGSExzE8" />
 
     @if(\App\Models\Setting::get('meta_verification_id'))
     <meta name="facebook-domain-verification" content="{{ \App\Models\Setting::get('meta_verification_id') }}" />
