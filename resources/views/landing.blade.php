@@ -91,101 +91,158 @@
 
     <!-- 2. Keunggulan Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <style>
+            /* --- 1. MOLECULAR BONDING ANIMATIONS --- */
+            .water-trigger {
+                animation: waterHit 4s infinite linear;
+            }
+            .p-top { animation: snapTop 4s infinite cubic-bezier(0.16, 1, 0.3, 1); }
+            .p-left { animation: snapLeft 4s infinite cubic-bezier(0.16, 1, 0.3, 1); }
+            .p-right { animation: snapRight 4s infinite cubic-bezier(0.16, 1, 0.3, 1); }
+            .bond-line { animation: bondFlash 4s infinite linear; }
+            .charge-plus { animation: chargePop 4s infinite ease-out; }
+            
+            @keyframes waterHit {
+                0% { transform: translateY(0); opacity: 0; }
+                10% { transform: translateY(0); opacity: 1; }
+                30% { transform: translateY(70px); opacity: 1; }
+                31% { transform: translateY(70px); opacity: 0; }
+                100% { transform: translateY(70px); opacity: 0; }
+            }
+            @keyframes snapTop {
+                0%, 30% { transform: translateY(0); fill: #cbd5e1; }
+                40%, 80% { transform: translateY(40px); fill: #1e293b; }
+                100% { transform: translateY(0); fill: #cbd5e1; }
+            }
+            @keyframes snapLeft {
+                0%, 30% { transform: translate(0,0); fill: #cbd5e1; }
+                40%, 80% { transform: translate(20px, -40px); fill: #1e293b; }
+                100% { transform: translate(0,0); fill: #cbd5e1; }
+            }
+            @keyframes snapRight {
+                0%, 30% { transform: translate(0,0); fill: #cbd5e1; }
+                40%, 80% { transform: translate(-20px, -40px); fill: #1e293b; }
+                100% { transform: translate(0,0); fill: #cbd5e1; }
+            }
+            @keyframes bondFlash {
+                0%, 35% { opacity: 0; }
+                40%, 80% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+            @keyframes chargePop {
+                0%, 40% { opacity: 0; transform: scale(0); }
+                45%, 75% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0; transform: scale(0); }
+            }
+            @keyframes textInactive {
+                0%, 39% { opacity: 0.5; }
+                40%, 100% { opacity: 0; }
+            }
+            @keyframes textLocked {
+                0%, 39% { opacity: 0; }
+                40%, 80% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+            .status-text-inactive { animation: textInactive 4s infinite steps(1); }
+            .status-text-locked { animation: textLocked 4s infinite steps(1); }
+
+            /* --- 2. DUSTING ANIMATIONS --- */
+            .sand-particle { animation: fallThrough 3s infinite linear; }
+            .dust-particle { animation: fallBlock 3s infinite ease-in; transform-origin: center; }
+            .p1 { animation-delay: 0s; } .p2 { animation-delay: 1s; } .p3 { animation-delay: 0.5s; }
+            .d1 { animation-delay: 0.2s; } .d2 { animation-delay: 1.2s; } .d3 { animation-delay: 0.7s; }
+
+            @keyframes fallThrough {
+                0% { transform: translateY(0); opacity: 1; }
+                100% { transform: translateY(150px); opacity: 1; }
+            }
+            @keyframes fallBlock {
+                0% { transform: translateY(0); opacity: 1; }
+                40% { transform: translateY(50px); opacity: 1; }
+                50% { transform: translateY(45px) translateX(10px); opacity: 0.5; }
+                60% { transform: translateY(40px) translateX(15px) scale(0); opacity: 0; }
+                100% { opacity: 0; }
+            }
+
+            /* --- 3. ODOR ANIMATIONS --- */
+            .bad-molecule { animation: badRise 5s infinite linear; transform-origin: center; }
+            .bad-aura { animation: pulseAura 1s infinite alternate; }
+            .hero-carbon { animation: carbonAttack 5s infinite cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center; }
+            .trap-ring { animation: trapLock 5s infinite; transform-origin: 100px 110px; }
+            .fresh-bloom { animation: freshExplode 5s infinite; transform-origin: 100px 110px; }
+
+            @keyframes badRise {
+                0% { opacity: 0; transform: scale(0) translateY(20px); }
+                20% { opacity: 1; transform: scale(1) translateY(0); }
+                40% { opacity: 1; transform: scale(1) translateY(-10px); }
+                45% { opacity: 0; transform: scale(0); }
+                100% { opacity: 0; }
+            }
+            @keyframes pulseAura { from { opacity: 0.2; transform: scale(1); } to { opacity: 0.5; transform: scale(1.2); } }
+            @keyframes carbonAttack {
+                0% { transform: translateY(0); opacity: 0; }
+                20% { opacity: 1; }
+                40% { transform: translateY(90px) scale(1.2); }
+                45% { transform: translateY(90px) scale(1); }
+                50% { opacity: 1; transform: translateY(90px); }
+                60% { opacity: 0; transform: translateY(90px) scale(1.5); }
+                100% { opacity: 0; }
+            }
+            @keyframes trapLock {
+                0%, 40% { transform: scale(1.5); opacity: 0; }
+                45% { transform: scale(1); opacity: 1; stroke: #3b82f6; }
+                55% { transform: scale(0.8); opacity: 0; }
+                100% { opacity: 0; }
+            }
+            @keyframes freshExplode {
+                0%, 55% { transform: scale(0); opacity: 0; }
+                60% { transform: scale(1.2); opacity: 1; }
+                70% { transform: scale(1); opacity: 1; }
+                90% { transform: scale(1.5) rotate(45deg); opacity: 0; }
+                100% { opacity: 0; }
+            }
+        </style>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Feature 1: Molecular Bonding -->
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-amber-500/30 transition-premium space-y-6 flex flex-col justify-between group">
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-blue-500/30 transition-premium space-y-6 flex flex-col justify-between group">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                            {{ \App\Models\Setting::get('feature_1_icon', '⚡') }}
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 w-8 h-8"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.29-2.29 3.21S3 10.79 3 11.95c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.5c1.37 0 2.5-1.14 2.5-2.53 0-.72-.35-1.41-1.07-2S17.18 12.53 17 11.62c-.18.91-.71 1.77-1.43 2.35s-1.07 1.12-1.07 1.84c0 1.39 1.13 2.53 2.5 2.53z"/></svg>
                         </div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full font-bold">Instan & Padat</span>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-bold">Instan & Padat</span>
                     </div>
                     
-                    <!-- Diagram Schematic: Molecular Lattice & Litter Scoop -->
-                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative">
-                        <svg class="w-full h-28 text-amber-500" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Diagram Schematic: Molecular Grid Lattice (taken from C://Users//Dhiko Herlambang//Downloads//bentocat_refined_v20) -->
+                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-blue-50/30 transition-all duration-500">
+                        <svg viewBox="0 0 200 150" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
                             <defs>
-                                <filter id="glow-amber" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feGaussianBlur stdDeviation="3" result="blur" />
-                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                                </filter>
-                                <linearGradient id="dropGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.8" />
-                                    <stop offset="100%" stop-color="#2563eb" stop-opacity="1" />
-                                </linearGradient>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5" />
+                                </pattern>
                             </defs>
-                            
-                            <!-- Loose sand bed at the bottom -->
-                            <g fill="#e2e8f0">
-                                <circle cx="20" cy="85" r="2" /> <circle cx="35" cy="88" r="1.5" />
-                                <circle cx="50" cy="84" r="2.5" /> <circle cx="65" cy="87" r="1.8" />
-                                <circle cx="135" cy="87" r="2" /> <circle cx="150" cy="85" r="1.5" />
-                                <circle cx="165" cy="88" r="2.2" /> <circle cx="180" cy="84" r="1.8" />
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                            <g class="bonding-group">
+                                <line x1="100" y1="90" x2="70" y2="120" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
+                                <line x1="100" y1="90" x2="130" y2="120" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
+                                <line x1="70" y1="120" x2="130" y2="120" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
+                                <line x1="100" y1="90" x2="100" y2="50" class="bond-line" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 1" />
+                                <circle cx="100" cy="50" r="12" fill="#cbd5e1" class="particle p-top" />
+                                <circle cx="50" cy="130" r="12" fill="#cbd5e1" class="particle p-left" />
+                                <circle cx="150" cy="130" r="12" fill="#cbd5e1" class="particle p-right" />
+                                <circle cx="100" cy="90" r="10" fill="#94a3b8" class="particle p-center" opacity="0.5" />
+                                <text x="100" y="54" text-anchor="middle" font-size="10" fill="white" class="charge-plus" opacity="0">+</text>
+                                <text x="70" y="124" text-anchor="middle" font-size="10" fill="white" class="charge-plus" opacity="0">+</text>
+                                <text x="130" y="124" text-anchor="middle" font-size="10" fill="white" class="charge-plus" opacity="0">+</text>
                             </g>
-
-                            <!-- Liquid Droplets falling (Instant Absorption) -->
-                            <path d="M 100,5 Q 100,12 100,14" fill="none" stroke="url(#dropGrad)" stroke-width="2.5" stroke-linecap="round" class="water-drop-1" />
-                            <path d="M 104,12 Q 104,18 104,20" fill="none" stroke="url(#dropGrad)" stroke-width="1.8" stroke-linecap="round" class="water-drop-2" />
-
-                            <!-- Litter Scoop (Serokan Pasir) lifting the clump -->
-                            <g stroke="#cbd5e1" stroke-width="1.5" fill="none" stroke-linecap="round" class="scoop-lift">
-                                <!-- Scoop Frame -->
-                                <path d="M 55,50 L 65,75 L 135,75 L 145,50" />
-                                <!-- Scoop Grills -->
-                                <line x1="75" y1="75" x2="70" y2="52" />
-                                <line x1="87" y1="75" x2="85" y2="52" />
-                                <line x1="100" y1="75" x2="100" y2="52" />
-                                <line x1="113" y1="75" x2="115" y2="52" />
-                                <line x1="125" y1="75" x2="130" y2="52" />
-                                <!-- Scoop Handle -->
-                                <path d="M 55,50 Q 40,45 25,48" stroke-width="2.5" />
-                            </g>
-
-                            <!-- Glowing Bonded Clump sitting securely inside the scoop -->
-                            <g class="scoop-lift">
-                                <!-- Golden clump outline -->
-                                <circle cx="100" cy="58" r="18" fill="#fef3c7" stroke="currentColor" stroke-width="2" filter="url(#glow-amber)" />
-                                <!-- Internal molecular bonds -->
-                                <g stroke="currentColor" stroke-width="1.2">
-                                    <line x1="90" y1="52" x2="100" y2="46" />
-                                    <line x1="100" y1="46" x2="110" y2="52" />
-                                    <line x1="110" y1="52" x2="110" y2="64" />
-                                    <line x1="110" y1="64" x2="100" y2="70" />
-                                    <line x1="100" y1="70" x2="90" y2="64" />
-                                    <line x1="90" y1="64" x2="90" y2="52" />
-                                    <line x1="90" y1="52" x2="100" y2="58" />
-                                    <line x1="110" y1="52" x2="100" y2="58" />
-                                    <line x1="100" y1="70" x2="100" y2="58" />
-                                </g>
-                                <!-- Bond points -->
-                                <circle cx="100" cy="58" r="3" fill="currentColor" />
-                                <circle cx="90" cy="52" r="2" fill="currentColor" />
-                                <circle cx="100" cy="46" r="2" fill="currentColor" />
-                                <circle cx="110" cy="52" r="2" fill="currentColor" />
-                                <circle cx="110" cy="64" r="2" fill="currentColor" />
-                                <circle cx="100" cy="70" r="2" fill="currentColor" />
-                                <circle cx="90" cy="64" r="2" fill="currentColor" />
-                            </g>
+                            <circle cx="100" cy="20" r="5" fill="#3b82f6" class="water-trigger" />
+                            <text x="100" y="140" text-anchor="middle" font-size="8" fill="#3b82f6" font-weight="bold" letter-spacing="1" class="status-text-inactive">BONDING INACTIVE</text>
+                            <text x="100" y="140" text-anchor="middle" font-size="8" fill="#1e293b" font-weight="bold" letter-spacing="1" class="status-text-locked" opacity="0">LATTICE LOCKED</text>
                         </svg>
-                        <style>
-                            @keyframes dropFall {
-                                0% { transform: translateY(-20px); opacity: 0; }
-                                20% { opacity: 1; }
-                                70% { transform: translateY(25px); opacity: 0; }
-                                100% { transform: translateY(25px); opacity: 0; }
-                            }
-                            @keyframes scoopWobble {
-                                0%, 100% { transform: translateY(0) rotate(0deg); }
-                                50% { transform: translateY(-4px) rotate(0.5deg); }
-                            }
-                            .water-drop-1 { animation: dropFall 2s ease-in infinite; }
-                            .water-drop-2 { animation: dropFall 2s ease-in infinite; animation-delay: 0.4s; }
-                            .scoop-lift { animation: scoopWobble 4s ease-in-out infinite; }
-                        </style>
                     </div>
 
-                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-amber-600 transition-premium">
+                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-blue-600 transition-premium">
                         {{ \App\Models\Setting::get('feature_1_title', 'Molecular Bonding') }}
                     </h3>
                     <p class="text-xs text-slate-500 leading-relaxed">
@@ -195,97 +252,42 @@
             </div>
 
             <!-- Feature 2: Zero-Dust Tech -->
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-premium space-y-6 flex flex-col justify-between group">
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-cyan-500/30 transition-premium space-y-6 flex flex-col justify-between group">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                            {{ \App\Models\Setting::get('feature_2_icon', '🍃') }}
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-500 w-8 h-8"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg>
                         </div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full font-bold">99.9% Bebas Debu</span>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-cyan-600 bg-cyan-50 px-2.5 py-1 rounded-full font-bold">99.9% Bebas Debu</span>
                     </div>
 
-                    <!-- Diagram Schematic: Clean Paw Print & Wind Blow -->
-                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative">
-                        <svg class="w-full h-28 text-emerald-500" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Diagram Schematic: Zero-Dust Fall & Filter -->
+                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-cyan-50/30 transition-all duration-500">
+                        <svg viewBox="0 0 200 150" class="w-full h-full">
                             <defs>
-                                <filter id="glow-emerald" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feGaussianBlur stdDeviation="2.5" result="blur" />
-                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                                </filter>
+                                <linearGradient id="cleanZone" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#06b6d4" />
+                                    <stop offset="100%" stop-color="#fff" />
+                                </linearGradient>
                             </defs>
-                            <!-- Sand floor -->
-                            <line x1="20" y1="80" x2="180" y2="80" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3" />
-                            
-                            <!-- Clean Cat Paw Print (centered) -->
-                            <g fill="currentColor" opacity="0.15" class="paw-print">
-                                <!-- Main pad -->
-                                <path d="M 100,75 C 93,75 88,70 88,64 C 88,57 93,52 100,52 C 107,52 112,57 112,64 C 112,70 107,75 100,75 Z" />
-                                <!-- 4 toe pads -->
-                                <circle cx="86" cy="46" r="4.5" />
-                                <circle cx="95" cy="41" r="5" />
-                                <circle cx="105" cy="41" r="5" />
-                                <circle cx="114" cy="46" r="4.5" />
+                            <line x1="0" y1="75" x2="200" y2="75" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4 2" opacity="0.6" />
+                            <rect x="0" y="75" width="200" height="75" fill="url(#cleanZone)" opacity="0.1" />
+                            <g class="sand-fall-group">
+                                <circle cx="60" cy="20" r="6" fill="#64748b" class="sand-particle p1" />
+                                <circle cx="100" cy="0" r="7" fill="#64748b" class="sand-particle p2" />
+                                <circle cx="140" cy="30" r="6" fill="#64748b" class="sand-particle p3" />
                             </g>
-
-                            <!-- Protective Shield (Forcefield) enclosing the paw -->
-                            <path d="M 65,80 A 35,35 0 0,1 135,80" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2" class="animate-pulse" filter="url(#glow-emerald)" />
-                            
-                            <!-- Fresh air wind waves pushing dust away -->
-                            <path d="M 30,30 Q 60,15 100,25 T 170,15" fill="none" stroke="#6ee7b7" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="8 6" class="wind-flow" />
-                            <path d="M 40,45 Q 70,30 110,40 T 160,30" fill="none" stroke="#6ee7b7" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 8" class="wind-flow" style="animation-delay: 0.5s;" />
-
-                            <!-- Tiny floating leaves (relevan) in the breeze -->
-                            <g fill="#34d399" class="wind-leaf-1">
-                                <path d="M 50,22 C 55,22 58,25 55,28 C 50,28 47,25 50,22 Z" />
+                            <g class="dust-block-group">
+                                <circle cx="75" cy="25" r="2" fill="#ef4444" class="dust-particle d1" />
+                                <circle cx="90" cy="15" r="2" fill="#ef4444" class="dust-particle d2" />
+                                <circle cx="125" cy="35" r="2" fill="#ef4444" class="dust-particle d3" />
                             </g>
-                            <g fill="#34d399" class="wind-leaf-2">
-                                <path d="M 140,25 C 145,25 148,28 145,31 C 140,31 137,28 140,25 Z" />
-                            </g>
-
-                            <!-- Dust particles being swept away (outside the shield) -->
-                            <circle cx="35" cy="65" r="2" fill="#94a3b8" class="dust-particle" style="--dx: -15px; --dy: -10px; animation-duration: 2.2s;" />
-                            <circle cx="45" cy="55" r="1.5" fill="#94a3b8" class="dust-particle" style="--dx: -20px; --dy: -15px; animation-duration: 1.8s;" />
-                            <circle cx="155" cy="60" r="2.2" fill="#94a3b8" class="dust-particle" style="--dx: 25px; --dy: -12px; animation-duration: 2.5s; animation-delay: 0.3s;" />
-                            <circle cx="165" cy="50" r="1.8" fill="#94a3b8" class="dust-particle" style="--dx: 20px; --dy: -18px; animation-duration: 2s; animation-delay: 0.6s;" />
+                            <text x="180" y="70" text-anchor="end" font-size="10" fill="#ef4444" opacity="0.8">FILTERED</text>
+                            <text x="180" y="140" text-anchor="end" font-size="10" fill="#06b6d4" font-weight="bold">CLEAN</text>
                         </svg>
-                        <style>
-                            @keyframes windMove {
-                                to { stroke-dashoffset: -30; }
-                            }
-                            .wind-flow {
-                                animation: windMove 3s linear infinite;
-                            }
-                            @keyframes leafFloat1 {
-                                0%, 100% { transform: translate(0,0) rotate(0deg); }
-                                50% { transform: translate(15px, -5px) rotate(15deg); }
-                            }
-                            @keyframes leafFloat2 {
-                                0%, 100% { transform: translate(0,0) rotate(0deg); }
-                                50% { transform: translate(-15px, 5px) rotate(-15deg); }
-                            }
-                            .wind-leaf-1 { animation: leafFloat1 4s ease-in-out infinite; }
-                            .wind-leaf-2 { animation: leafFloat2 3.5s ease-in-out infinite; }
-                            
-                            @keyframes dustSweep {
-                                0% { transform: translate(0,0); opacity: 0; }
-                                20% { opacity: 0.8; }
-                                80% { transform: translate(var(--dx), var(--dy)); opacity: 0.2; }
-                                100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
-                            }
-                            .dust-particle {
-                                animation: dustSweep infinite linear;
-                            }
-                            @keyframes pawPulse {
-                                0%, 100% { transform: scale(1); opacity: 0.15; transform-origin: 100px 58px; }
-                                50% { transform: scale(1.05); opacity: 0.25; transform-origin: 100px 58px; }
-                            }
-                            .paw-print {
-                                animation: pawPulse 3s ease-in-out infinite;
-                            }
-                        </style>
                     </div>
 
-                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-emerald-600 transition-premium">
+                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-cyan-600 transition-premium">
                         {{ \App\Models\Setting::get('feature_2_title', 'Zero-Dust Tech') }}
                     </h3>
                     <p class="text-xs text-slate-500 leading-relaxed">
@@ -295,90 +297,39 @@
             </div>
 
             <!-- Feature 3: Odor Encapsulation -->
-            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-teal-500/30 transition-premium space-y-6 flex flex-col justify-between group">
+            <div class="bg-white border border-[#e5e0d8]/80 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-purple-500/30 transition-premium space-y-6 flex flex-col justify-between group">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
-                            {{ \App\Models\Setting::get('feature_3_icon', '🌸') }}
+                        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-xl group-hover:scale-110 transition-premium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-500 w-8 h-8"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 5.5-2a1 1 0 0 1 1 0c1 .8 3.5 2 5.5 2a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
                         </div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full font-bold">Kontrol Bau Maksimal</span>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full font-bold">Kontrol Bau Maksimal</span>
                     </div>
 
-                    <!-- Diagram Schematic: Active Carbon Hexagon & Aroma Emission -->
-                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative">
-                        <svg class="w-full h-28 text-teal-500" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <filter id="glow-teal" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feGaussianBlur stdDeviation="3" result="blur" />
-                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                                </filter>
-                            </defs>
-
-                            <!-- Rising Ammonia (NH3) Odor molecules (from bottom-left and bottom-right) -->
-                            <g stroke="#cbd5e1" stroke-width="1.2" fill="none" stroke-linecap="round">
-                                <path d="M 25,95 Q 35,75 30,60 T 45,45" class="odor-wave" style="animation-delay: 0s;" />
-                                <path d="M 45,95 Q 50,80 48,65 T 60,50" class="odor-wave" style="animation-delay: 0.4s;" />
-                                <path d="M 155,95 Q 150,80 152,65 T 140,50" class="odor-wave" style="animation-delay: 0.2s;" />
-                                <path d="M 175,95 Q 165,75 170,60 T 155,45" class="odor-wave" style="animation-delay: 0.6s;" />
+                    <!-- Diagram Schematic: Active Carbon Encapsulation -->
+                    <div class="w-full h-32 rounded-2xl bg-slate-50/50 border border-slate-100 flex items-center justify-center p-2 overflow-hidden relative group-hover:bg-purple-50/30 transition-all duration-500">
+                        <svg viewBox="0 0 200 150" class="w-full h-full overflow-visible">
+                            <!-- Odor ammonia gas molecules -->
+                            <path d="M90 120 L110 120 L100 100 Z" fill="#22c55e" class="bad-molecule" />
+                            <circle cx="100" cy="115" r="15" fill="#22c55e" opacity="0.3" class="bad-aura" />
+                            <!-- Active Carbon (Grouped with text C to animate together) -->
+                            <g class="hero-carbon">
+                                <circle cx="100" cy="20" r="25" fill="#3b82f6" />
+                                <text x="100" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="white">C</text>
                             </g>
-                            <!-- NH3 Labels -->
-                            <text x="22" y="90" fill="#94a3b8" font-size="6" font-family="monospace">NH₃</text>
-                            <text x="168" y="90" fill="#94a3b8" font-size="6" font-family="monospace">NH₃</text>
-
-                            <!-- Active Carbon Hexagon (Encapsulator) -->
-                            <g class="carbon-core">
-                                <polygon points="100,20 125,35 125,65 100,80 75,65 75,35" fill="#f0fdfa" stroke="currentColor" stroke-width="2.5" filter="url(#glow-teal)" />
-                                <polygon points="100,26 120,38 120,62 100,74 80,62 80,38" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3" />
-                                <!-- Lock symbol inside -->
-                                <path d="M 96,48 L 104,48 L 104,54 L 96,54 Z M 97,48 A 3,3 0 0,1 103,48" stroke="currentColor" stroke-width="1.2" fill="none" />
-                                <circle cx="100" cy="51" r="0.8" fill="currentColor" />
-                            </g>
-
-                            <!-- Sweet Fragrance / Aroma emitting from the top (sakura petals, sparkles) -->
-                            <g fill="#ec4899" class="aroma-sparkle">
-                                <!-- Sakura Petal 1 -->
-                                <path d="M 100,10 C 97,5 100,0 103,0 C 103,5 100,10 100,10 Z" transform="translate(0, 10) rotate(15 100 10)" />
-                                <!-- Sakura Petal 2 -->
-                                <path d="M 85,15 C 82,10 85,5 88,5 C 88,10 85,15 85,15 Z" transform="translate(0, 5) rotate(-30 85 15)" />
-                                <!-- Sakura Petal 3 -->
-                                <path d="M 115,15 C 112,10 115,5 118,5 C 118,10 115,15 115,15 Z" transform="translate(0, 5) rotate(45 115 15)" />
-                            </g>
-                            <!-- Sparkles -->
-                            <g fill="#eab308" class="aroma-sparkle" style="animation-delay: 0.5s;">
-                                <path d="M 92,20 L 94,22 L 92,24 L 90,22 Z" />
-                                <path d="M 108,18 L 110,20 L 108,22 L 106,20 Z" />
+                            <!-- Encapsulating rings -->
+                            <circle cx="100" cy="110" r="28" fill="none" stroke="#3b82f6" stroke-width="3" class="trap-ring" opacity="0" />
+                            <!-- Fresh smell emitting bloom -->
+                            <g class="fresh-bloom" opacity="0">
+                                <circle cx="100" cy="110" r="8" fill="#f472b6" />
+                                <path d="M100 100 L100 90 M100 120 L100 130 M90 110 L80 110 M110 110 L120 110" stroke="#f472b6" stroke-width="2" />
+                                <circle cx="80" cy="90" r="3" fill="#f472b6" />
+                                <circle cx="120" cy="90" r="3" fill="#f472b6" />
                             </g>
                         </svg>
-                        <style>
-                            @keyframes odorDisappear {
-                                0% { stroke-dasharray: 0 100; stroke-dashoffset: 0; opacity: 0; }
-                                50% { stroke-dasharray: 50 100; opacity: 0.8; }
-                                100% { stroke-dasharray: 100 100; stroke-dashoffset: -100; opacity: 0; }
-                            }
-                            .odor-wave {
-                                animation: odorDisappear 3s linear infinite;
-                            }
-                            @keyframes aromaEmit {
-                                0% { transform: translateY(15px) scale(0.6); opacity: 0; }
-                                50% { opacity: 1; }
-                                100% { transform: translateY(-20px) scale(1.1); opacity: 0; }
-                            }
-                            .aroma-sparkle {
-                                animation: aromaEmit 2.5s ease-out infinite;
-                                transform-origin: 100px 30px;
-                            }
-                            @keyframes pulseCarbon {
-                                0%, 100% { transform: scale(1); }
-                                50% { transform: scale(1.03); }
-                            }
-                            .carbon-core {
-                                animation: pulseCarbon 4s ease-in-out infinite;
-                                transform-origin: 100px 50px;
-                            }
-                        </style>
                     </div>
 
-                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-teal-600 transition-premium">
+                    <h3 class="font-outfit font-black text-xl text-slate-900 group-hover:text-purple-600 transition-premium">
                         {{ \App\Models\Setting::get('feature_3_title', 'Odor Encapsulation') }}
                     </h3>
                     <p class="text-xs text-slate-500 leading-relaxed">
@@ -387,9 +338,7 @@
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- 3. Katalog Section -->
+    </section><!-- 3. Katalog Section -->
     <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-28 space-y-12">
         <div class="text-center space-y-3">
             <h2 class="font-outfit font-black text-3xl sm:text-4xl text-slate-900">Katalog BentoCat Premium</h2>
