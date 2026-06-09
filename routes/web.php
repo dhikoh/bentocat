@@ -36,6 +36,10 @@ Route::redirect('/tentang-kami.html', '/', 301);
 Route::redirect('/bentocat-5-liter.html', '/', 301);
 Route::redirect('/bentocat-10-liter.html', '/', 301);
 Route::redirect('/bentocat-25-liter.html', '/', 301);
+Route::redirect('/sitemaps.xml', '/sitemap.xml', 301);
+Route::get('/assets/images/{any}', function () {
+    return redirect('/images/product_default.png', 301);
+})->where('any', '.*');
 
 // Sitemap
 Route::get('/sitemap.xml', [ClientController::class, 'sitemap'])->name('sitemap');
