@@ -35,6 +35,17 @@ class RestrictMarketingRole
                 'admin.my-logs.edit',
                 'admin.my-logs.update',
                 'admin.my-logs.destroy',
+                // Prompt Generator & Templates
+                'admin.prompt-generator.index',
+                'admin.prompt-generator.save-product',
+                'admin.prompt-generator.generate',
+                'admin.prompt-generator.download',
+                'admin.prompt-generator.templates.index',
+                'admin.prompt-generator.templates.create',
+                'admin.prompt-generator.templates.store',
+                'admin.prompt-generator.templates.edit',
+                'admin.prompt-generator.templates.update',
+                'admin.prompt-generator.templates.destroy',
             ];
 
             // Check if route is an article route (CMS)

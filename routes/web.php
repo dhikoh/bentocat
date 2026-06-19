@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\MarketingLogController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PromptGeneratorController;
 use App\Http\Controllers\ClientController;
 
 // Public client routes (Fase 3 & 4)
@@ -120,10 +121,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/my-logs/{log}', [MarketingLogController::class, 'update'])->name('my-logs.update');
         Route::delete('/my-logs/{log}', [MarketingLogController::class, 'destroy'])->name('my-logs.destroy');
 
-        // Superadmin and Marketing (SEO / Pixel Settings)
+        // Superadmin and Marketing (SEO / Pixel Settings & Prompt Generator)
         Route::middleware('role:superadmin,marketing')->group(function () {
             Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
             Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+            // Prompt Generator & Templates
+            Route::get('/prompt-generator', [PromptGeneratorController::class, 'index'])->name('prompt-generator.index');
+            Route::post('/prompt-generator/save-product', [PromptGeneratorController::class, 'saveProduct'])->name('prompt-generator.save-product');
+            Route::post('/prompt-generator/generate', [PromptGeneratorController::class, 'generate'])->name('prompt-generator.generate');
+            Route::get('/prompt-generator/download', [PromptGeneratorController::class, 'downloadHandbook'])->name('prompt-generator.download');
+            
+            // CRUD Marketing Templates
+            Route::get('/prompt-generator/templates', [PromptGeneratorController::class, 'indexTemplates'])->name('prompt-generator.templates.index');
+            Route::get('/prompt-generator/templates/create', [PromptGeneratorController::class, 'createTemplate'])->name('prompt-generator.templates.create');
+            Route::post('/prompt-generator/templates', [PromptGeneratorController::class, 'storeTemplate'])->name('prompt-generator.templates.store');
+            Route::get('/prompt-generator/templates/{template}/edit', [PromptGeneratorController::class, 'editTemplate'])->name('prompt-generator.templates.edit');
+            Route::put('/prompt-generator/templates/{template}', [PromptGeneratorController::class, 'updateTemplate'])->name('prompt-generator.templates.update');
+            Route::delete('/prompt-generator/templates/{template}', [PromptGeneratorController::class, 'destroyTemplate'])->name('prompt-generator.templates.destroy');
         });
 
         // Superadmin only (Monitor logs & User accounts)

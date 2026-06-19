@@ -199,6 +199,9 @@
             <div class="pt-4 pb-1">
                 <p class="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">Sistem</p>
             </div>
+            <a href="{{ route('admin.prompt-generator.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.prompt-generator.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                <span class="text-lg">🤖</span> Asisten Prompt AI
+            </a>
             <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium {{ Route::is('admin.settings.*') ? 'bg-amber-500/10 border-l-4 border-amber-500 text-amber-400 font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
                 <span class="text-lg">⚙️</span> Pengaturan Web
             </a>
