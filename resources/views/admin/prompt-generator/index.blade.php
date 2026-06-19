@@ -87,6 +87,13 @@
                             </select>
                         </div>
 
+                        <!-- Customer Chat Input -->
+                        <div class="space-y-2">
+                            <label for="customer_chat" class="block text-sm font-semibold text-slate-300">Salinan Chat / Pesan Masuk (Opsional)</label>
+                            <textarea id="customer_chat" name="customer_chat" rows="3" placeholder="Tempel (paste) chat dari WhatsApp, DM Instagram, atau Email customer di sini jika ingin AI merespons pesan tersebut..." class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-white text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition">{{ old('customer_chat') }}</textarea>
+                            <p class="text-xs text-slate-500">Gunakan kolom ini jika Anda ingin AI menyusun draf balasan untuk pesan riil pelanggan.</p>
+                        </div>
+
                         <!-- Dynamic Variables Fields (Populated by JS) -->
                         <div id="dynamic-variables-section" class="hidden space-y-4 p-4 bg-slate-950/40 border border-slate-800/80 rounded-2xl">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">Variabel Template Dinamis</h3>

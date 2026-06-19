@@ -106,7 +106,7 @@ class AdminPromptGeneratorTest extends TestCase
             'base_prompt' => 'Tawarkan ke {nama_petshop} dengan harga {harga}.'
         ]);
 
-        // Test HTML Response
+        // Test HTML Response with customer_chat
         $response = $this->actingAs($admin)->post('/admin/prompt-generator/generate', [
             'template_id' => $template->id,
             'target_audience' => 'Owner Petshop Bandung',
@@ -117,7 +117,8 @@ class AdminPromptGeneratorTest extends TestCase
                 'nama_petshop' => 'Miau Petshop',
                 'harga' => 'Rp 50.000'
             ],
-            'custom_notes' => 'Tambahkan promo buy 10 get 1'
+            'custom_notes' => 'Tambahkan promo buy 10 get 1',
+            'customer_chat' => 'Halo BentoCat, saya tertarik bermitra untuk Petshop saya.'
         ]);
 
         $response->assertRedirect('/admin/prompt-generator');
@@ -129,6 +130,8 @@ class AdminPromptGeneratorTest extends TestCase
         $this->assertStringContainsString('B2B', $prompt);
         $this->assertStringContainsString('Owner Petshop Bandung', $prompt);
         $this->assertStringContainsString('Tambahkan promo buy 10 get 1', $prompt);
+        $this->assertStringContainsString('Halo BentoCat, saya tertarik bermitra untuk Petshop saya.', $prompt);
+        $this->assertStringContainsString('PESAN / CHAT MASUK DARI CUSTOMER', $prompt);
     }
 
     public function test_can_generate_prompt_via_ajax()
@@ -317,5 +320,11 @@ class AdminPromptGeneratorTest extends TestCase
         $response = $this->actingAs($marketing)->delete("/admin/prompt-generator/templates/{$mTemplate->id}");
         $response->assertRedirect('/admin/prompt-generator/templates');
         $this->assertDatabaseMissing('marketing_templates', ['name' => 'Updated Marketing Template']);
+    }
+
+    public function test_marketing_template_seeder_runs_successfully()
+    {
+        $this->seed(\Database\Seeders\MarketingTemplateSeeder::class);
+        $this->assertDatabaseCount('marketing_templates', 8);
     }
 }

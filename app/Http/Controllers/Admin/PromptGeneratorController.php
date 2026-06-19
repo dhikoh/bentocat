@@ -56,6 +56,7 @@ class PromptGeneratorController extends Controller
             'length' => 'required|string',
             'variables' => 'nullable|array',
             'custom_notes' => 'nullable|string',
+            'customer_chat' => 'nullable|string',
         ]);
 
         $template = MarketingTemplate::findOrFail($request->template_id);
@@ -75,6 +76,14 @@ class PromptGeneratorController extends Controller
         // Construct the prompt string
         $finalPrompt = "### SYSTEM INSTRUCTION & ROLE\n";
         $finalPrompt .= "Anda adalah asisten AI Pemasaran BentoCat ahli. Anda harus merespons instruksi ini secara akurat dengan merujuk dan menerapkan strategi-strategi yang tertulis dalam berkas \"marketing_skills_handbook.md\" yang diunggah oleh pengguna.\n\n";
+
+        // Check if there is incoming customer chat
+        if (!empty($request->customer_chat)) {
+            $finalPrompt .= "### PESAN / CHAT MASUK DARI CUSTOMER (KONTEKS PERCAKAPAN)\n";
+            $finalPrompt .= $request->customer_chat . "\n\n";
+            $finalPrompt .= "### TUGAS KHUSUS RESPONS CHAT\n";
+            $finalPrompt .= "Susunlah balasan langsung untuk pesan/chat masuk di atas berdasarkan profil produk BentoCat, panduan marketing handbook, dan kerangka instruksi di bawah.\n\n";
+        }
         
         $finalPrompt .= "### PROFIL PRODUK BENTOCAT (KONTEKS BISNIS)\n";
         $finalPrompt .= "- Nama Produk: " . $productName . "\n";
