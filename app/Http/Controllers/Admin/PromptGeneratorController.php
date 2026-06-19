@@ -69,7 +69,23 @@ class PromptGeneratorController extends Controller
         $compiledPrompt = $template->base_prompt;
         if ($request->has('variables') && is_array($request->variables)) {
             foreach ($request->variables as $key => $value) {
-                $compiledPrompt = str_replace('{' . $key . '}', $value ?? '', $compiledPrompt);
+                $replacement = !is_null($value) && trim($value) !== '' 
+                    ? $value 
+                    : '[' . str_replace('_', ' ', ucwords($key, '_')) . ']';
+                $compiledPrompt = str_replace('{' . $key . '}', $replacement, $compiledPrompt);
+            }
+        }
+        
+        // Also fallback for any unsubmitted placeholders in the template
+        if (!empty($template->placeholders)) {
+            foreach (explode(',', $template->placeholders) as $key) {
+                $key = trim($key);
+                if (!empty($key) && !str_contains($compiledPrompt, '{' . $key . '}')) {
+                    // Check if placeholder is still present in curly braces in compiledPrompt
+                    // (which means it wasn't replaced because it wasn't in request->variables)
+                    $replacement = '[' . str_replace('_', ' ', ucwords($key, '_')) . ']';
+                    $compiledPrompt = str_replace('{' . $key . '}', $replacement, $compiledPrompt);
+                }
             }
         }
 

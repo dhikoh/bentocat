@@ -169,6 +169,44 @@ class AdminPromptGeneratorTest extends TestCase
         $this->assertStringContainsString('Miau Petshop', $response->json('prompt'));
     }
 
+    public function test_empty_variables_fallback_to_bracketed_placeholders()
+    {
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@bentocat.id',
+            'password' => bcrypt('password123'),
+            'role' => 'superadmin'
+        ]);
+
+        $template = MarketingTemplate::create([
+            'name' => 'Test Promo',
+            'category' => 'B2B',
+            'target_audience' => 'Petshops',
+            'tone' => 'Professional',
+            'placeholders' => 'nama_petshop,diskon_khusus',
+            'base_prompt' => 'Tawarkan ke {nama_petshop} dengan diskon {diskon_khusus}.'
+        ]);
+
+        // Submit with diskon_khusus as empty string
+        $response = $this->actingAs($admin)->postJson('/admin/prompt-generator/generate', [
+            'template_id' => $template->id,
+            'target_audience' => 'Owner Petshop Bandung',
+            'tone' => 'Sopan & Ramah',
+            'language' => 'Bahasa Indonesia',
+            'length' => 'Sedang (200 - 450 kata)',
+            'variables' => [
+                'nama_petshop' => 'Miau Petshop',
+                'diskon_khusus' => ''
+            ]
+        ]);
+
+        $response->assertStatus(200);
+        $prompt = $response->json('prompt');
+        $this->assertStringContainsString('Miau Petshop', $prompt);
+        $this->assertStringContainsString('[Diskon Khusus]', $prompt);
+    }
+
+
     public function test_can_perform_crud_on_marketing_templates()
     {
         $admin = User::create([
