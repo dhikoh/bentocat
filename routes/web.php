@@ -132,6 +132,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/prompt-generator/generate', [PromptGeneratorController::class, 'generate'])->name('prompt-generator.generate');
             Route::get('/prompt-generator/download', [PromptGeneratorController::class, 'downloadHandbook'])->name('prompt-generator.download');
             
+            // AJAX Customer History & Quick CRUD
+            Route::get('/prompt-generator/customers/{customer}/history', [PromptGeneratorController::class, 'getCustomerHistory'])->name('prompt-generator.customers.history');
+            Route::delete('/prompt-generator/history/{history}', [PromptGeneratorController::class, 'deleteHistory'])->name('prompt-generator.history.destroy');
+            Route::post('/prompt-generator/customers/quick-store', [PromptGeneratorController::class, 'quickStoreCustomer'])->name('prompt-generator.customers.quick-store');
+            Route::put('/prompt-generator/customers/{customer}/quick-update', [PromptGeneratorController::class, 'quickUpdateCustomer'])->name('prompt-generator.customers.quick-update');
+            Route::delete('/prompt-generator/customers/{customer}/quick-destroy', [PromptGeneratorController::class, 'quickDestroyCustomer'])->name('prompt-generator.customers.quick-destroy');
+            
             // CRUD Marketing Templates
             Route::get('/prompt-generator/templates', [PromptGeneratorController::class, 'indexTemplates'])->name('prompt-generator.templates.index');
             Route::get('/prompt-generator/templates/create', [PromptGeneratorController::class, 'createTemplate'])->name('prompt-generator.templates.create');

@@ -24,6 +24,11 @@ class CustomerProfile extends Model
         return $this->hasMany(LeadRequest::class, 'customer_id');
     }
 
+    public function promptHistories(): HasMany
+    {
+        return $this->hasMany(PromptHistory::class, 'customer_profile_id');
+    }
+
     public function latestMarketingLog()
     {
         return $this->hasOne(MarketingLog::class, 'customer_profile_id')->latestOfMany();

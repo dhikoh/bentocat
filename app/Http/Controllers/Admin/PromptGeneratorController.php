@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\MarketingTemplate;
+use App\Models\CustomerProfile;
+use App\Models\PromptHistory;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class PromptGeneratorController extends Controller
@@ -20,8 +23,9 @@ class PromptGeneratorController extends Controller
         $marketingSystem = Setting::get('prompt_marketing_system', "Kemitraan retail petshop lokal (distribusi offline dengan harga wajar tanpa biaya logistik marketplace yang mahal) serta kerja sama agen wilayah.");
         
         $templates = MarketingTemplate::all();
+        $customers = CustomerProfile::orderBy('nama', 'asc')->get();
 
-        return view('admin.prompt-generator.index', compact('productName', 'advantages', 'marketingSystem', 'templates'));
+        return view('admin.prompt-generator.index', compact('productName', 'advantages', 'marketingSystem', 'templates', 'customers'));
     }
 
     /**
@@ -54,6 +58,8 @@ class PromptGeneratorController extends Controller
             'tone' => 'required|string',
             'language' => 'required|string',
             'length' => 'required|string',
+            'emoji_style' => 'required|string|in:standard,none',
+            'customer_profile_id' => 'nullable|exists:customer_profiles,id',
             'variables' => 'nullable|array',
             'custom_notes' => 'nullable|string',
             'customer_chat' => 'nullable|string',
@@ -64,6 +70,12 @@ class PromptGeneratorController extends Controller
         $advantages = Setting::get('prompt_advantages', '');
         $marketingSystem = Setting::get('prompt_marketing_system', '');
         $whatsapp = Setting::get('contact_whatsapp', '+62 877-7771-7300');
+
+        // Load customer profile if selected
+        $customer = null;
+        if (!empty($request->customer_profile_id)) {
+            $customer = CustomerProfile::find($request->customer_profile_id);
+        }
 
         // Compile base prompt placeholders
         $compiledPrompt = $template->base_prompt;
@@ -81,8 +93,6 @@ class PromptGeneratorController extends Controller
             foreach (explode(',', $template->placeholders) as $key) {
                 $key = trim($key);
                 if (!empty($key) && !str_contains($compiledPrompt, '{' . $key . '}')) {
-                    // Check if placeholder is still present in curly braces in compiledPrompt
-                    // (which means it wasn't replaced because it wasn't in request->variables)
                     $replacement = '[' . str_replace('_', ' ', ucwords($key, '_')) . ']';
                     $compiledPrompt = str_replace('{' . $key . '}', $replacement, $compiledPrompt);
                 }
@@ -93,12 +103,40 @@ class PromptGeneratorController extends Controller
         $finalPrompt = "### SYSTEM INSTRUCTION & ROLE\n";
         $finalPrompt .= "Anda adalah asisten AI Pemasaran BentoCat ahli. Anda harus merespons instruksi ini secara akurat dengan merujuk dan menerapkan strategi-strategi yang tertulis dalam berkas \"marketing_skills_handbook.md\" yang diunggah oleh pengguna.\n\n";
 
+        // Human-like organic rules (Anti-Bot)
+        $finalPrompt .= "### KETENTUAN GAYA PENULISAN ORGANIK (ANTI-BOT / ANTI-SLOP)\n";
+        $finalPrompt .= "- TULISAN HARUS ORGANIK & ALAMI: Hindari sapaan robotik atau basa-basi khas AI (seperti 'Halo pet lovers!', 'Memperkenalkan...', 'Apakah Anda ingin...', 'Tentu, berikut adalah...'). Mulailah tulisan/pesan Anda secara langsung, luwes, bersahabat, empati, dan mengalir layaknya sales lapangan berpengalaman asli Indonesia.\n";
+        $finalPrompt .= "- STRUKTUR PARAGRAF: Gunakan paragraf pendek (maksimal 3-4 kalimat per paragraf) dengan kalimat yang ringkas agar mudah dipindai (scannable) oleh pembaca.\n";
+        $finalPrompt .= "- NARASI MENGALIR: Jangan salin-tempel daftar keunggulan BentoCat secara kaku beruntun. Integrasikan keunggulan tersebut ke dalam kalimat transisi yang natural.\n\n";
+
+        // Emoji styling rules
+        $finalPrompt .= "### ATURAN EMOJI & EMOTICON\n";
+        if ($request->emoji_style === 'none') {
+            $finalPrompt .= "- DILARANG keras menggunakan emoji, emoticon, ikon, atau simbol visual grafis apa pun dalam teks output. Teks harus benar-benar bersih (pure clean text).\n\n";
+        } else {
+            $finalPrompt .= "- Gunakan emoji secara taktis, wajar, proporsional, dan kontekstual hanya untuk mempercantik poin penting atau pemisah baris (hindari spam emoji di akhir setiap kalimat).\n\n";
+        }
+
         // Check if there is incoming customer chat
         if (!empty($request->customer_chat)) {
             $finalPrompt .= "### PESAN / CHAT MASUK DARI CUSTOMER (KONTEKS PERCAKAPAN)\n";
             $finalPrompt .= $request->customer_chat . "\n\n";
             $finalPrompt .= "### TUGAS KHUSUS RESPONS CHAT\n";
             $finalPrompt .= "Susunlah balasan langsung untuk pesan/chat masuk di atas berdasarkan profil produk BentoCat, panduan marketing handbook, dan kerangka instruksi di bawah.\n\n";
+        }
+
+        // Customer Profile context if selected
+        if ($customer) {
+            $finalPrompt .= "### PROFIL PELANGGAN SASARAN (KONTEKS PENERIMA)\n";
+            $finalPrompt .= "- Nama Pelanggan: " . $customer->nama . "\n";
+            $finalPrompt .= "- No. WhatsApp Pelanggan: " . $customer->whatsapp . "\n";
+            if (!empty($customer->alamat)) {
+                $finalPrompt .= "- Alamat Lengkap: " . $customer->alamat . "\n";
+            }
+            if (!empty($customer->kota)) {
+                $finalPrompt .= "- Kota/Wilayah: " . $customer->kota . " (" . $customer->provinsi . ")\n";
+            }
+            $finalPrompt .= "\n";
         }
         
         $finalPrompt .= "### PROFIL PRODUK BENTOCAT (KONTEKS BISNIS)\n";
@@ -126,7 +164,18 @@ class PromptGeneratorController extends Controller
         $finalPrompt .= "- Bahasa Output: " . $request->language . "\n";
         $finalPrompt .= "- Panjang Teks: " . $request->length . "\n";
         $finalPrompt .= "- Kontak WhatsApp Hubungi: " . $whatsapp . " (Sertakan jika relevan di bagian CTA).\n";
-        $finalPrompt .= "- Aturan Gaya Penulisan: Gunakan struktur penulisan natural, mengalir bebas, tidak kaku (hindari kalimat bergaya terjemahan literal), serta gunakan emoji secara proporsional dan profesional sesuai media.";
+
+        // Save generated prompt history if customer is selected
+        if ($customer) {
+            PromptHistory::create([
+                'customer_profile_id' => $customer->id,
+                'user_id' => auth()->id(),
+                'template_name' => $template->name,
+                'chat_input' => $request->customer_chat,
+                'variables' => $request->variables,
+                'generated_prompt' => $finalPrompt,
+            ]);
+        }
 
         if ($request->wantsJson()) {
             return response()->json(['prompt' => $finalPrompt]);
@@ -237,5 +286,100 @@ class PromptGeneratorController extends Controller
 
         return redirect()->route('admin.prompt-generator.templates.index')
             ->with('success', 'Template berhasil dihapus.');
+    }
+
+    /**
+     * AJAX: Get customer profile and prompt history.
+     */
+    public function getCustomerHistory($id)
+    {
+        $customer = CustomerProfile::findOrFail($id);
+        $history = PromptHistory::where('customer_profile_id', $id)
+            ->latest()
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'template_name' => $item->template_name,
+                    'chat_input' => $item->chat_input ?? '',
+                    'generated_prompt' => $item->generated_prompt,
+                    'created_at' => $item->created_at->translatedFormat('d M Y H:i'),
+                ];
+            });
+
+        return response()->json([
+            'customer' => $customer,
+            'history' => $history
+        ]);
+    }
+
+    /**
+     * AJAX: Delete a prompt history item.
+     */
+    public function deleteHistory($id)
+    {
+        $history = PromptHistory::findOrFail($id);
+        $history->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * AJAX: Quick store customer profile.
+     */
+    public function quickStoreCustomer(Request $request)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'whatsapp' => 'required|string|max:255',
+            'alamat' => 'nullable|string',
+            'provinsi' => 'nullable|string|max:255',
+            'kota' => 'nullable|string|max:255',
+        ]);
+
+        $validated['uuid'] = (string) Str::uuid();
+
+        $customer = CustomerProfile::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'customer' => $customer
+        ]);
+    }
+
+    /**
+     * AJAX: Quick update customer profile.
+     */
+    public function quickUpdateCustomer(Request $request, $id)
+    {
+        $customer = CustomerProfile::findOrFail($id);
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'whatsapp' => 'required|string|max:255',
+            'alamat' => 'nullable|string',
+            'provinsi' => 'nullable|string|max:255',
+            'kota' => 'nullable|string|max:255',
+        ]);
+
+        $customer->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'customer' => $customer
+        ]);
+    }
+
+    /**
+     * AJAX: Quick destroy customer profile.
+     */
+    public function quickDestroyCustomer($id)
+    {
+        $customer = CustomerProfile::findOrFail($id);
+        $customer->delete();
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 }
