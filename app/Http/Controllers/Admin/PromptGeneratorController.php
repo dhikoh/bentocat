@@ -92,7 +92,7 @@ class PromptGeneratorController extends Controller
         if (!empty($template->placeholders)) {
             foreach (explode(',', $template->placeholders) as $key) {
                 $key = trim($key);
-                if (!empty($key) && !str_contains($compiledPrompt, '{' . $key . '}')) {
+                if (!empty($key) && str_contains($compiledPrompt, '{' . $key . '}')) {
                     $replacement = '[' . str_replace('_', ' ', ucwords($key, '_')) . ']';
                     $compiledPrompt = str_replace('{' . $key . '}', $replacement, $compiledPrompt);
                 }
@@ -338,6 +338,7 @@ class PromptGeneratorController extends Controller
         ]);
 
         $validated['uuid'] = (string) Str::uuid();
+        $validated['alamat'] = $validated['alamat'] ?? '-';
 
         $customer = CustomerProfile::create($validated);
 
@@ -361,6 +362,8 @@ class PromptGeneratorController extends Controller
             'provinsi' => 'nullable|string|max:255',
             'kota' => 'nullable|string|max:255',
         ]);
+
+        $validated['alamat'] = $validated['alamat'] ?? '-';
 
         $customer->update($validated);
 

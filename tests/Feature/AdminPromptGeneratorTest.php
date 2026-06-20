@@ -7,6 +7,8 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\MarketingTemplate;
 use App\Models\Setting;
+use App\Models\CustomerProfile;
+use App\Models\PromptHistory;
 
 class AdminPromptGeneratorTest extends TestCase
 {
@@ -106,13 +108,13 @@ class AdminPromptGeneratorTest extends TestCase
             'base_prompt' => 'Tawarkan ke {nama_petshop} dengan harga {harga}.'
         ]);
 
-        // Test HTML Response with customer_chat
         $response = $this->actingAs($admin)->post('/admin/prompt-generator/generate', [
             'template_id' => $template->id,
             'target_audience' => 'Owner Petshop Bandung',
             'tone' => 'Sopan & Ramah',
             'language' => 'Bahasa Indonesia',
             'length' => 'Sedang (200 - 450 kata)',
+            'emoji_style' => 'standard',
             'variables' => [
                 'nama_petshop' => 'Miau Petshop',
                 'harga' => 'Rp 50.000'
@@ -159,6 +161,7 @@ class AdminPromptGeneratorTest extends TestCase
             'tone' => 'Sopan & Ramah',
             'language' => 'Bahasa Indonesia',
             'length' => 'Sedang (200 - 450 kata)',
+            'emoji_style' => 'standard',
             'variables' => [
                 'nama_petshop' => 'Miau Petshop'
             ]
@@ -194,6 +197,7 @@ class AdminPromptGeneratorTest extends TestCase
             'tone' => 'Sopan & Ramah',
             'language' => 'Bahasa Indonesia',
             'length' => 'Sedang (200 - 450 kata)',
+            'emoji_style' => 'standard',
             'variables' => [
                 'nama_petshop' => 'Miau Petshop',
                 'diskon_khusus' => ''
@@ -308,6 +312,7 @@ class AdminPromptGeneratorTest extends TestCase
             'tone' => 'Sopan & Ramah',
             'language' => 'Bahasa Indonesia',
             'length' => 'Sedang (200 - 450 kata)',
+            'emoji_style' => 'standard',
             'variables' => [
                 'nama_petshop' => 'Miau Petshop'
             ]
@@ -364,5 +369,201 @@ class AdminPromptGeneratorTest extends TestCase
     {
         $this->seed(\Database\Seeders\MarketingTemplateSeeder::class);
         $this->assertDatabaseCount('marketing_templates', 8);
+    }
+
+    public function test_can_generate_prompt_with_customer_and_saves_history()
+    {
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@bentocat.id',
+            'password' => bcrypt('password123'),
+            'role' => 'superadmin'
+        ]);
+
+        $customer = CustomerProfile::create([
+            'uuid' => 'test-uuid-123',
+            'nama' => 'Budi Petshop',
+            'whatsapp' => '08123456789',
+            'alamat' => 'Jl. Kucing No. 10',
+            'provinsi' => 'Jawa Barat',
+            'kota' => 'Bandung'
+        ]);
+
+        $template = MarketingTemplate::create([
+            'name' => 'Promo B2B',
+            'category' => 'B2B',
+            'target_audience' => 'Petshops',
+            'tone' => 'Professional',
+            'placeholders' => 'nama_petshop',
+            'base_prompt' => 'Tawarkan ke {nama_petshop}.'
+        ]);
+
+        $response = $this->actingAs($admin)->postJson('/admin/prompt-generator/generate', [
+            'template_id' => $template->id,
+            'target_audience' => 'Owner Petshop Bandung',
+            'tone' => 'Sopan & Ramah',
+            'language' => 'Bahasa Indonesia',
+            'length' => 'Sedang (200 - 450 kata)',
+            'emoji_style' => 'standard',
+            'customer_profile_id' => $customer->id,
+            'variables' => [
+                'nama_petshop' => 'Miau Petshop'
+            ],
+            'customer_chat' => 'Mau beli BentoCat dong.'
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('prompt_histories', [
+            'customer_profile_id' => $customer->id,
+            'template_name' => 'Promo B2B',
+            'chat_input' => 'Mau beli BentoCat dong.'
+        ]);
+    }
+
+    public function test_can_generate_prompt_without_emojis_when_emoji_style_is_none()
+    {
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@bentocat.id',
+            'password' => bcrypt('password123'),
+            'role' => 'superadmin'
+        ]);
+
+        $template = MarketingTemplate::create([
+            'name' => 'Promo B2B',
+            'category' => 'B2B',
+            'target_audience' => 'Petshops',
+            'tone' => 'Professional',
+            'placeholders' => 'nama_petshop',
+            'base_prompt' => 'Tawarkan ke {nama_petshop}. 😊🐱'
+        ]);
+
+        $response = $this->actingAs($admin)->postJson('/admin/prompt-generator/generate', [
+            'template_id' => $template->id,
+            'target_audience' => 'Owner Petshop Bandung',
+            'tone' => 'Sopan & Ramah',
+            'language' => 'Bahasa Indonesia',
+            'length' => 'Sedang (200 - 450 kata)',
+            'emoji_style' => 'none',
+            'variables' => [
+                'nama_petshop' => 'Miau Petshop'
+            ]
+        ]);
+
+        $response->assertStatus(200);
+        $prompt = $response->json('prompt');
+        
+        // Check that the instruction forbids emojis
+        $this->assertStringContainsString('DILARANG keras menggunakan emoji', $prompt);
+    }
+
+    public function test_can_perform_quick_customer_ajax_crud()
+    {
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@bentocat.id',
+            'password' => bcrypt('password123'),
+            'role' => 'superadmin'
+        ]);
+
+        // Store
+        $response = $this->actingAs($admin)->postJson('/admin/prompt-generator/customers/quick-store', [
+            'nama' => 'Anto Petshop',
+            'whatsapp' => '08777777777',
+            'alamat' => 'Jl. Anjing No. 1',
+            'provinsi' => 'DKI Jakarta',
+            'kota' => 'Jakarta Barat'
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true
+        ]);
+        $this->assertDatabaseHas('customer_profiles', [
+            'nama' => 'Anto Petshop',
+            'whatsapp' => '628777777777' // setWhatsappAttribute cleans and formats
+        ]);
+
+        $customer = CustomerProfile::where('nama', 'Anto Petshop')->first();
+
+        // Update
+        $response = $this->actingAs($admin)->putJson("/admin/prompt-generator/customers/{$customer->id}/quick-update", [
+            'nama' => 'Anto Petshop Updated',
+            'whatsapp' => '08777777777',
+            'alamat' => 'Jl. Anjing No. 2',
+            'provinsi' => 'DKI Jakarta',
+            'kota' => 'Jakarta Pusat'
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true
+        ]);
+        $this->assertDatabaseHas('customer_profiles', [
+            'id' => $customer->id,
+            'nama' => 'Anto Petshop Updated',
+            'alamat' => 'Jl. Anjing No. 2'
+        ]);
+
+        // Destroy
+        $response = $this->actingAs($admin)->deleteJson("/admin/prompt-generator/customers/{$customer->id}/quick-destroy");
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true
+        ]);
+        $this->assertDatabaseMissing('customer_profiles', [
+            'id' => $customer->id
+        ]);
+    }
+
+    public function test_can_fetch_and_delete_prompt_history_via_ajax()
+    {
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@bentocat.id',
+            'password' => bcrypt('password123'),
+            'role' => 'superadmin'
+        ]);
+
+        $customer = CustomerProfile::create([
+            'uuid' => 'test-uuid-456',
+            'nama' => 'Cici Petshop',
+            'whatsapp' => '08123456789',
+            'alamat' => 'Jl. Alamat'
+        ]);
+
+        $history = PromptHistory::create([
+            'customer_profile_id' => $customer->id,
+            'user_id' => $admin->id,
+            'template_name' => 'Promo B2B',
+            'chat_input' => 'Test chat',
+            'generated_prompt' => 'Test prompt'
+        ]);
+
+        // Get History
+        $response = $this->actingAs($admin)->getJson("/admin/prompt-generator/customers/{$customer->id}/history");
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'customer',
+            'history' => [
+                '*' => [
+                    'id',
+                    'template_name',
+                    'chat_input',
+                    'generated_prompt',
+                    'created_at'
+                ]
+            ]
+        ]);
+
+        // Delete History
+        $response = $this->actingAs($admin)->deleteJson("/admin/prompt-generator/history/{$history->id}");
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true
+        ]);
+        $this->assertDatabaseMissing('prompt_histories', [
+            'id' => $history->id
+        ]);
     }
 }
