@@ -5,46 +5,57 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Distributor;
 use App\Models\City;
+use App\Models\Province;
 
 class DistributorSeeder extends Seeder
 {
     public function run(): void
     {
-        $distributionCities = [
-            'Blitar' => [
-                'nama' => 'BentoCat Distributor Blitar (Pusat)',
-                'pic' => 'Pak Joko',
-                'whatsapp' => '081234567890',
-                'alamat' => 'Jl. Sudirman No. 45, Kepanjenkidul, Kota Blitar, Jawa Timur'
+        $distributorsData = [
+            [
+                'nama' => 'BentoCat Indonesia',
+                'pic' => 'Admin BentoCat Indonesia',
+                'whatsapp' => '6287777717300',
+                'alamat' => 'Blitar',
+                'provinsi_name' => 'Banten',
+                'city_name' => 'Tangerang', // fallback city in Banten
             ],
-            'Surabaya' => [
-                'nama' => 'BentoCat Distributor Surabaya',
-                'pic' => 'Ibu Maria',
-                'whatsapp' => '081345678901',
-                'alamat' => 'Ruko Juanda Raya No. 12, Sidoarjo / Surabaya'
+            [
+                'nama' => 'Gukguk Meong',
+                'pic' => 'Admin Gukguk Meong',
+                'whatsapp' => '6281905222223',
+                'alamat' => 'Jl. Kampung Baris No.505, Karangturi, Kec. Semarang Tim., Kota Semarang, Jawa Tengah 50124',
+                'provinsi_name' => 'Jawa Tengah',
+                'city_name' => 'Semarang',
             ],
-            'Depok' => [
-                'nama' => 'BentoCat Distributor Depok & Jakarta Selatan',
-                'pic' => 'Pak Andi',
-                'whatsapp' => '081456789012',
-                'alamat' => 'Jl. Margonda Raya No. 200, Beji, Kota Depok'
+            [
+                'nama' => 'Aulia Petshop',
+                'pic' => 'Admin Aulia Petshop',
+                'whatsapp' => '6282132395055',
+                'alamat' => 'Jl. Ahmad Yani No.2A, Jambean, Sukorejo, Kec. Bojonegoro, Kabupaten Bojonegoro, Jawa Timur 62115',
+                'provinsi_name' => 'Jawa Timur',
+                'city_name' => 'Bojonegoro',
             ],
-            'Bandung' => [
-                'nama' => 'BentoCat Distributor Priangan (Bandung)',
-                'pic' => 'Kang Asep',
-                'whatsapp' => '081567890123',
-                'alamat' => 'Jl. Soekarno-Hatta No. 500, Buahbatu, Kota Bandung'
-            ],
-            'Tangerang' => [
-                'nama' => 'BentoCat Distributor Banten (Tangerang)',
-                'pic' => 'Pak Hendra',
-                'whatsapp' => '081678901234',
-                'alamat' => 'Bumi Serpong Damai (BSD) Sektor 4, Tangerang'
+            [
+                'nama' => 'Cherry Petshop',
+                'pic' => 'Admin Cherry Petshop',
+                'whatsapp' => '6282180888077',
+                'alamat' => 'Jl. Jend. A. Yani, Merening Wetan, Kedawung, Kec. Kroya, Kabupaten Cilacap, Jawa Tengah 53282',
+                'provinsi_name' => 'Jawa Tengah',
+                'city_name' => 'Cilacap',
             ]
         ];
 
-        foreach ($distributionCities as $cityName => $data) {
-            $city = City::where('nama', $cityName)->first();
+        foreach ($distributorsData as $data) {
+            $city = City::where('nama', $data['city_name'])->first();
+            if (!$city) {
+                // Find any city in the province if specific city is not found
+                $province = Province::where('nama', $data['provinsi_name'])->first();
+                if ($province) {
+                    $city = City::where('provinsi_id', $province->id)->first();
+                }
+            }
+
             if ($city) {
                 Distributor::create([
                     'kota_id' => $city->id,
@@ -52,10 +63,11 @@ class DistributorSeeder extends Seeder
                     'pic' => $data['pic'],
                     'whatsapp' => $data['whatsapp'],
                     'alamat' => $data['alamat'],
-                    'tampil_ke_publik' => true,
+                    'tampil_ke_publik' => false, // Distributor Semua disembunyikan
                     'status' => 'ACTIVE'
                 ]);
             }
         }
     }
 }
+

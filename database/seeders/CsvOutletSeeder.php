@@ -224,9 +224,9 @@ class CsvOutletSeeder extends Seeder
             'Kulonprogo' => 'DI Yogyakarta'
         ];
 
-        // Default distributor (Pusat = id 1)
-        $distributor = Distributor::where('nama', 'like', '%Pusat%')->first();
-        $distributorId = $distributor ? $distributor->id : 1;
+        // Default distributor (Pusat)
+        $distributor = Distributor::where('nama', 'BentoCat Indonesia')->first();
+        $distributorId = $distributor ? $distributor->id : (Distributor::first() ? Distributor::first()->id : 1);
 
         $file = fopen($csvPath, 'r');
         $header = fgetcsv($file);
@@ -325,7 +325,7 @@ class CsvOutletSeeder extends Seeder
                 $outlet->longitude = $lng;
                 $outlet->is_mitra = ($isMitraString === 'ya');
                 $outlet->featured = false;
-                $outlet->is_hidden = false;
+                $outlet->is_hidden = !$outlet->is_mitra; // Petshop Non Mitra Semuanya Disembunyikan
                 $outlet->status = 'AKTIF';
                 $outlet->delivery_mode = 'SELF_DELIVERY';
 

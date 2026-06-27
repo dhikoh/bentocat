@@ -1211,7 +1211,7 @@ class OutletSeeder extends Seeder
         ];
 
         // Central distributor fallback
-        $centralDistributor = Distributor::where('nama', 'like', '%Pusat%')->first();
+        $centralDistributor = Distributor::where('nama', 'BentoCat Indonesia')->first() ?: Distributor::first();
 
         foreach ($outletsData as $data) {
             $city = City::where('nama', $data['city_name'])->first();
@@ -1241,6 +1241,7 @@ class OutletSeeder extends Seeder
                     'google_maps_url' => $data['google_maps_url'],
                     'featured' => $data['featured'],
                     'is_mitra' => $data['is_mitra'],
+                    'is_hidden' => !$data['is_mitra'], // Petshop Non Mitra Semuanya Disembunyikan
                     'status' => 'AKTIF',
                     'delivery_mode' => $data['delivery_mode']
                 ]);
