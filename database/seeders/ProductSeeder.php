@@ -14,9 +14,12 @@ class ProductSeeder extends Seeder
         $product = Product::create([
             'nama' => 'BentoCat Premium Bentonite Cat Litter',
             'slug' => Str::slug('BentoCat Premium Bentonite Cat Litter'),
-            'thumbnail' => 'bentocat.png',
-            'deskripsi' => 'Pasir kucing bentonite premium dengan daya serap tinggi, gumpal kuat, dan aroma premium tahan lama untuk menjaga kebersihan rumah Anda.',
-            'status' => 'ACTIVE'
+            'thumbnail' => 'https://drive.google.com/file/d/1ejK9Gr1E6XNpJGgaulF9bDo0GLy8v0nU/view?usp=drive_link',
+            'deskripsi' => "BentoCat Premium Bentonite Cat Litter adalah pasir kucing bentonite berkualitas tinggi (ultra-premium) yang dirancang khusus untuk kenyamanan kucing kesayangan Anda dan kebersihan rumah yang maksimal.\n\nKeunggulan BentoCat Premium:\n- Daya Serap Cairan Ekstra Cepat & Kuat: Pasir langsung menggumpal dengan kokoh saat terkena cairan, mencegah kebocoran ke dasar bak pasir dan mempermudah proses pembersihan.\n- Kontrol Bau Maksimal (Odour Control): Dilengkapi dengan teknologi pengikat bau dan aroma premium yang segar dan tahan lama, menjaga ruangan tetap wangi.\n- Formula Bebas Debu (99.9% Dust Free): Aman untuk sistem pernapasan kucing maupun pemiliknya, serta meminimalkan jejak kaki berdebu di lantai.\n- Alami & Ramah Lingkungan: Terbuat dari 100% bentonite alami pilihan yang aman bagi kesehatan kucing Anda.\n\nHadir dalam varian aroma menyegarkan Lavender, Lemon, Apel, Melon, dan Strawberry, dengan pilihan kemasan praktis ukuran 5.5, 10, dan 25.",
+            'status' => 'ACTIVE',
+            'label_level_1' => 'Kategori',
+            'label_level_2' => 'Aroma',
+            'label_level_3' => 'Kemasan'
         ]);
 
         // Level 1: Category
@@ -28,8 +31,8 @@ class ProductSeeder extends Seeder
         ]);
 
         // Level 2: Aromas
-        $aromas = ['Lavender', 'Lemon', 'Apple', 'Strawberry', 'Melon'];
-        $sizes = ['5.5 kg', '10 kg', '25 kg'];
+        $aromas = ['Lavender', 'Lemon', 'Apel', 'Melon', 'Strawberry'];
+        $sizes = ['5.5', '10', '25'];
 
         foreach ($aromas as $aroma) {
             $aromaVariant = ProductVariant::create([
@@ -51,3 +54,4 @@ class ProductSeeder extends Seeder
         }
     }
 }
+
